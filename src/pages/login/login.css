@@ -1,0 +1,88 @@
+#background{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+#background img:nth-child(1){
+  height: 100%;
+  opacity: 60%;
+}
+
+#background div.bg-text {
+  display: grid;
+  grid-template-columns: 100%;
+  color: white;
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  text-align: right;
+}
+
+#background div.bg-text h6{
+  margin: 6px;
+}
+
+#login{
+  border-radius: 8px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: white;
+  box-shadow: 4px 4px var(--active);
+
+  position: absolute;
+  width: 320px; height: 360px;
+  top: 20%; left: 32px;
+
+  background-color: var(--background-d);
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+div.top{
+  text-align: center;
+}
+
+div form{
+  display: grid;
+  grid-template-columns: 100%;
+}
+
+div form input{
+  background-color: var(--element-c1);
+  border-color: #00000000;
+  height: 28px;
+  color: var(--element-c3);
+  font-size: 18px;
+  margin: 0px;
+
+  padding: 0% 3% 0% 3%;
+
+}
+
+div form p{
+  font-size: 16px;
+  color: var(--element-c2);
+  margin: 8px;
+
+}
+
+div button{
+  width: 100%;
+
+  background-color: var(--highlight);
+  color: var(--element-c1);
+  height: 32px;
+  margin-top: 40px;
+}
+
+div.controls{
+  position: absolute;
+  display: grid;
+  grid-template-columns: auto auto;
+  width: 50%; left: 25%;
+}
+
+div.controls h6:nth-child(2){
+  color: var(--highlight)
+}

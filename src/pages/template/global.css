@@ -1,0 +1,21 @@
+*{
+  padding: 0px;
+}
+
+:root{
+  --background: #0F0A36;
+  --background-d: #0F0A367F;
+  --element-c1: #140F38;
+  --element-c2: #7A77A3;
+  --element-c2d: #7A77A33F;
+  --element-c3: #c7c4ea;
+  --highlight: #00FCCA;
+
+  --active: #020120;
+  --none: #02012000;
+}
+
+body{
+  background-color: var(--background);
+  color: white;
+}
