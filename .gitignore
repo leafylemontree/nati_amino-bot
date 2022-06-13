@@ -17,3 +17,4 @@ out.txt
 node_modules*
 pack*
 index.js
+git_token.txt
