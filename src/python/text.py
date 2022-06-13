@@ -47,7 +47,8 @@ msg_text = {
             "doxxea"        : "[cbu]--doxxea\n[c]═══════════.♥.═\n\n[c]Este comando no lo usaría ni con mis peores enemigos. Permite doxxear a varios usuarios a la vez, para ellos deben ser mencionados.",
             "boku"          : "[cbu]boku\n[c]═══════════.♥.═\n\n[c]Turbio quien haya escrito esto...",
             "grasa"         : "[cbu]grasa\n[c]═══════════.♥.═\n\n[c]Esto es para todos los grasosos que ponen un  :v salvaje. Si le dan coanfitrión al bot, puede sacar los usuarios del chat."
-        }
+        },
+    'enter' : ["[cb]─────── ♡ ───────\n[cb]꒱࿐♡ WELCOME˚.*ೃ\n[c]Usuario N° ", "\n\n[c]Espero tengas una bonita\n[c]estadía aquí en el chat,\n[c]no olvides leer las reglas\n[c]o de otra manera se les\n[c]sacará del chat hasta\n[c]nuevo aviso o permanente.\n[c]Cualquier queja o pre-\n[c]gunta hacérselo saber\n[c]al anfi o coanfitriones,\n[c]resolverán tus problemas\n[c]lo más puntual que puedan.\n[c]°｡ ፝֯֟⋆๑ ૮ ˶ᵔ ᵕ ᵔ˶ ა ⸙❛◌̥◞\n[cb]─────── ♡ ───────\n[c]:¨·.·¨:\n[c]`·.‎‏"]
     }
 
 with open("../json/text.json", "w+") as textfile:

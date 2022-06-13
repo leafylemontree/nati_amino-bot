@@ -87,15 +87,15 @@ class c:
         return tape_f.main(msg).decode('ascii')
 
     def database(mode, uid, *, name="none"):
-        uid     = uid.encode("ascii")
-        name    = name.encode("ascii")
+        uid     = uid.encode("utf-8")
+        name    = name.encode("utf-8")
         result  = c_db.main(mode, uid, name);
-        result  = result.decode("ascii")
+        result  = result.decode("utf-8")
         return result
 
     def get_word(mode):
         print(mode)
         result = words.main(mode)
-        result = result.decode("ascii")
+        result = result.decode("utf-8")
         print(result)
         return result.upper()
