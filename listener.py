@@ -20,9 +20,33 @@ def main():
 
     @bot.event(message_types=api.MessageType.ALL, media_types=api.MediaType.ALL)
     async def on_message(ctx: Context):
-        # server.send(ctx)
+        try:
+            if ctx.msg.content.find("Good day. I want") != -1:
+                await ctx.client.delete_message(
+                    chat_id=ctx.msg.threadId,
+                    message_id=ctx.msg.messageId
+                    )
+                await ctx.client.kick_from_chat(
+                    ctx.msg.threadId,
+                    ctx.msg.author.uid,
+                    allow_rejoin=False
+                )
+                return
+            if ctx.msg.author.nickname.find("mambll_") != -1:
+                await ctx.client.kick_from_chat(
+                    ctx.msg.threadId,
+                    ctx.msg.author.uid,
+                    allow_rejoin=False
+                    )
+                return
+        except Exception:
+            pass
         reply = await commands.message(ctx);
         return
+
+    #@bot.event()
+    #async def on_mention(ctx: Context):
+    #    return
 
     try:
         bot.start();

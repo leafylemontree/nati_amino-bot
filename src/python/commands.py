@@ -8,6 +8,12 @@ from local_webscraping import web_tools
 import bot_objects
 from c_func import c
 import bot_objects as bot_o
+import threading
+import time
+import asyncio
+from aiofile import async_open, AIOFile
+
+from antispam import AS
 
 msg_text = None
 status = None
@@ -34,24 +40,33 @@ class commands:
         global status, msg_text
         reply = bot_o.Reply(None, False)
 
-        try: print(f"--------------------------------\n{ctx.msg.author.nickname}\n{ctx.msg.content}\n{ctx.msg.isHidden} {ctx.msg.type}")
-        except Exception: pass
 
         if ctx.msg.type == 101:                     return       await subCommands.enter(ctx)
-        elif ctx.msg.type == 102:                   return       await subCommands.leave(ctx)
-        elif ctx.msg.type in [108, 109, 113, 114] : return       await subCommands.strange(ctx)
-        
+        #elif ctx.msg.type == 102:                   return       await subCommands.leave(ctx)
+        #elif ctx.msg.type in [108, 109, 113, 114] : return       await subCommands.strange(ctx)
+       
+        await AS.detect_all(ctx)
 
         msg = ctx.msg.content;
-        nick = ctx.msg.author.nickname;
+        nick = ""
+        if ctx.msg.author:   nick = ctx.msg.author.nickname
         if msg is None: return None;
         com = msg.upper()
 
         if   ctx.msg.author.uid in status.wordle.get_users() :                               reply = await commands.wordle(ctx, com)
         elif status.challenge.check_user(ctx.msg.author.uid) :                               reply = await commands.challenge(ctx, com, 1)
-        await subCommands.repetition(ctx, msg)
+        #await subCommands.repetition(ctx, msg)
+        #await subCommands.link_spam(ctx)
 
-        if   com.find("NATI") == 0:                                                 reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
+        if com.find("-CH_ID") == 0:
+            reply.msg = ctx.msg.threadId
+            print(ctx.msg.threadId)
+
+        if   com.find("--SETLOG") == 0 :                                            reply.msg =  await AS.set_logging(ctx)
+        elif com.find("--BAN") == 0:                                                reply.msg = await AS.ban_user(ctx)
+        elif com.find("--UNBAN") == 0:                                              reply.msg = await AS.unban_user(ctx)
+        elif com.find("NATI")   == 0:                                               reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
+        elif com.find("ARTEMIS") == 0:                                              reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
         elif com.find("--NANO") == 0 :                                              reply.msg = msg_text['nano']
         elif msg.find("http://aminoapps.com/c/Manhvi") == 0:                        reply.msg = "¡Alto ahi!\n\nEse mensaje parece ser spam."
         elif com.find("--WORDLE") == 0:                                             reply     = await commands.wordle(ctx, com)
@@ -66,7 +81,7 @@ class commands:
         elif com.find("--MATRIX") == 0:                                             reply.msg = c.matrix(com)
         elif com.find("--ALIAS") == 0:                                              reply.msg = await subCommands.alias(ctx, msg)
         elif com.find("--EMBED") == 0:                                              reply.msg = await subCommands.embed(ctx)
-        # elif com.find("--GHOST") == 0:                                            reply.msg = await subCommands.ghost(ctx, msg)
+        elif com.find("--GHOST") == 0:                                            reply.msg = await subCommands.ghost(ctx, msg)
         elif com.find("--CUTES") == 0:                                              reply     = await commands.cutes(ctx, com)
         elif com.find("--COPYPASTE") == 0:                                          reply     = await commands.copypaste(ctx, msg)
         elif com.find("--JOIN") == 0:                                               reply     = await subCommands.join(ctx, msg)
@@ -76,7 +91,7 @@ class commands:
         elif com.find("--INFO") == 0 :                                              reply     = await subCommands.userInfo(ctx)
         elif com.find("PLEBEYOS") != -1 :                                           reply.msg = f"{msg_text['plebeyos']} {nick}"
         elif com.find("LA NAVE") != -1 :                                            reply.msg = msg_text['la_nave']
-        elif com.find("--HELP") == 0:                                               reply     = subCommands.help(msg)
+        elif com.find("--HELP") == 0:                                               reply     = subCommands.help(msg, ctx.msg.ndcId)
         elif com == "--NOMBRE":                                                     reply.msg = f"[c]Tu nombre es:\n\n[c]{nick}";
         elif ((msg.find("--say") < 5) & (msg.find("--say") != -1)) :                reply.msg = msg[6:]
         elif ((com.find("KIWILATIGO") != -1) | (com.find("KIWILÁTIGO") != -1)):     reply     = subCommands.kiwilatigo(ctx)
@@ -92,11 +107,15 @@ class commands:
         # elif com.find("--SUS") == 0:                                              reply['audio'] = 'media/amongus.mp3'
         elif com.find("--DOXX") == 0:                                               reply     = await commands.doxx(ctx, 0)
         elif com.find("DOXXEA A") != -1:                                            reply     = await commands.doxx(ctx, 1)
-        elif subCommands.papulince(com):                                            reply = await subCommands.kick(ctx, msg_text['grasa'])
-
+        elif com.find("--THREADID") == 0:                                           reply.msg = ctx.msg.threadId
+        elif com.find("--COMID") == 0:                                              reply.msg = str(ctx.msg.ndcId)
+        #elif subCommands.papulince(com):                                            reply = await subCommands.kick(ctx, msg_text['grasa'])
+        elif com.find("Y LOS RESULTADOS?") != -1:                                   reply.msg = "Y los blogs?"
 
         if   ((reply.msg is not None) & (reply.reply is True))           : await ctx.reply(reply.msg)
         elif ((reply.msg is not None) & (reply.reply is False))          : await ctx.send(reply.msg)
+
+        #if reply.msg is not None: print(ctx.msg.author.nickname, ctx.msg.content)
         return None;
 
     async def doxx(ctx, mode):
@@ -226,24 +245,24 @@ class commands:
         print(f"num = {num}")
 
         if com[1].find("KISS") != -1:
-            with open(f'media/cutes/kiss/{str(num)}.gif', 'rb') as file:
-                 gif = file.read()
+            async with AIOFile(f'media/cutes/kiss/{str(num)}.gif', 'rb') as file:
+                 gif = await file.read()
                  await ctx.send_gif(gif)
 
             c.database(12, user.uid)
             c.database(22, ctx.msg.author.uid)
             reply.msg = f"<$@{nick_usr_1}$> le da un beso a <$@{nick_usr_2}$>"
         elif com[1].find("HUG") != -1:
-            with open(f'media/cutes/hug/{str(num)}.gif', 'rb') as file:
-                 gif = file.read()
+            async with AIOFile(f'media/cutes/hug/{str(num)}.gif', 'rb') as file:
+                 gif = await file.read()
                  await ctx.send_gif(gif)
 
             c.database(11, user.uid)
             c.database(21, ctx.msg.author.uid)
             reply.msg = f"<$@{nick_usr_1}$> le da un abrazo a <$@{nick_usr_2}$>"
         elif com[1].find("PAT") != -1 :
-            with open(f'media/cutes/pat/{str(num)}.gif', 'rb') as file:
-                 gif = file.read()
+            async with AIOFile(f'media/cutes/pat/{str(num)}.gif', 'rb') as file:
+                 gif = await file.read()
                  await ctx.send_gif(gif)
 
             c.database(13, user.uid)
@@ -592,8 +611,17 @@ Este usuario ha hecho {usr_db.kiwi} furias del kiwi.
 
         return bot_o.Reply(msg, False)
     async def enter(ctx):
+        if ctx.msg.author.nickname.find("mamb") != -1 : return None
         thread = await ctx.get_chat_info()
         msg = f"{msg_text['enter'][0]}{thread.membersCount}{msg_text['enter'][1]}<$@{ctx.msg.author.nickname}$>"
+        
+        #try:
+        
+        #await subCommands.wait_to_disable(ctx)
+        
+        #except:
+        #    pass
+
         embed = Embed(
                 title="Bella personita",
                 object_type=0,
@@ -638,10 +666,29 @@ Este usuario ha hecho {usr_db.kiwi} furias del kiwi.
                                     embed=embed,
                                     link_snippets_list=None,
                                     reply=None)       
+        print("Fantasma")
+
+        embed = Embed(
+                title="Malhechor:",
+                object_type=0,
+                object_id=ctx.msg.author.uid,
+                content=f"Mensaje tipo: {ctx.msg.type}"
+            )
+        await ctx.client.send_message( message=msg,
+                                    chat_id="ba533e76-a58e-0e2d-28d1-b939968a356b",
+                                    message_type=0,
+                                    ref_id=None,
+                                    mentions=None,
+                                    embed=embed,
+                                    link_snippets_list=None,
+                                    reply=None)     
+        print("Enviado")
         return bot_o.Reply(None, True)
-    def help(com):
+    def help(com, comId):
         msg = com.split(" ")
-        if      len(msg) == 1:          return bot_o.Reply(msg_text['help']['default'], False)
+        
+        if ( (len(msg) == 1) & (comId == 112646170) ):          return bot_o.Reply(msg_text['help']['default'].replace("Nati", "Artemis"), False)
+        elif      len(msg) == 1:          return bot_o.Reply(msg_text['help']['default'], False)
 
         msg = msg[1].lower()
 
@@ -734,6 +781,8 @@ Este usuario ha hecho {usr_db.kiwi} furias del kiwi.
         c.database(32, ctx.msg.author.uid)
         return bot_o.Reply(f"[ci]¡Oh no! Han hecho enfadar a {ctx.msg.author.nickname}\n\n[ci]/c skpa.", False)
     async def chatInfo(ctx):
+        user = await ctx.get_user_info()
+        if ((user.role == 0) & (user.uid != "17261eb7-7fcd-4af2-9539-dc69c5bf2c76")): return bot_o.Reply("Usted no está autorizado para ejercer este comando", False)
         thread = await ctx.get_chat_info()
         userCount = thread.membersCount
 
@@ -747,8 +796,6 @@ Este usuario ha hecho {usr_db.kiwi} furias del kiwi.
             for j in users:
                 uidList.append(j.uid)
 
-        user = await ctx.get_user_info()
-        if ((user.role == 0) & (user.uid != "17261eb7-7fcd-4af2-9539-dc69c5bf2c76")): return bot_o.Reply("Usted no está autorizado para ejercer este comando", False)
 
         await ctx.client.send_message(  message="Mencionando usuarios...",
                                     chat_id=ctx.msg.threadId,
@@ -825,7 +872,7 @@ Este usuario ha hecho {usr_db.kiwi} furias del kiwi.
 
         if len(messages[threadId]) < 3: return
        
-        print(messages[threadId])
+        #print(messages[threadId])
         if ((messages[threadId][0] == messages[threadId][1]) & (messages[threadId][1] == messages[threadId][2])):
            
             print("Mensajes iguales")
@@ -870,5 +917,14 @@ Este es el usuario"""
             messages[threadId].pop(0)
 
         return
-
-
+    async def wait_to_disable(ctx):
+        await ctx.client.set_view_only_chat(
+                    chat_id=ctx.msg.threadId,
+                    view_only='enable'
+                )
+        time.sleep(3)
+        await ctx.client.set_view_only_chat(
+                    chat_id=ctx.msg.threadId,
+                    view_only='disable'
+                )
+        return

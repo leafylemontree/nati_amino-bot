@@ -3,35 +3,63 @@ import pathlib
 # import struct
 # import array
 
-path = str(pathlib.Path(__file__).parent.resolve())
-path = path[:(len(path) - 6)] + "c/"
-
-matrMul = ctypes.cdll.LoadLibrary(f"{path}matrMul.so")
-matrAdd = ctypes.cdll.LoadLibrary(f"{path}matrAdd.so")
-math_f  = ctypes.cdll.LoadLibrary(f"{path}math_f.so")
-tape_f  = ctypes.cdll.LoadLibrary(f"{path}tape.so")
-c_db  = ctypes.cdll.LoadLibrary(f"{path}database.so")
-words  = ctypes.cdll.LoadLibrary(f"{path}words.so")
-
-matrMul.main.argtypes  = (ctypes.c_char_p, )
-matrMul.main.restype   = ctypes.c_char_p
-
-matrAdd.main.argtypes  = (ctypes.c_char_p, )
-matrAdd.main.restype   = ctypes.c_char_p
-
-math_f.main.argtypes  = (ctypes.c_int, ctypes.c_int, ctypes.c_char_p)
-math_f.main.restype   = ctypes.c_float
-
-tape_f.main.argtypes  = (ctypes.c_char_p, )
-tape_f.main.restype   = ctypes.c_char_p
-
-c_db.main.argtypes  = (ctypes.c_int, ctypes.c_char_p, ctypes.c_char_p)
-c_db.main.restype   = ctypes.c_char_p
-
-words.main.argtypes  = (ctypes.c_int, )
-words.main.restype   = ctypes.c_char_p
-
 class c:
+    
+    matrMul = None
+    matrSum = None
+    math_f  = None
+    tape_f  = None
+    c_db    = None
+    words   = None
+
+    
+    def init_c(): 
+        global matrMul, matrSum, math_f, tape_f, c_db, words
+
+        path = str(pathlib.Path(__file__).parent.resolve())
+        path = path[:(len(path) - 6)] + "c/"
+        
+        # Matrix multiplication
+        matrMul = ctypes.cdll.LoadLibrary(f"{path}matrMul.so")
+        matrMul.main.argtypes  = (ctypes.c_char_p, )
+        matrMul.main.restype   = ctypes.c_char_p
+
+        # Matrix addition
+        matrAdd = ctypes.cdll.LoadLibrary(f"{path}matrAdd.so")
+        matrAdd.main.argtypes  = (ctypes.c_char_p, )
+        matrAdd.main.restype   = ctypes.c_char_p
+
+        # Math resolver
+        math_f  = ctypes.cdll.LoadLibrary(f"{path}math_f.so")
+        math_f.main.argtypes  = (
+                                        ctypes.c_int,
+                                        ctypes.c_int,
+                                        ctypes.c_char_p
+                                     )
+        math_f.main.restype   = ctypes.c_float
+
+        # Math "tape" mode
+        tape_f  = ctypes.cdll.LoadLibrary(f"{path}tape.so")
+        tape_f.main.argtypes  = (ctypes.c_char_p, )
+        tape_f.main.restype   = ctypes.c_char_p
+
+        # database interactions
+        c_db  = ctypes.cdll.LoadLibrary(f"{path}database.so")
+        c_db.main.argtypes  = (
+                                        ctypes.c_int,
+                                        ctypes.c_char_p,
+                                        ctypes.c_char_p
+                                    )
+        c_db.main.restype   = ctypes.c_char_p
+
+        # get a random word
+        words  = ctypes.cdll.LoadLibrary(f"{path}words.so")
+        words.main.argtypes  = (ctypes.c_int, )
+        words.main.restype   = ctypes.c_char_p
+
+        print("C code libraries initialized")
+
+    init_c()
 
     def matrix(msg):
         msg = msg[9:]
@@ -77,7 +105,7 @@ class c:
         elif    msg[0] == "COS" :        result = math_f.main( 8, l, c_in)
         elif    msg[0] == "TAN" :        result = math_f.main( 9, l, c_in)
         elif    msg[0] == "INV" :        result = math_f.main(10, l, c_in)
-        else:                              result = "Nada"
+        else:                            result = f"El argumento '{msg[0]}' no corresponde a un comando válido."
 
 
         return str(result)
@@ -99,3 +127,6 @@ class c:
         result = result.decode("utf-8")
         print(result)
         return result.upper()
+
+#class f:
+
