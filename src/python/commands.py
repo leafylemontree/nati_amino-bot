@@ -14,6 +14,10 @@ import asyncio
 from aiofile import async_open, AIOFile
 
 from antispam import AS
+from manage import Image
+from objects import Objects
+import os
+import sys
 
 msg_text = None
 status = None
@@ -39,7 +43,7 @@ class commands:
     async def message(ctx: Context):
         global status, msg_text
         reply = bot_o.Reply(None, False)
-
+        img   = None
 
         if ctx.msg.type == 101:                     return       await subCommands.enter(ctx)
         #elif ctx.msg.type == 102:                   return       await subCommands.leave(ctx)
@@ -62,13 +66,13 @@ class commands:
             reply.msg = ctx.msg.threadId
             print(ctx.msg.threadId)
 
-        if   com.find("--SETLOG") == 0 :                                            reply.msg =  await AS.set_logging(ctx)
+        if   com.find("--SETLOG") == 0 :                                            reply.msg = await AS.set_logging(ctx)
         elif com.find("--BAN") == 0:                                                reply.msg = await AS.ban_user(ctx)
         elif com.find("--UNBAN") == 0:                                              reply.msg = await AS.unban_user(ctx)
+        elif com.find("--CHECK") == 0:                                              reply.msg = await AS.check_wall(ctx)
         elif com.find("NATI")   == 0:                                               reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
         elif com.find("ARTEMIS") == 0:                                              reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
         elif com.find("--NANO") == 0 :                                              reply.msg = msg_text['nano']
-        elif msg.find("http://aminoapps.com/c/Manhvi") == 0:                        reply.msg = "¡Alto ahi!\n\nEse mensaje parece ser spam."
         elif com.find("--WORDLE") == 0:                                             reply     = await commands.wordle(ctx, com)
         elif com.find("--RETAR") == 0:                                              reply     = await commands.challenge(ctx, com, 0)
         elif ((com.find("--SIGUEME") == 0) | (com.find("--SÍGUEME") == 0)) :        reply     = await subCommands.follow(ctx)
@@ -89,8 +93,8 @@ class commands:
         elif com.find("--MATH") == 0:                                               reply     = subCommands.replyMsg( c.math(com) )
         elif com.find("--BLOGS") == 0:                                              reply     = await subCommands.getBlogs(ctx, com)
         elif com.find("--INFO") == 0 :                                              reply     = await subCommands.userInfo(ctx)
-        elif com.find("PLEBEYOS") != -1 :                                           reply.msg = f"{msg_text['plebeyos']} {nick}"
-        elif com.find("LA NAVE") != -1 :                                            reply.msg = msg_text['la_nave']
+        elif com.find("PLEBEYOS") == 0 :                                           reply.msg = f"{msg_text['plebeyos']} {nick}"
+        elif com.find("LA NAVE") == 0 :                                            reply.msg = msg_text['la_nave']
         elif com.find("--HELP") == 0:                                               reply     = subCommands.help(msg, ctx.msg.ndcId)
         elif com == "--NOMBRE":                                                     reply.msg = f"[c]Tu nombre es:\n\n[c]{nick}";
         elif ((msg.find("--say") < 5) & (msg.find("--say") != -1)) :                reply.msg = msg[6:]
@@ -109,11 +113,19 @@ class commands:
         elif com.find("DOXXEA A") != -1:                                            reply     = await commands.doxx(ctx, 1)
         elif com.find("--THREADID") == 0:                                           reply.msg = ctx.msg.threadId
         elif com.find("--COMID") == 0:                                              reply.msg = str(ctx.msg.ndcId)
-        #elif subCommands.papulince(com):                                            reply = await subCommands.kick(ctx, msg_text['grasa'])
+        elif com.find("--LOG") == 0:                                                reply.msg = await AS.logConfig(ctx)
+        elif com.find("--ABSTRACT") == 0:                                           img       = await subCommands.abstractImage(ctx)
+#elif subCommands.papulince(com):                                            reply = await subCommands.kick(ctx, msg_text['grasa'])
         elif com.find("Y LOS RESULTADOS?") != -1:                                   reply.msg = "Y los blogs?"
+        elif com.find("--EXIT") != -1: sys.exit()
 
         if   ((reply.msg is not None) & (reply.reply is True))           : await ctx.reply(reply.msg)
         elif ((reply.msg is not None) & (reply.reply is False))          : await ctx.send(reply.msg)
+
+        if  img:
+            async with AIOFile(img, 'rb') as file:
+                 img = await file.read()
+                 await ctx.send_image(img)
 
         #if reply.msg is not None: print(ctx.msg.author.nickname, ctx.msg.content)
         return None;
@@ -928,3 +940,66 @@ Este es el usuario"""
                     view_only='disable'
                 )
         return
+    async def abstractImage(ctx):
+        steps = 64
+
+        msg = ctx.msg.content
+        if msg.find(" ") != -1:
+            msg = msg.split(" ")[1]
+            try:
+                steps = int(msg)
+            except:
+                pass
+            if steps > 100000: steps = 100000 
+       
+        
+        #def imgPscLoop(loop, ctx, steps):
+        #    asyncio.set_event_loop(loop)
+        #    asyncio.run(subCommands.abstractImageProcessing(ctx, steps))
+        await subCommands.abstractImageProcessing(ctx, steps)   
+
+        return "result.png"
+
+    async def abstractImageProcessing(ctx, steps):
+        img = Image("test", 512, 512)
+        col = Objects.c_Color(255, 255, 255, 255)
+        img.generate(col)
+        print(f"steps {steps}")
+        
+        a = [1, 510, 510]
+        b = [1, 510, 510]
+
+        try:
+
+            for i in range(steps):
+                col = Objects.c_Color(
+                int(random()*255),
+                int(random()*255),
+                int(random()*255),
+                255)
+
+                a = [
+                    a[1],
+                    a[2], 
+                1+int(random()*510),
+                    ]
+
+                b = [
+                    a[1],
+                    a[2], 
+                1+int(random()*510),
+                    ]
+            
+                img.draw.triangle(img, col, 
+                    a[0],
+                    b[0],
+                    a[1],
+                    b[1],
+                    a[2],
+                    b[2],
+                    )
+            img.write()
+            img.free()
+        except Exception:
+            pass
+        return "result.png" 
