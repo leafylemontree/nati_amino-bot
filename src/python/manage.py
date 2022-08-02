@@ -6,11 +6,11 @@ from random import random
 import os
 import time
 
-imgfc = ctypes.cdll.LoadLibrary("/home/user/new-bot/src/c/img_plotter.so")
+imgfc = ctypes.cdll.LoadLibrary("src/c/img_plotter.so")
 
 
 class Image(ctypes.Structure):
-    
+
     _fields_ = [
                  ('name',   ctypes.c_char_p),
                  ('width',  ctypes.c_int),
@@ -23,7 +23,7 @@ class Image(ctypes.Structure):
         self.name   = name.encode("utf-8")
         self.width  = width
         self.height = height
-        self.data   = None 
+        self.data   = None
         self.draw   = Draw
         self.render = None
         self.effect = None
@@ -33,7 +33,7 @@ class Image(ctypes.Structure):
         imgfc.generateBlank.restype = ctypes.c_int
         r = imgfc.generateBlank(ctypes.byref(self), ctypes.byref(color))
         return r
-    
+
     def write(self):
         imgfc.imageWrite.argtypes = (ctypes.POINTER(Image),)
         imgfc.imageWrite.restype = ctypes.c_int
@@ -52,4 +52,3 @@ class Image(ctypes.Structure):
         imgfc._free.restype = ctypes.c_int
         r = imgfc._free(ctypes.byref(self))
         return r
-
