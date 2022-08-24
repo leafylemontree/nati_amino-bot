@@ -1,8 +1,0 @@
-img_plotter is not distributed in this package.
-
-You can, if you want, download the git repository
-https://github.com/bvaleria02/img_plotter
-and then, compile it by
-gcc -fPIC -shared img_plotter.so image.c
-
-The version used here is a fork of it, mostly to add support to python
