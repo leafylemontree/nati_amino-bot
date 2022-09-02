@@ -80,6 +80,15 @@ async def config(ctx):
                 if chatId in Config.no_fun:
                     Config.no_fun.remove(chatId)
                     out = "Modo Orwelliano desactivado"
+        elif msg[1] == "-SAFE":
+            if    msg[2] in Config._true :
+                if chatId not in Config.safe_mode:
+                    Config.safe_mode.append(chatId)
+                    out = "Modo seguro activado"
+            elif  msg[2] in Config._false:
+                if chatId in Config.safe_mode:
+                    Config.safe_mode.remove(chatId)
+                    out = "Modo seguro desactivado"
         
         Config.write()
         await ctx.send(out)

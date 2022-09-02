@@ -12,9 +12,9 @@ def main():
 
     @bot.event(message_types=api.MessageType.ALL, media_types=api.MediaType.ALL)
     async def on_message(ctx: Context):
-        global loop
-        if loop is False: loop = asyncio.get_event_loop()
-        subprocess.run(loop, ctx)
+        #global loop
+        #if loop is False: loop = asyncio.get_event_loop()
+        #subprocess.run(loop, ctx)
         await commands.message(ctx);
 
     bot.start();

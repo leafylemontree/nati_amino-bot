@@ -1,3 +1,4 @@
+from __future__ import annotations
 import time
 import threading
 import json
@@ -27,6 +28,7 @@ class Config:
     slow_mode        = []
     only_staff       = []
     no_fun           = []
+    safe_mode        = []
     
     _true   = ["1", "ON", "TRUE", "ENABLE", "YES", "SI"]
     _false  = ["0", "OFF", "FALSE", "DISABLE", "NO"]
@@ -45,6 +47,7 @@ class Config:
         Config.slow_mode       = a['slow']
         Config.only_staff      = a['staff']
         Config.no_fun          = a['1984']
+        Config.safe_mode       = a['safe']
         return
     
     def write():
@@ -56,6 +59,7 @@ class Config:
             "slow"   : Config.slow_mode,
             "staff"  : Config.only_staff,
             "1984"   : Config.no_fun,
+            "safe"   : Config.safe_mode,
                 }
         with open("data/config.json", "w+") as fp:
             json.dump(a, fp, indent=4)

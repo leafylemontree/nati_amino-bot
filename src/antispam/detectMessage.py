@@ -22,9 +22,9 @@ async def findContent(content, comId=None):
         if content.upper().find("{}") != -1            : warnings.append("111")
         if len(content) > 3200                         : warnings.append("151") 
 
-        #if int(comId) in AS.ignore_coms:
-        #    if "102" in warnings: warnings.remove("102")
-        #    if "103" in warnings: warnings.remove("103")
+        if int(comId) in AS.ignore_coms:
+            if "102" in warnings: warnings.remove("102")
+            if "103" in warnings: warnings.remove("103")
         return warnings
 
 async def msgType(mtype, content=None, author=None):
@@ -33,7 +33,7 @@ async def msgType(mtype, content=None, author=None):
         if mtype in [58, 108, 109, 110, 113, 114] :
             if author  is None                 : pass 
             if content is None                 : pass 
-            warnings.append("200")
+            else                               : warnings.append("200")
         return warnings
 
 async def detectAll(ctx):

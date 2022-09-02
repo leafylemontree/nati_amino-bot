@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import aiohttp
 import asyncio
+from src import utils
 
 DEEP_AI_API_KEY = "1815b770-ab06-40c2-9481-4934e7de0c4c"
 
@@ -30,7 +31,8 @@ class web_tools:
 -------------------
 {content}
 """[:2000]
-
+    
+    @utils.safe
     def generateText(msg):
         global DEEP_AI_API_KEY
 
@@ -73,7 +75,9 @@ class web_tools:
         parr     = web_tools.utils.getText(text, '<div class="lazysocialbuttons"')
         return f"[cb]{title}\n\n{parr}"[:2000]
 
-    def horoscopo(msg):
+    @utils.safe
+    async def horoscopo(ctx):
+        msg = ctx.msg.content
         msg = msg.split(" ")
         if len(msg) < 2 : return "Horóscopo de hoy. Si deseas saber sobre tu signo, ponlo después del comando, así:\n\n--horoscopo cancer"
         msg[1] = msg[1].lower()

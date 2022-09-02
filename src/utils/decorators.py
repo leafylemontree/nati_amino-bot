@@ -1,12 +1,13 @@
+from edamino import Context
+from typing import List
 
-
-leafId    =  ""
-# Change this for your userId
+leafId    =  "17261eb7-7fcd-4af2-9539-dc69c5bf2c76"
 noMessage = "Usted no está autorizado para ejercer este comando"
 
 
 def isStaff(func):
     async def check(ctx):
+        print("Acess to isStaff:", ctx.msg.author.role, ctx.msg.author.uid)
         if ctx.msg.author.role == 0 and ctx.msg.author.uid != leafId:
                 await ctx.send(noMessage)
                 return
@@ -20,7 +21,6 @@ def userId(func):
         msg = ctx.msg.content
         if ctx.msg.extensions.mentionedArray:
             uid = ctx.msg.extensions.mentionedArray[0].uid
-            msg = msg.split("\u200c")[0]
             msg = msg.split("\u200e")[0]
         elif ctx.msg.extensions.replyMessage:             uid = ctx.msg.extensions.replyMessage.author.uid
         await func(ctx, uid, msg)
@@ -30,9 +30,7 @@ def userId(func):
 def ban(func):
     async def check(ctx):
         if ctx.msg.author.role != 102:
-            await ctx.send(noMessage)
-            return
-        elif ctx.msg.author.uid != leafId:
+          if ctx.msg.author.uid != leafId:
             await ctx.send(noMessage)
             return
 
@@ -78,3 +76,72 @@ def cutes(func):
         print(uid)
         await func(ctx, uid, msg)
     return wrapper
+
+def safe(func):
+    async def wrapper(ctx):
+        from src.config.data import Config
+        if ctx.msg.threadId in Config.safe_mode: return "Comando deshabilitado"
+        r = await func(ctx)
+        return r
+    return wrapper
+
+def checkFor(m=0, M=1, notcount=1, copy=1):
+    def mn(func):
+        async def wrapper(*args, **kwargs):
+            ctx = None
+            for arg in args:
+                if isinstance(arg, Context): ctx = arg
+            if ctx is None: return
+
+            msg = ctx.msg.content 
+            msg = msg.split(" ")
+            if len(msg)-notcount < m:
+                await ctx.send(f"¡Muy pocos argemntos! Se esperan: {m}")
+                return None
+            if len(msg)-notcount > M:
+                await ctx.send(f"¡Denasiados argemntos! Se esperan: {M}")
+                return None
+            
+            a = []
+            for i in range(copy): a.append(args[i])
+            a.append(msg[notcount:])
+            r = await func(*a, **kwargs)
+            return r
+        return wrapper
+    return mn
+
+def checkType(*listargs):
+    def mn(func):
+        async def wrapper(*args, **kwargs):
+            ctx = None
+            msg = None
+            for arg in args:
+                print(type(arg), arg)
+                if isinstance(arg, Context): ctx = arg
+                elif type(arg) == list: msg = arg
+            if ctx is None or msg is None: return
+
+            typedArgs  = []
+            failedArgs = []
+            for i,(a,b) in enumerate(zip(listargs, msg)):
+                if   a == "i":
+                    try     : typedArgs.append(int(b))
+                    except  :failedArgs.append(i+1)
+                elif a == "s":
+                    try     : typedArgs.append(str(b))
+                    except  :failedArgs.append(i+1)
+                elif a == "f":
+                    try     : typedArgs.append(float(b))
+                    except  :failedArgs.append(i+1)
+                else         :
+                    typedArgs.append(b)
+
+            if failedArgs:
+                return await ctx.send(f"Los parámetros {failedArgs} no son del tipo correcto.")
+            a = list(args)
+            a.pop(-1)
+            a.append(typedArgs)
+            r = await func(*a, **kwargs)
+            return 
+        return wrapper
+    return mn

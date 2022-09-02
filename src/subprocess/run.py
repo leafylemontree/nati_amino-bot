@@ -28,9 +28,9 @@ def run(loop, ctx):
 
     if Process.clock is False:
         Process.set(1, True)
-        p2 = multiprocessing.Process(target=clock, args=(loop,))
         try:
-                p2.start()
+            p2 = threading.Thread(target=clock, args=(loop,ctx))
+            p2.start()
         except Exception:
                 Process.set(1, False)
     return

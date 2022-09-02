@@ -37,22 +37,22 @@ async def register_user(comId, userId):
         if (dif > 30):  return False
         return True
 
-async def banUser(ctx, userId, ndcId):
+async def banUser(ctx, userId, ndcId, reasons):
     chatId = None
-    if str(ndcId) in AS.ban_no_warn.keys():
-        chatId = AS.ban_no_warn[str(ndcId)]
+    if ndcId in AS.ban_no_warn:
+        chatId = AS.logging_chat[str(ndcId)]
     else: return
-
-    try:
-        await ctx.client.ban(
-                        user_id=ctx.msg.author.uid,
-                        reason=f"Baneado automáticamente por razones: {msg_type}"
+    print("user detected", userId)
+    #try:
+    await ctx.client.ban(
+                        user_id=userId,
+                        reason=f"Baneado automáticamente por razones: {reasons}"
                         )
-        user = await ctx.client.get_user_info(user_id=uid)
-        await ctx.client.send_message(message=f"""
+    user = await ctx.client.get_user_info(user_id=userId)
+    await ctx.client.send_message(message=f"""
 Se ha baneado a {user.nickname}
-Motivo: {msg_type}
-ID: {uid}
+Motivo: {reasons}
+ID: {userId}
 ----------
 Para desbanear, solo responda este mensaje y ponga --unban
 """,
@@ -63,10 +63,10 @@ Para desbanear, solo responda este mensaje y ponga --unban
                                     embed=None,
                                     link_snippets_list=None,
                                     reply=None )
-        return True
-    except Exception:
-        user = await ctx.client.get_user_info(user_id=userId)
-        if user.role != 102: await ctx.send("Ha activado el modo de expulsar sin advertencia, sin embargo, el bot no posee del cargo de líder, por lo que no puede expulsar.\n\nPuede desactivar este mensaje desactivando el modo con este comando:\n--log -normal")
+    return True
+    #except Exception:
+    user = await ctx.client.get_user_info(user_id=userId)
+    if user.role != 102: await ctx.send("Ha activado el modo de expulsar sin advertencia, sin embargo, el bot no posee del cargo de líder, por lo que no puede expulsar.\n\nPuede desactivar este mensaje desactivando el modo con este comando:\n--log -normal")
     return
 
 async def sendLog(ctx, warnings):
@@ -87,7 +87,7 @@ async def sendLog(ctx, warnings):
     print(comId, AS.logging_chat[comId])
 
     if await register_user(ctx.msg.ndcId, ctx.msg.author.uid) : return
-    if int(comId) in AS.ban_no_warn: await banUser(ctx, ctx.msg.author.uid. ctx.msg.ndcId)
+    if int(comId) in AS.ban_no_warn: await banUser(ctx, ctx.msg.author.uid, ctx.msg.ndcId, str(warnings))
     
     base_msg = f"""Posible amenaza detectada:
 ------------------

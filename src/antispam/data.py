@@ -1,7 +1,11 @@
 import json
 
 class AS:
-    whitelist = ['f1b18fdc-2d6a-44f3-a421-32f70a7868e2', 'a884053e-32fd-4bfb-89eb-99727de19090']
+    whitelist = [
+            'f1b18fdc-2d6a-44f3-a421-32f70a7868e2',
+            'a884053e-32fd-4bfb-89eb-99727de19090',
+            "7b0d5e02-cee4-4b80-a3d8-939b8e2ccd28"
+            ]
 
     logging_chat = {}
     
@@ -28,6 +32,9 @@ class AS:
         print("no_warns:", no_warnings)
         stalkList   = o['stalk']
         print("stalks:", stalkList)
+    
+    with open("data/com_chatlist.json", "r") as fp:
+        logging_chat = json.load(fp)
     
     async def save_config():
         o = {

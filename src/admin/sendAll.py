@@ -1,7 +1,8 @@
 from src.antispam.data import AS
+from src.utils.decorators import leafId
 
 async def send_all(ctx):
-        if user.uid != "17261eb7-7fcd-4af2-9539-dc69c5bf2c76": return await ctx.send("Usted no está autorizado para ejercer este comando")
+        if ctx.msg.author.uid != leafId: return await ctx.send("Usted no está autorizado para ejercer este comando")
         msg = ctx.msg.content[10:]
         for comId,chatId in AS.logging_chat.items():
             try:

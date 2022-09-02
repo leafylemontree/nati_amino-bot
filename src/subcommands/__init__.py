@@ -9,3 +9,6 @@ from .call          import everyone, staff
 from .sus           import sus
 from .webScrape     import web_tools 
 from ._math         import *
+from .doxx          import doxx
+from .copypaste     import copypaste
+from .wordle        import wordle, status

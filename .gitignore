@@ -1,16 +1,18 @@
 media/amongus.mp3
-media/cutes/hug/*
-media/cutes/kiss/*
-media/cutes/pat/*
+media/cutes/*.png
+media/cutes/*.gif
 media
 
-src/c/*.so
+*.so
 src/fortran
-src/python/__pycache__
+*__pycache__*
 src/python/images_manipulation.py
 database/*
 database_old/*
 main
+result.png
+wiki.png
+*.raw*
 
 out.txt
 .env

@@ -6,6 +6,7 @@ from src import config
 from src import subcommands
 from src import admin
 from src import images
+from src import games
 from src.text import text
 
 def login():
@@ -36,9 +37,6 @@ async def message(ctx: Context):
         nick = ""
         if ctx.msg.author:   nick = ctx.msg.author.nickname
 
-        #if   ctx.msg.author.uid in status.wordle.get_users() :                               reply = await commands.wordle(ctx, com)
-        #elif status.challenge.check_user(ctx.msg.author.uid) :                               reply = await commands.challenge(ctx, com, 1)
-
         if   com.find("--SETLOG") == 0 :                                            reply.msg = await antispam.set_logging(ctx)
         elif com.find("--BAN") == 0:                                                reply.msg = await antispam.ban_user(ctx)
         elif com.find("--UNBAN") == 0:                                              reply.msg = await antispam.unban_user(ctx)
@@ -54,8 +52,9 @@ async def message(ctx: Context):
             elif com.find("EMMA") == 0 and ctx.msg.ndcId == 215907772:                  reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("ANYA") == 0 and ctx.msg.ndcId == 139175768:                  reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("--NANO") == 0 :                                              reply.msg = text['nano']
-             #elif com.find("--WORDLE") == 0:                                           reply     = await commands.wordle(ctx, com)
-            #elif com.find("--RETAR") == 0:                                             reply     = await commands.challenge(ctx, com, 0)
+            elif com.find("--JUEGOS") == 0:                                             await games.main(ctx)
+            elif com.find("-J") == 0:                                                   await games.turn(ctx)
+            elif com.find("--WORDLE") == 0:                                           reply     = await commands.wordle(ctx, com)
             elif ((com.find("--SIGUEME") == 0) | (com.find("--SÍGUEME") == 0)) :        reply     = await subcommands.follow(ctx)
             elif com.find("--COMPLETAR") == 0:                                          reply.msg = subcommands.web_tools.generateText(msg[7:])
             elif com.find("--BIBLIA") == 0:                                             reply.msg = subcommands.web_tools.bible(msg)
@@ -78,7 +77,7 @@ async def message(ctx: Context):
             elif com.find("--HELP") == 0:                                               reply     = subcommands._help(msg, ctx.msg.ndcId)
             elif com == "--NOMBRE":                                                     reply.msg = f"[c]Tu nombre es:\n\n[c]{nick}";
             elif ((msg.find("--say") < 5) & (msg.find("--say") != -1)) :                reply.msg = msg[6:]
-            #elif ((com.find("KIWILATIGO") != -1) | (com.find("KIWILÁTIGO") != -1)):     reply     = subcommands.kiwilatigo(ctx)
+            elif ((com.find("KIWILATIGO") != -1) | (com.find("KIWILÁTIGO") != -1)):     reply     = subcommands.kiwilatigo(ctx)
             elif com.find("--NORMAS") == 0  :                                           reply.msg = text['normas']
             elif com.find("--SOPORTE") == 0  :                                          reply.msg = "support.aminoapps.com/hc/es-419/requests/new?from_aminoapp=1"
             elif com.find("--CENTRO") == 0  :                                           reply.msg = "support.aminoapps.com/hc/es-419?from_aminoapp=1"
@@ -90,8 +89,8 @@ async def message(ctx: Context):
             elif com.find("--PLATYPUS") == 0:                                           reply.msg = text['platypus'][int(random() * 2)]
             elif com.find("--METH") == 0:                                               reply.msg = text['meth']
             elif com.find("--SUS") == 0:                                                reply.msg = await subcommands.sus(ctx)
-            #elif com.find("--DOXX") == 0:                                               reply     = await commands.doxx(ctx, 0)
-            #elif com.find("DOXXEA A") != -1:                                            reply     = await commands.doxx(ctx, 1)
+            elif com.find("--DOXX") == 0:                                               reply     = await commands.doxx(ctx, 0)
+            elif com.find("DOXXEA A") != -1:                                            reply     = await commands.doxx(ctx, 1)
             elif com.find("--THREADID") == 0:                                           reply.msg = ctx.msg.threadId
             elif com.find("--COMID") == 0:                                              reply.msg = str(ctx.msg.ndcId)
             elif com.find("--LOG") == 0:                                                reply.msg = await config.logConfig(ctx)
