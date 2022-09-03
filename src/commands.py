@@ -56,12 +56,12 @@ async def message(ctx: Context):
             elif com.find("-J") == 0:                                                   await games.turn(ctx)
             elif com.find("--WORDLE") == 0:                                           reply     = await commands.wordle(ctx, com)
             elif ((com.find("--SIGUEME") == 0) | (com.find("--SÍGUEME") == 0)) :        reply     = await subcommands.follow(ctx)
-            elif com.find("--COMPLETAR") == 0:                                          reply.msg = subcommands.web_tools.generateText(msg[7:])
-            elif com.find("--BIBLIA") == 0:                                             reply.msg = subcommands.web_tools.bible(msg)
-            elif ((com.find("--HOROSCOPO")==0)|(com.find("--HORÓSCOPO")==0)):           reply.msg = subcommands.web_tools.horoscopo(msg)
+            elif com.find("--COMPLETAR") == 0:                                          reply.msg = await subcommands.web_tools.generateText(ctx)
+            elif com.find("--BIBLIA") == 0:                                             reply.msg = await subcommands.web_tools.bible(ctx)
+            elif ((com.find("--HOROSCOPO")==0)|(com.find("--HORÓSCOPO")==0)):           reply.msg = await subcommands.web_tools.horoscopo(ctx)
             elif com.find("--LETRA") == 0                                   :           reply.msg = subcommands.web_tools.lyrics(msg)
             elif com.find("--DEF") == 0:                                                reply.msg = subcommands.web_tools.definition(msg)
-            elif com.find("--WIKI") == 0:                                               reply.msg = await subcommands.web_tools.wiki(msg)
+            elif com.find("--WIKI") == 0:                                               reply.msg = await subcommands.web_tools.wiki(ctx)
             elif com.find("--MATRIX") == 0:                                             reply.msg = subcommands._math.matrix(com)
             elif com.find("--ALIAS") == 0:                                              reply.msg = await subcommands.alias(ctx, msg)
             elif com.find("--GHOST") == 0:                                              reply.msg = await subcommands.ghost(ctx, msg)
@@ -89,8 +89,8 @@ async def message(ctx: Context):
             elif com.find("--PLATYPUS") == 0:                                           reply.msg = text['platypus'][int(random() * 2)]
             elif com.find("--METH") == 0:                                               reply.msg = text['meth']
             elif com.find("--SUS") == 0:                                                reply.msg = await subcommands.sus(ctx)
-            elif com.find("--DOXX") == 0:                                               reply     = await commands.doxx(ctx, 0)
-            elif com.find("DOXXEA A") != -1:                                            reply     = await commands.doxx(ctx, 1)
+            elif com.find("--DOXX") == 0:                                               reply     = await subcommands.doxx(ctx, 0)
+            elif com.find("DOXXEA A") != -1:                                            reply     = await subcommands.doxx(ctx, 1)
             elif com.find("--THREADID") == 0:                                           reply.msg = ctx.msg.threadId
             elif com.find("--COMID") == 0:                                              reply.msg = str(ctx.msg.ndcId)
             elif com.find("--LOG") == 0:                                                reply.msg = await config.logConfig(ctx)

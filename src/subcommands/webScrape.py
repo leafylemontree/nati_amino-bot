@@ -7,8 +7,8 @@ from src import utils
 DEEP_AI_API_KEY = "1815b770-ab06-40c2-9481-4934e7de0c4c"
 
 class web_tools:
-    async def wiki(msg):
-        
+    async def wiki(ctx):
+        msg = ctx.msg.content 
         if msg.find(" ")== -1: return "Debe ingresar un contenido cual buscar"
         msg = msg.split(" ")[1:]
         msg = "_".join(msg)
@@ -33,8 +33,9 @@ class web_tools:
 """[:2000]
     
     @utils.safe
-    def generateText(msg):
+    async def generateText(ctx):
         global DEEP_AI_API_KEY
+        msg = ctx.msg.content[7:] 
 
         response = requests.post(
                 "https://api.deepai.org/api/text-generator",
@@ -44,7 +45,8 @@ class web_tools:
         text = response.json()
         return text['output']
 
-    def bible(msg):
+    async def bible(ctx):
+        msg = ctx.msg.content 
         msg = msg.split(" ")
         libro     = ""
         capitulo  = -1
@@ -173,10 +175,3 @@ class web_tools:
             # print(text)
             return rep
 
-
-
-async def main():
-    await web_tools.wiki("--wiki web api")
-
-loop = asyncio.new_event_loop()
-loop.run_until_complete(main())
