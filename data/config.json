@@ -1,9 +1,17 @@
 {
     "check": [],
-    "welcome": [],
-    "goodbye": [],
-    "bot": [],
-    "slow": [],
-    "staff": [],
-    "safe": []
+    "welcome": [
+    ],
+    "goodbye": [
+    ],
+    "bot": [
+    ],
+    "slow": [
+    ],
+    "staff": [
+    ],
+    "1984": [
+    ],
+    "safe": [
+    ]
 }
