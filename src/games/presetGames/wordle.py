@@ -2,11 +2,12 @@ from .base import BaseInstance
 import cairo
 from src.images.funcs import *
 from aiofile import AIOFile
+from src.utils.database import get_word
 
 class Wordle(BaseInstance):
 
     class data:
-        word        = "ARBOL"
+        word        = ""
         keys        = []
         turn        = 0
         state       = 0
@@ -28,7 +29,7 @@ class Wordle(BaseInstance):
         cr.paint()
         cr.restore()
 
-        name = self.players[self.data.turn][1]
+        name = self.players[(self.data.turn-1) % len(self.players)][1]
         cr.move_to(160, 48)
         cr.set_source_rgb(1, 1, 1)
         cr.set_font_size(40)
@@ -76,12 +77,24 @@ class Wordle(BaseInstance):
         if len(self.data.keys) < 6 and self.data.keys[-1] == self.data.word:
             self.data.turn += 1
             self.data.keys = []
+            while True:
+                self.data.word = get_word(5)
+                if len(self.data.word) == 5: break
             return True
         return False
 
     async def lose(self):
-        if len(self.data.keys) > 5 and self.data.keys[-1] != self.data.word:
+        if len(self.data.keys) > 4 and self.data.keys[-1] != self.data.word:
             self.data.turn += 1
             self.data.keys = []
             return True
         return False
+
+
+    def start(self):
+        self.run         = True
+        self.auth.isOpen = False
+        if self.data.word == "":
+            while True:
+                self.data.word = get_word(5)
+                if len(self.data.word) == 5: break

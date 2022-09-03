@@ -70,8 +70,10 @@ Jugadores:
             auth = Auth(None, True, "PUBLICA", ctx.msg.author.nickname, ctx.msg.author.uid)
 
         if   msg[0].upper() == "AHORCADO": data = Hangman
-        if   msg[0].upper() == "WORDLE"  : data = Wordle
-        else                             : data = None
+        elif msg[0].upper() == "WORDLE"  : data = Wordle
+        else                             :
+            print("No game")
+            data = None
 
         self.lastRoom += 1
         self.instances.append( data(
@@ -112,8 +114,9 @@ Jugadores:
         print(s, type(s))
         if s is False or r != s:
             return await ctx.send("Usted no es el administrador de la sala, o bien la sala no existe.")
+        await self.functions.send(self.ctx, self.instances[r].threadId, f"Sala {self.instances[r].roomId} eliminada", self.instances[r].ndcId)
+        if self.instances[r].run: await self.functions.send(self.ctx, self.instances[r].threadId, f"La sala {self.instances[r].roomId} ha finalizado el juego", self.instances[r].ndcId, ghost=True)
         self.instances.pop(r)
-        await ctx.send(f"Sala {msg[0]} eliminada")
         return
 
     @utils.checkFor(m=1, M=1, notcount=2, copy=2)
@@ -124,6 +127,10 @@ Jugadores:
         if r is False               : return await ctx.send("La sala seleccionada no existe")
         if ctx.msg.author.uid != s  : return await ctx.send("Usted no es el dueño de esta sala")
         print(r)
+
+        if self.instances[r].run:
+            return await self.functions.send(self.ctx, ctx.msg.threadId, f"La sala {self.instances[r].roomId} ya está iniciada", self.instances[r].ndcId)
+
         await self.functions.send(self.ctx, ctx.msg.threadId, f"El juego {self.instances[r].game} ha sido iniciado por {self.instances[r].auth.nickname}", self.instances[r].ndcId, ghost=True)
         self.instances[r].start()
         t = await self.instances[r].screen(ctx)
@@ -147,8 +154,9 @@ Jugadores:
             self.instances[r].end()
         
         if await self.instances[r].lose():
-            player = self.instances[r].players[(self.instances[r].data.turn-1) % len(self.instances[r].players)][1]
-            await self.functions.send(self.ctx, self.instances[r].threadId, f"{player} ha perdido", self.instances[r].ndcId)
+            player1 = self.instances[r].players[(self.instances[r].data.turn) % len(self.instances[r].players)][1]
+            player2 = self.instances[r].players[(self.instances[r].data.turn-1) % len(self.instances[r].players)][1]
+            await self.functions.send(self.ctx, self.instances[r].threadId, f"{player1} ha perdido\nTurno de {player2}", self.instances[r].ndcId)
             await sleep(1)
         return
 

@@ -1,4 +1,5 @@
 from .base import BaseInstance
+from src.utils.database import get_word
 
 class Hangman(BaseInstance):
    
@@ -34,7 +35,7 @@ class Hangman(BaseInstance):
         else:
             self.data.keys.append(key)
             self.data.turn += 1
-        return await self.screen()
+        return await self.screen(ctx)
 
     async def win(self):
         for key in self.data.word:
@@ -43,3 +44,13 @@ class Hangman(BaseInstance):
     
     async def lose(self):
         return
+
+    def end(self):
+        self.run         = False
+        self.auth.isOpen = True
+        self.data.keys = []
+    
+    def start(self):
+        self.run         = True
+        self.auth.isOpen = False
+        self.data.word = get_word(5)

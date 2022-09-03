@@ -11,7 +11,7 @@ const char *main(int length){
 
   for(int i = 0; i < 32; i++) c_out[i] = 0;
 
-  strcat(path, "/src/text/palabras.txt");
+  strcat(path, "/src/utils/c/text/palabras.txt");
 
 
   FILE *input;
