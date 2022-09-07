@@ -19,12 +19,6 @@ def run(loop, ctx):
         Process.set(0, True)
         p1 = threading.Thread(target=stalk, args=(loop,ctx))
         p1.start()
-        #p1 = multiprocessing.Process(target=stalk, args=(loop,ctx))
-        #p1.start()
-        #try:
-        #        p1.start()
-        #except Exception:
-        #        Process.set(0, False)
 
     if Process.clock is False:
         Process.set(1, True)

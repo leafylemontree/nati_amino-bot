@@ -62,8 +62,8 @@ async def stalk_run(ctx):
                 s2 = await checkWall(ctx, user, j[0])
                 s3 = await checkBio(ctx, user)
                 s4 = await checkBlogs(ctx, user)
-                print('s:', s1, s2, s3, s4)
                 warnings = [s1, s2, s3, s4]
+                print("warnings:", warnings)
                 if warnings == [[],{},[],[]] : continue
                 await sleep(3)
                 print("Amenaza detectada!")

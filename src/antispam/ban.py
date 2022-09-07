@@ -52,7 +52,7 @@ async def unban_user(ctx, userId, reason):
             chat = AS.logging_chat[str(ctx.msg.ndcId)]
             await ctx.client.send_message(message=f"""
 Se ha desbaneado a {user.nickname}
-ID: {uid}
+ID: {userId}
 """,
                                     chat_id=chat,
                                     message_type=0,

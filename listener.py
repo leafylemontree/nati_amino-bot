@@ -12,17 +12,17 @@ def main():
 
     @bot.event(message_types=api.MessageType.ALL, media_types=api.MediaType.ALL)
     async def on_message(ctx: Context):
-        #global loop
-        #if loop is False: loop = asyncio.get_event_loop()
-        #subprocess.run(loop, ctx)
+        global loop
+        if loop is False: loop = asyncio.get_event_loop()
+        subprocess.run(loop, ctx)
         await commands.message(ctx);
 
-    bot.start();
-    #try:
-    #    bot.start();
-    #except:
-    #    print("Login failed!")
-    #    objects.botStats.write()
+    try:
+        bot.start();
+    except Exception as e:
+        print("Login failed!")
+        print("Exception caught:", e)
+        objects.botStats.write()
 
 
 if __name__ == "__main__":

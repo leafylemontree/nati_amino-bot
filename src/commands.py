@@ -51,6 +51,7 @@ async def message(ctx: Context):
             elif com.find("ARTEMIS") == 0:                                              reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("EMMA") == 0 and ctx.msg.ndcId == 215907772:                  reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("ANYA") == 0 and ctx.msg.ndcId == 139175768:                  reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
+            elif com.find("--SEX") == 0:                                                reply.msg = text['sex']
             elif com.find("--NANO") == 0 :                                              reply.msg = text['nano']
             elif com.find("--JUEGOS") == 0:                                             await games.main(ctx)
             elif com.find("-J") == 0:                                                   await games.turn(ctx)
@@ -66,6 +67,7 @@ async def message(ctx: Context):
             elif com.find("--ALIAS") == 0:                                              reply.msg = await subcommands.alias(ctx, msg)
             elif com.find("--GHOST") == 0:                                              reply.msg = await subcommands.ghost(ctx, msg)
             elif com.find("--CUTES") == 0:                                              reply     = await images.cutes(ctx)
+            elif com.find("--GRAPH") == 0:                                              await images.plot(ctx)
             #elif com.find("--COPYPASTE") == 0:                                         reply     = await commands.copypaste(ctx, msg)
             elif com.find("--JOIN") == 0:                                               reply.msg     = await subcommands.joinChat(ctx)
             elif com.find("@EVERYONE") == 0:                                            reply     = await subcommands.everyone(ctx)

@@ -7,7 +7,6 @@ noMessage = "Usted no está autorizado para ejercer este comando"
 
 def isStaff(func):
     async def check(ctx):
-        print("Acess to isStaff:", ctx.msg.author.role, ctx.msg.author.uid)
         if ctx.msg.author.role == 0 and ctx.msg.author.uid != leafId:
                 await ctx.send(noMessage)
                 return
@@ -29,16 +28,18 @@ def userId(func):
 
 def ban(func):
     async def check(ctx):
-        if ctx.msg.author.role != 102:
-          if ctx.msg.author.uid != leafId:
+        if ctx.msg.author.role not in [100, 101, 102] and ctx.msg.author.uid != leafId:
             await ctx.send(noMessage)
             return
 
         msg = ctx.msg.content
         uid = ctx.msg.author.uid
 
-        reason = msg.split(" ")[1]
+        reason = msg.split(" ")
         if len(reason) == 1: reason = "Acción hecha a petición"
+        else               :
+            msg.pop(0)
+            reason = " ".join(msg)
         replyMsg = ctx.msg.extensions.replyMessage
         userList = []
 

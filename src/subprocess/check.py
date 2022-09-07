@@ -21,7 +21,12 @@ async def checkWall(ctx, user, ndcId):
         return detected
 
 async def checkBio(ctx, user):
-        return []
+        bio          = user.content
+        if bio is None: return []
+        bio_warnings = await findContent(bio, ctx.client.ndc_id.replace("x", ""))
+        print(bio)
+        print("warnings:", bio_warnings)
+        return bio_warnings
 
 async def checkBlogs(ctx, user):
         return []
