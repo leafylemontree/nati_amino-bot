@@ -46,6 +46,7 @@ async def message(ctx: Context):
         elif com.find("--DADOS") == 0:                                              reply     = subcommands.dices(msg)
         elif com.find("--SENDALL") == 0:                                            await antispam.send_all(ctx)
         elif com.find("--ADMIN") == 0:                                              await admin.nati(ctx)
+        elif com.find("--DEEPANALYZE") == 0:                                        await antispam.deepAnalyze.run(ctx)
         elif d != 100: 
             if   com.find("NATI")   == 0:                                               reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("ARTEMIS") == 0:                                              reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."

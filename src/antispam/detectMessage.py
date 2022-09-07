@@ -14,13 +14,16 @@ async def findNickname(nick):
 
 async def findContent(content, comId=None):
         warnings = []
-        
+        if content is None: return warnings
+        else: content = content.upper()
+
         if content.find("T.ME") != -1                  : warnings.append("101")
         if content.find("AMINOAPPS.COM/C/") != -1      : warnings.append("102")
         if content.find("AMINOAPPS.COM/INVITE/") != -1 : warnings.append("103")
         if content.find("T.CO") != -1                  : warnings.append("104")
         if content.upper().find("{}") != -1            : warnings.append("111")
         if len(content) > 3200                         : warnings.append("151") 
+        if len(content) > 32000                        : warnings.append("152") 
 
         if int(comId) in AS.ignore_coms:
             if "102" in warnings: warnings.remove("102")

@@ -300,9 +300,11 @@ class AntiSpam:
     banned_nicks = [
                     "MAMBLL",
                     "WHAT? 0)0)0)",
-                    "coin_pub",
+                    "COIN_PUB",
                     "ᴍᴀᴍʙʟʟ",
-                    "ᴀᴍɪɴᴏ ᴄᴏɪɴs"
+                    "ᴀᴍɪɴᴏ ᴄᴏɪɴs",
+                    "CULT_OF_KOMARU",
+                    "FOXY"
                     ]
 
     sexual_nicks = [
@@ -334,6 +336,7 @@ class AntiSpam:
                 "104": "Spam de Twitter",
                 "111": "Mensaje reconocido por cerrar la app",
                 "151": "Mensaje de gran longitud que cierra la app",
+                "152": "Biografía que cierra la app",
 
                 "200": "Mensaje fuera de lo común"
 
