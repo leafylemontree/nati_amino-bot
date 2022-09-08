@@ -7,6 +7,7 @@ from src.antispam.detectMessage import findNickname, findContent
 from edamino.api import Embed
 from src import objects
 from .n_logging import banUser
+from src import utils
 
 class DeepAnalyze:
 
@@ -19,6 +20,7 @@ class DeepAnalyze:
     lastAnalyze = 0
     ctx         = None
 
+    @utils.isStaff
     async def run(self, ctx):
         comId = ctx.msg.ndcId
 
@@ -58,13 +60,18 @@ Si tiene el modo estricto activo, el bot expulsará a quien haya detectado como 
         counter = 1
         while True:
             counter -= 1
+            t = time.time()
+            for com,clk in list(self.done.items()):
+                if (t - clk) > 300: self.done.pop(com,None)
             if self.queue and counter == 0:
                 await self.analyze()
                 counter = 300
+            elif counter == 0:
+                counter = 1
             await asyncio.sleep(1)
 
     async def analyze(self):
-        comId = self.queue.pop(0)
+        comId = self.queue[0]
         threadId = AS.logging_chat[str(comId)]
         banningToggle = comId in AS.ban_no_warn
         print("Anlizando ahora a:", comId, threadId, banningToggle)
@@ -114,7 +121,8 @@ Nick:"""
                 warnings.extend(s2)
                 if banningToggle: await banUser(self.ctx, user.uid, comId, warnings)
 
-
-
+        c = self.queue.pop(0)
+        self.done[str(c)] = time.time()
+        return    
 
 deepAnalyze = DeepAnalyze()

@@ -6,11 +6,16 @@ noMessage = "Usted no está autorizado para ejercer este comando"
 
 
 def isStaff(func):
-    async def check(ctx):
+    async def check(*args, **kwargs):
+        ctx = None
+        for arg in args:
+            if isinstance(arg, Context): ctx = arg
+        if ctx is None: return
+
         if ctx.msg.author.role == 0 and ctx.msg.author.uid != leafId:
                 await ctx.send(noMessage)
                 return
-        r = await func(ctx)
+        r = await func(*args, **kwargs)
         return r
     return check
 
