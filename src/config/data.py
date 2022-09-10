@@ -79,4 +79,3 @@ def review(mode, chatId):
     if mode == 'chat': return chatId in temporal_disable.keys()
     return None
 
-Config.read()

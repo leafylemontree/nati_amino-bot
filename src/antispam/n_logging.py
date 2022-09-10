@@ -4,13 +4,11 @@ from src    import objects
 import json
 from edamino.api import Embed
 import datetime
+from src.database import db
 
 @utils.isStaff
 async def set_logging(ctx):
-    AS.logging_chat[str(ctx.msg.ndcId)] = ctx.msg.threadId
-    with open("data/com_chatlist.json", "w+") as chatFile:
-        json.dump(AS.logging_chat, chatFile, indent=4)
-        print(AS.logging_chat)
+    db.setLogConfig(ctx.msg.ndcId, 'threadId', ctx.msg.threadId)
     return "El chat para el log del bot ha sido cambiado con éxito"
 
 async def register_user(comId, userId):
@@ -38,18 +36,16 @@ async def register_user(comId, userId):
         return True
 
 async def banUser(ctx, userId, ndcId, reasons):
-    chatId = None
-    if ndcId in AS.ban_no_warn:
-        chatId = AS.logging_chat[str(ndcId)]
-    else: return
-    print("user detected", userId)
-    #try:
-    await ctx.client.ban(
+    log = db.getLogConfig(ndcId)
+    if not log.ban: return
+    chatId = log.threadId
+    try:
+        await ctx.client.ban(
                         user_id=userId,
                         reason=f"Baneado automáticamente por razones: {reasons}"
                         )
-    user = await ctx.client.get_user_info(user_id=userId)
-    await ctx.client.send_message(message=f"""
+        user = await ctx.client.get_user_info(user_id=userId)
+        await ctx.client.send_message(message=f"""
 Se ha baneado a {user.nickname}
 Motivo: {reasons}
 ID: {userId}
@@ -63,15 +59,14 @@ Para desbanear, solo responda este mensaje y ponga --unban
                                     embed=None,
                                     link_snippets_list=None,
                                     reply=None )
-    return True
-    #except Exception:
-    user = await ctx.client.get_user_info(user_id=userId)
-    if user.role != 102: await ctx.send("Ha activado el modo de expulsar sin advertencia, sin embargo, el bot no posee del cargo de líder, por lo que no puede expulsar.\n\nPuede desactivar este mensaje desactivando el modo con este comando:\n--log -normal")
+        return True
+    except Exception:
+        user = await ctx.client.get_user_info(user_id=userId)
+        if user.role != 102: await ctx.send("Ha activado el modo de expulsar sin advertencia, sin embargo, el bot no posee del cargo de líder, por lo que no puede expulsar.\n\nPuede desactivar este mensaje desactivando el modo con este comando:\n--log -normal")
     return
 
 async def sendLog(ctx, warnings):
     thread = await ctx.get_chat_info()
-    comId  = str(ctx.msg.ndcId)
 
     try:
         await ctx.client.delete_message(
@@ -82,12 +77,13 @@ async def sendLog(ctx, warnings):
         pass
             
     chat = None
-    if comId in AS.logging_chat.keys(): chat = AS.logging_chat[comId]
-    else:                               return
-    print(comId, AS.logging_chat[comId])
+    log = db.getLogConfig(ctx.msg.ndcId)
+    if log.threadId: chat = log.threadId
+    else:            return
+    print(ndcId, chat)
 
     if await register_user(ctx.msg.ndcId, ctx.msg.author.uid) : return
-    if int(comId) in AS.ban_no_warn: await banUser(ctx, ctx.msg.author.uid, ctx.msg.ndcId, str(warnings))
+    if log.ban: await banUser(ctx, ctx.msg.author.uid, ctx.msg.ndcId, str(warnings))
     
     base_msg = f"""Posible amenaza detectada:
 ------------------
@@ -144,8 +140,9 @@ Rzones:"""
             object_id=l.uid,
             content=l.nickname
         )
+        log = db.getLogConfig(int(ctx.client.ndc_id.replace("x", "")))
         await ctx.client.send_message(message=st_str[:2000],
-                                    chat_id=AS.logging_chat[str(user.ndcId)],
+                                    chat_id=log.threadId,
                                     message_type=0,
                                     ref_id=None,
                                     mentions=None,

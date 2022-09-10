@@ -85,8 +85,9 @@ def cutes(func):
 
 def safe(func):
     async def wrapper(ctx):
-        from src.config.data import Config
-        if ctx.msg.threadId in Config.safe_mode: return "Comando deshabilitado"
+        from src.database import db
+        chat = db.getChatConfig(ctx.msg.threadId)
+        if chat.safe: return "Comando deshabilitado"
         r = await func(ctx)
         return r
     return wrapper

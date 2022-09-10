@@ -8,6 +8,7 @@ from edamino.api import Embed
 from src import objects
 from .n_logging import banUser
 from src import utils
+from src.database import db
 
 class DeepAnalyze:
 
@@ -72,8 +73,9 @@ Si tiene el modo estricto activo, el bot expulsará a quien haya detectado como 
 
     async def analyze(self):
         comId = self.queue[0]
-        threadId = AS.logging_chat[str(comId)]
-        banningToggle = comId in AS.ban_no_warn
+        log = db.getLogConfig(comId)
+        threadId = log.threadId
+        banningToggle = log.ban 
         print("Anlizando ahora a:", comId, threadId, banningToggle)
         self.ctx.client.set_ndc(comId)
 
@@ -108,8 +110,7 @@ Nick:"""
                 msg += "\n\nBiografía:"
                 for w in s2: msg += f"\n\t{w}: {objects.AntiSpam.msg_desc[w]}"
                 await self.ctx.client.send_message(message=msg,
-                                    #chat_id=threadId,
-                                    chat_id=self.ctx.msg.threadId,
+                                    chat_id=threadId,
                                     message_type=0,
                                     ref_id=None,
                                     mentions=None,

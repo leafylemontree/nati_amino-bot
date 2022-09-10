@@ -1,9 +1,10 @@
 from src import objects
 from src import utils
+from src.database import db
 
 
 def kiwilatigo(ctx):
-        utils.database(32, ctx.msg.author.ud)
+        utils.database(32, ctx.msg.author.uid)
         return objects.Reply(f"[ci]¡Oh no! Han hecho enfadar a {ctx.msg.author.nickname}\n\n[ci]/c skpa.", False)
 
 async def alias(ctx, msg):
@@ -13,7 +14,8 @@ async def alias(ctx, msg):
             msg.pop(0)
             uid = ctx.msg.extensions.mentionedArray[0].uid
             msg = " ".join(msg)[:127]
-            utils.database(31, uid, name=msg)
+            
+            db.modifyRecord(31, user, value=msg)
             user = await ctx.client.get_user_info(uid)
             print(uid)
             print(msg)
@@ -26,7 +28,7 @@ async def alias(ctx, msg):
             print(uid)
             print(msg)
             msg = " ".join(msg)[:127]
-            utils.database(31, uid, name=msg)
+            db.modifyRecord(31, ctx.msg.author, value=msg)
             return f"El nuevo alias de {ctx.msg.author.nickname} es {msg}."
         return None
 
