@@ -116,7 +116,8 @@ def insertConfig():
     for chat in chats:
         db.cursor.execute(f'INSERT INTO Chat VALUES ("{chat}", {1 if chat in check else 0}, {1 if chat in welcome else 0}, {1 if chat in goodbye else 0}, {1 if chat in bot else 0}, {1 if chat in slow else 0}, {1 if chat in staff else 0}, {1 if chat in nofun else 0}, {1 if chat in safe else 0});')
 
-#insertLogging()
-#insertConfig()
+insertUsers()
+insertLogging()
+insertConfig()
 
 
