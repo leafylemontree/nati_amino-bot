@@ -80,7 +80,6 @@ async def sendLog(ctx, warnings):
     log = db.getLogConfig(ctx.msg.ndcId)
     if log.threadId: chat = log.threadId
     else:            return
-    print(ndcId, chat)
 
     if await register_user(ctx.msg.ndcId, ctx.msg.author.uid) : return
     if log.ban: await banUser(ctx, ctx.msg.author.uid, ctx.msg.ndcId, str(warnings))
