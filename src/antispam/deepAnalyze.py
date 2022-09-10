@@ -108,8 +108,8 @@ Nick:"""
                 msg += "\n\nBiografía:"
                 for w in s2: msg += f"\n\t{w}: {objects.AntiSpam.msg_desc[w]}"
                 await self.ctx.client.send_message(message=msg,
-                                    #chat_id=threadId,
-                                    chat_id=self.ctx.msg.threadId,
+                                    chat_id=threadId,
+                                    #chat_id=self.ctx.msg.threadId,
                                     message_type=0,
                                     ref_id=None,
                                     mentions=None,
