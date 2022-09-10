@@ -1,5 +1,6 @@
 from src   import utils
 from .data import AS
+from src.database import db
 
 @utils.ban
 async def ban_user(ctx, userId, reason):
@@ -14,9 +15,9 @@ async def ban_user(ctx, userId, reason):
         except Exception:
             await ctx.send("No puede banear al usuario")
             return
-         
-        if str(ctx.msg.ndcId) in AS.logging_chat:
-            chat = AS.logging_chat[str(ctx.msg.ndcId)]
+        
+        log = db.getLogConfig(ctx.msg.ndcId)
+        if log.threadId:
             await ctx.client.send_message(message=f"""
 Se ha baneado a {user.nickname}
 Motivo: {reason}
@@ -24,7 +25,7 @@ ID: {userId}
 ----------
 Para desbanear, solo responda este mensaje y ponga --unban
 """,
-                                    chat_id=chat,
+                                    chat_id=log.threadId,
                                     message_type=0,
                                     ref_id=None,
                                     mentions=None,
@@ -47,14 +48,13 @@ async def unban_user(ctx, userId, reason):
             await ctx.send("No puede desbanear al usuario")
             return
        
-
-        if str(ctx.msg.ndcId) in AS.logging_chat:
-            chat = AS.logging_chat[str(ctx.msg.ndcId)]
+        log = db.getLogConfig(ctx.msg.ndcId)
+        if log.threadId:
             await ctx.client.send_message(message=f"""
 Se ha desbaneado a {user.nickname}
 ID: {userId}
 """,
-                                    chat_id=chat,
+                                    chat_id=log.threadId,
                                     message_type=0,
                                     ref_id=None,
                                     mentions=None,

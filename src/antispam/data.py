@@ -22,27 +22,5 @@ class AS:
     no_warnings = {}
     stalkList   = {}
 
-    with open("data/comConfig.json", "r+") as fp:
-        o = json.load(fp)
-        ban_no_warn = o['ban']
-        print("ban_no_warn:", ban_no_warn)
-        ignore_coms = o['ignore']
-        print("ignored:", ignore_coms)
-        no_warnings = o['no-warning']
-        print("no_warns:", no_warnings)
-        stalkList   = o['stalk']
-        print("stalks:", stalkList)
-    
-    with open("data/com_chatlist.json", "r") as fp:
-        logging_chat = json.load(fp)
-    
     async def save_config():
-        o = {
-                'ban'         : AS.ban_no_warn,
-                'ignore'      : AS.ignore_coms,
-                'no-warning'  : AS.no_warnings,
-                'stalk'       : AS.stalkList,
-                }
-        with open('data/comConfig.json', 'w+') as fp:
-            json.dump(o, fp, indent=4)
         return

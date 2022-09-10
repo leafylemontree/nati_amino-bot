@@ -1,6 +1,7 @@
 from .data      import AS
 from .n_logging import sendLog
 from src        import objects
+from src.database import db
 
 async def findNickname(nick):
         warnings = []
@@ -24,8 +25,10 @@ async def findContent(content, comId=None):
         if content.upper().find("{}") != -1            : warnings.append("111")
         if len(content) > 3200                         : warnings.append("151") 
         if len(content) > 32000                        : warnings.append("152") 
-
-        if int(comId) in AS.ignore_coms:
+        
+        if not comId: return warnings
+        log = db.getLogConfig(comId)
+        if log._ignore:
             if "102" in warnings: warnings.remove("102")
             if "103" in warnings: warnings.remove("103")
         return warnings

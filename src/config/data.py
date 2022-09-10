@@ -37,32 +37,9 @@ class Config:
     slow_mode_thread.start()
     
     def read():
-        with open("data/config.json", "r") as fp:
-            a = json.load(fp)
-        if a == {}: return
-        Config.check_on_enter  = a['check']
-        Config.disable_welcome = a['welcome']
-        Config.enable_goodbye  = a['goodbye']
-        Config.disable_bot     = a['bot']
-        Config.slow_mode       = a['slow']
-        Config.only_staff      = a['staff']
-        Config.no_fun          = a['1984']
-        Config.safe_mode       = a['safe']
         return
     
     def write():
-        a = {
-            "check"  : Config.check_on_enter,
-            "welcome": Config.disable_welcome,
-            "goodbye": Config.enable_goodbye,
-            "bot"    : Config.disable_bot,
-            "slow"   : Config.slow_mode,
-            "staff"  : Config.only_staff,
-            "1984"   : Config.no_fun,
-            "safe"   : Config.safe_mode,
-                }
-        with open("data/config.json", "w+") as fp:
-            json.dump(a, fp, indent=4)
         return
 
 def register(mode, chatId, time):
@@ -79,4 +56,3 @@ def review(mode, chatId):
     if mode == 'chat': return chatId in temporal_disable.keys()
     return None
 
-Config.read()

@@ -1,26 +1,21 @@
 from src import objects
 from src import utils
 from edamino.api import Embed
+from src.database import db
 
 @utils.userId
 async def userInfo(ctx, uid, content):
         user = await ctx.client.get_user_info(uid)
 
         # print(user)
-        role = "Ninguno"
-        if   user.role == 0:   role = "Ninguno"
-        # elif user.role == 100: role = "Curador"
-        elif user.role == 101: role = "Curador"
-        elif user.role == 102: role = "Líder"
+        role = "Curador" if user.role == 102 else "Líder" if user.role == 101 else "Ninguno"
 
         dia = ["día", "dias"]
         a = 1
         if user.consecutiveCheckInDays == 1: a = 0
-        activo = "No activo"
-        if user.onlineStatus == 1: activo = "Conectado"
+        activo = "No activo" if user.onlineStatus == 0 else "Conectado"
 
-        usr_db = objects.Database_return()
-        usr_db.strToVal( utils.database(1, user.uid) )
+        usr_db = db.getUserData(user)
         msg = f"""[cu]Información de perfil:
        
 Nick: {user.nickname}
@@ -52,7 +47,7 @@ Unido en: {user.createdTime}
     - {usr_db.doxx_g} doxeadas.
 
 Este usuario ha hecho {usr_db.kiwi} furias del kiwi.
-{usr_db.win}/{usr_db.derr}/{usr_db.draw}. Total: {usr_db.points} puntos.
+{usr_db.win}/{usr_db.draw}/{usr_db.lose}. Total: {usr_db.points} puntos.
 """
 
         embed = Embed(
