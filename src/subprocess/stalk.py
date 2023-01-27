@@ -6,6 +6,7 @@ from asyncio import sleep
 from .data import alreadyChecked
 from .check import checkWall, checkBio, checkBlogs
 from src import objects
+from src.database import db
 
 async def set_online(ctx):
         print("Try activity")
@@ -23,8 +24,8 @@ async def get_communities(ctx):
         coms = await get_my_communities(ctx, 0, 100)
         comList = []
         for i,j in enumerate(coms):
-            print(i,j.name)
-            if j.ndcId in AS.stalkList: comList.append([j.ndcId, j.name])
+            log = db.getLogConfig(j.ndcId)
+            if log.stalk: comList.append([j.ndcId, j.name])
         print(comList)
         return comList
 

@@ -25,5 +25,6 @@ async def lineart(ctx):
         im.write_to_png("media/line.png")
         async with AIOFile("media/line.png", 'rb') as file:
             img = await file.read()
-            await ctx.send_image(img)
+            from src.imageSend import send_image
+            await send_image(ctx, img)
         return

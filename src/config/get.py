@@ -6,7 +6,7 @@ async def get(ctx):
         chat   = db.getChatConfig(chatId) 
 
         if review('chat', chatId)           : return -1 
-        if chat.bot in Config.disable_bot     : return -1
+        if chat.bot : return -1
 
         if chatId in Config.slow_mode       :
             if not review('user', ctx.msg.author.uid):

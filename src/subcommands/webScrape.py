@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 import aiohttp
 import asyncio
 from src import utils
+from aiofile import AIOFile
+import random
+from src import utils
 
 DEEP_AI_API_KEY = "1815b770-ab06-40c2-9481-4934e7de0c4c"
 
@@ -175,3 +178,15 @@ class web_tools:
             # print(text)
             return rep
 
+    async def xfcd(ctx):
+        com = ctx.msg.content.split(" ")
+        try:    _id = int(com[1]) if len(com) > 1 else int(random.random()*2600 + 1)
+        except: _id = int(random.random()*2600 + 1)
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://xkcd.com/" + str(_id)) as response:
+                text = await response.text()
+                imgLink = text.split('<a href= "' )[1].split('"')[0]
+            async with session.get(imgLink) as response:
+                from src.imageSend import send_image
+                await send_image(ctx, await response.read())

@@ -12,3 +12,7 @@ from ._math         import *
 from .doxx          import doxx
 from .copypaste     import copypaste
 from .wordle        import wordle, status
+from .timefuncs     import stopwatch, timer
+from .trivia        import trivia 
+from .audio         import audioRecognize
+from .youtube       import videoDownload

@@ -6,6 +6,7 @@ from edamino import Context, Client
 from .functions import Functions
 from .presetGames import Hangman, Auth, Wordle
 from asyncio import sleep
+from src import database
 
 class GameRoom:
     instances   = []
@@ -147,8 +148,9 @@ Jugadores:
 
         await sleep(1)
         if await self.instances[r].win():
-            player = self.instances[r].players[(self.instances[r].data.turn-1) % len(self.instances[r].players)][1]
-            await self.functions.send(self.ctx, self.instances[r].threadId, f"¡{player} es el ganador!", self.instances[r].ndcId)
+            player = self.instances[r].players[(self.instances[r].data.turn-1) % len(self.instances[r].players)]
+            database.db.modifyRecord(43, await ctx.client.get_user_info(player[0]), 250)
+            await self.functions.send(self.ctx, self.instances[r].threadId, f"¡{player[0]} es el ganador!", self.instances[r].ndcId)
             await sleep(1)
             await self.functions.send(self.ctx, self.instances[r].threadId, f"La sala {self.instances[r].roomId} ha finalizado el juego", self.instances[r].ndcId, ghost=True)
             self.instances[r].end()

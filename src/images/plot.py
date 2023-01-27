@@ -32,16 +32,18 @@ async def plot(ctx, msg):
         cr.move_to(x, 255-accumulator)
         accumulator = 0
         for n,c in enumerate(constants):
-            accumulator += (c * ((x-255) ** (l-n)))
+            accumulator += (c * (((x-255)/16) ** (l-n)))
         print(x, accumulator)
-        accumulator =  256 if accumulator >  256 else accumulator
-        accumulator = -256 if accumulator < -256 else accumulator
+        accumulator *=  16
+        accumulator  =  256 if accumulator >  256 else accumulator
+        accumulator  = -256 if accumulator < -256 else accumulator
         cr.line_to(x, 255-accumulator)
         cr.stroke()
     
     sf.write_to_png("media/graph.png")
     async with AIOFile("media/graph.png", 'rb') as file:
         img = await file.read()
-        await ctx.send_image(img)
+        from src.imageSend import send_image
+        await send_image(ctx, img)
     return
 

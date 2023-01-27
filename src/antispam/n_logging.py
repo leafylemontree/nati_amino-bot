@@ -66,20 +66,13 @@ Para desbanear, solo responda este mensaje y ponga --unban
     return
 
 async def sendLog(ctx, warnings):
-    thread = await ctx.get_chat_info()
-
-    try:
-        await ctx.client.delete_message(
-                chat_id=ctx.msg.threadId,
-                message_id=ctx.msg.messageId)
-        await ctx.client.kick_from_chat(ctx.msg.threadId, ctx.msg.uid, allow_rejoin=True)
-    except Exception:
-        pass
-            
     chat = None
     log = db.getLogConfig(ctx.msg.ndcId)
+    db.registerReport(ctx.msg.author.uid, ctx.msg.ndcId, ctx.msg.threadId, warnings)
     if log.threadId: chat = log.threadId
-    else:            return
+    if log.ban:
+        try:                await ctx.client.kick_from_chat(ctx.msg.threadId, ctx.msg.uid, allow_rejoin=True)
+        except Exception:   pass
 
     if await register_user(ctx.msg.ndcId, ctx.msg.author.uid) : return
     if log.ban: await banUser(ctx, ctx.msg.author.uid, ctx.msg.ndcId, str(warnings))
@@ -88,7 +81,7 @@ async def sendLog(ctx, warnings):
 ------------------
 Nick: {ctx.msg.author.nickname}
 ID: {ctx.msg.author.uid}
-Chat: {thread.title}
+Chat: {ctx.msg.threadId}
 Tipo: {ctx.msg.type}
 Mensaje:
 {ctx.msg.content}
@@ -100,11 +93,11 @@ Mensaje:
                 if i in ["101", "102", "103", "104"]: objects.botStats.register(4)
                 if i in ["200"]: objects.botStats.register(5)
                 print(f"{i} - {objects.AntiSpam.msg_desc[i]}")
-            
+
     embed = Embed(title="Perfil del usuario", object_type=0, object_id=ctx.msg.author.uid, content=ctx.msg.author.nickname )
 
     await ctx.client.send_message(message=base_msg,
-                                    chat_id=chat,
+                                    chat_id=log.threadId,
                                     message_type=0,
                                     ref_id=None,
                                     mentions=None,
@@ -150,3 +143,37 @@ Rzones:"""
                                     reply=None )
         print("Message sent")
     return
+
+async def chatAnalyzeLog(ctx, message, warnings):
+    log = db.getLogConfig(ctx.msg.ndcId)
+    db.registerReport(ctx.msg.author.uid, ctx.msg.ndcId, ctx.msg.threadId, warnings)
+    chat = log.threadId if log.threadId else ctx.msg.threadId
+    
+    if log.ban:
+        try:    
+                await ctx.client.kick_from_chat(ctx.msg.threadId, ctx.msg.uid, allow_rejoin=True)
+                await banUser(ctx, ctx.msg.author.uid, ctx.msg.ndcId, str(warnings))
+        except Exception:
+                pass
+    
+    embed = Embed(title="Perfil del usuario", object_type=0, object_id=message.author.uid, content=message.author.nickname)
+    base_msg=f"""
+Análisis de chat manual
+------------------
+Nick: {message.author.nickname}
+ID: {message.author.uid}
+Chat: {ctx.msg.threadId}
+Tipo: {message.type}
+Mensaje:
+{message.content}
+-----------------"""
+    await ctx.client.send_message(message=base_msg,
+                                    chat_id=chat,
+                                    message_type=0,
+                                    ref_id=None,
+                                    mentions=None,
+                                    embed=embed,
+                                    link_snippets_list=None,
+                                    reply=None )
+    return
+

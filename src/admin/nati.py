@@ -1,4 +1,5 @@
 from src import utils
+from src.text import reload as textReload
 
 bio = """
 [c]°•○●°•○●°•○●°•○●°•○●°•○●°•○●°•○●°•○●°•○●
@@ -50,7 +51,7 @@ bio = """
 @utils.isStaff
 async def nati(ctx):
     com = ctx.msg.content.split(" ")
-    if len(com) == 1: return await ctx.send("Parámetros disponibles: -setnick, -setpic, -setbio")  
+    if len(com) == 1: return await ctx.send("Comandos disponibles: -setnick, -setpic, -setbio, -setbg, -setbanner")  
 
     if   com[1].upper() == "-SETNICK":
         if len(com) > 2:
@@ -59,9 +60,27 @@ async def nati(ctx):
             await ctx.client.edit_profile(nickname=" ".join(com))
         else           :    await ctx.client.edit_profile(nickname="ไ⃟⁙⁛⃫. ካằꚍו⁛⁅💮⃟⁆⃩⚘ ")
     elif com[1].upper() == "-SETPIC":
-        if not ctx.msg.extensions.replyMessage: return await ctx.send("Debe mencionar una imagen")
+        if not ctx.msg.extensions.replyMessage: return await ctx.send("Debe usar este comando respondiendo a una imagen")
         await ctx.client.edit_profile(icon=ctx.msg.extensions.replyMessage.mediaValue)
+    elif com[1].upper() == "-SETBANNER":
+        if not ctx.msg.extensions.replyMessage: return await ctx.send("Debe usar este comando respondiendo a una imagen")
+        await ctx.client.edit_profile(image_list=[ctx.msg.extensions.replyMessage.mediaValue])
+    elif com[1].upper() == "-SETBG":
+        if not ctx.msg.extensions.replyMessage and len(com) < 3: return await ctx.send("Debe usar este comando respondiendo a una imagen, o bien ingresando un valor hexadecimal para el color")
+        if ctx.msg.extensions.replyMessage:
+            await ctx.client.edit_profile(background_image=ctx.msg.extensions.replyMessage.mediaValue)
+        else:
+            await ctx.client.edit_profile(background_color=com[2])
+
     elif com[1].upper() == "-SETBIO":
-        await ctx.client.edit_profile(content=bio)
-    
-        return
+        content = bio
+        if len(com) > 2:
+            com.pop(0)
+            com.pop(0)
+            content = " ".join(com)
+        await ctx.client.edit_profile(content=content)
+    elif com[1].upper() == "-RELOADTEXT":
+        textReload()
+    elif com[1].upper() == "-CLEARAWAITER":
+        await utils.clearAW(ctx)
+    return

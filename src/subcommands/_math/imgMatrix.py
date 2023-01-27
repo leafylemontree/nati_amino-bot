@@ -62,7 +62,8 @@ Las matrices deben ingresarse de esta manera:
     
     os.system(f"convert -size {w}x{h} -depth 8 rgb:imgout.raw media/res.png")
     async with AIOFile("media/res.png", 'rb') as file:
-                 img = await file.read()
-                 await ctx.send_image(img)
+                img = await file.read()
+                from src.imageSend import send_image
+                await send_image(ctx, img)
 
     return

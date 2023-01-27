@@ -18,7 +18,7 @@ tape_f.main.restype   = ctypes.c_char_p
 
 def mathfc(msg):
         if    msg.find("{") != -1:
-            return str(c.tape(msg.upper()))
+            return str(tape(msg.upper()))
 
         msg     = msg.split(" ")
         msg     = msg[1:]

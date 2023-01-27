@@ -135,6 +135,7 @@ async def wiki(ctx, uid, msg):
 
         async with AIOFile("wiki.png", 'rb') as file:
             img = await file.read()
-            await ctx.send_image(img)
+            from src.imageSend import send_image
+            await send_image(ctx, img)
         return
 

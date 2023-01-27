@@ -147,6 +147,7 @@ async def stats(ctx):
         sf.write_to_png("media/stats.png")
         async with AIOFile("media/stats.png", 'rb') as file:
             img = await file.read()
-            await ctx.send_image(img)
+            from src.imageSend import send_image
+            await send_image(ctx, img)
         return
 

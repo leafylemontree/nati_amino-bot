@@ -8,7 +8,6 @@ class UserInfo:
         try:
             cur = cur[0]
         except IndexError as e:
-            print(e)
             return None
 
         self.userId,self.alias,self.hugs_r,self.hugs_g,self.kiss_r,self.kiss_g,self.pats_r,self.pats_g,self.doxx_r,self.doxx_g,self.kiwi,self.win,self.draw,self.lose,self.points,*self.unused = cur
@@ -22,7 +21,6 @@ class LogConfig:
         try:
             cur = cur[0]
         except IndexError as e:
-            print(e)
             return None
         self.comId, self.threadId, self.nowarn, self._ignore, self.ban, self.stalk, self.staff, self.bot, *self.unused = cur
         return self
@@ -34,7 +32,6 @@ class Config:
         try:
             cur = cur[0]
         except IndexError as e:
-            print(e)
             return None
         self.threadId, self._check, self.welcome, self.goodbye, self.bot, self.slow, self.staff, self.nofun, self.safe, *self.unused = cur
         return self
@@ -84,17 +81,22 @@ class Database:
         elif mode == 14: column = "recvDoxx"
         elif mode == 24: column = "givenDoxx"
         elif mode == 31: column = "alias"
+        elif mode == 43: column = "unused3"
+
 
         self.cursor.execute(f'SELECT {column} FROM UserInfo WHERE userId="{user.uid}";')
-        data = []
-        for par in self.cursor: data.append(par)
-        if not data: self.cursor.execute(f'INSERT INTO UserInfo VALUES ("{user.uid}", "-", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)')
+        data = self.cursor.fetchall()[0]
+        if not data:
+            self.cursor.execute(f'INSERT INTO UserInfo VALUES ("{user.uid}", "-", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)')
+            data = 0
+        else:
+            data = data[0]
 
-        data = data[0][0]
         if mode == 31 and value != 1:   data = f'"{value}"'.replace(";", "").replace("DROP TABLE", "").replace("drop table", "")
-        else:                           data = data+value
+        else:                           data = data + value
         
         self.cursor.execute(f'UPDATE UserInfo SET {column}={data} WHERE userId="{user.uid}";')
+        return data
 
     def setLogConfig(self, comId, mode, value):
         if mode not in ['threadId', 'nowarn', '_ignore', 'ban', 'stalk', 'staff', 'bot'] : return None
@@ -110,7 +112,7 @@ class Database:
         self.cursor.execute(f'SELECT * FROM Log WHERE comId={comId};')
         data = LogConfig(self.cursor)
         if not data:
-            self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0);')
+            self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 1);')
             self.cursor.execute(f'SELECT * FROM Log WHERE comId={comId};')
             data = LogConfig(self.cursor)
         return data
@@ -134,5 +136,10 @@ class Database:
             self.cursor.execute(f'SELECT * FROM Chat WHERE threadId="{threadId}";')
             data = Config(self.cursor)
         return data
+
+    def registerReport(self, userId, comId, threadId, warnings):
+        self.cursor.execute(f'INSERT INTO Reports VALUES ("{userId}", {comId}, "{threadId}", NOW(), {1 if "1" in warnings else 0}, {1 if "2" in warnings else 0}, {1 if "3" in warnings else 0}, {1 if "101" in warnings else 0}, {1 if "102" in warnings else 0}, {1 if "103" in warnings else 0}, {1 if "104" in warnings else 0}, {1 if "111" in warnings else 0}, {1 if "151" in warnings else 0}, {1 if "152" in warnings else 0}, {1 if "200" in warnings else 0});')
+        return
+
 
 db = Database()

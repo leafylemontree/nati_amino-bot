@@ -8,7 +8,7 @@ async def userInfo(ctx, uid, content):
         user = await ctx.client.get_user_info(uid)
 
         # print(user)
-        role = "Curador" if user.role == 102 else "Líder" if user.role == 101 else "Ninguno"
+        role = "Curador" if user.role == 101 else "Líder" if user.role == 102 else "Ninguno"
 
         dia = ["día", "dias"]
         a = 1

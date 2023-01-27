@@ -12,13 +12,11 @@ async def alias(ctx, msg):
             msg = msg.split("\u200e")[0]
             msg = msg.split(" ")
             msg.pop(0)
-            uid = ctx.msg.extensions.mentionedArray[0].uid
+            user = ctx.msg.extensions.mentionedArray[0]
             msg = " ".join(msg)[:127]
             
             db.modifyRecord(31, user, value=msg)
-            user = await ctx.client.get_user_info(uid)
-            print(uid)
-            print(msg)
+            user = await ctx.client.get_user_info(user.uid)
             return f"El nuevo alias de {user.nickname} es {msg}."
         else:
             msg = msg.split(" ")

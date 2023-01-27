@@ -342,7 +342,20 @@ class AntiSpam:
 
             }
 
-    
+class Bot_attributes:
+    counter = 0
+    loop  = False 
+    instane = -1
+
+    def kill(self, r):
+        import os, sys, signal
+        print("EXECUTION CLOSED")
+        os.kill(os.getpid(), signal.SIGTERM)
+        sys.exit(0)
+
+ba = Bot_attributes()
+
+
 
 
 # Missing objects in Edamino

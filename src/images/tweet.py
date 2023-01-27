@@ -1,4 +1,4 @@
-import cairo
+import cairocffi        as cairo 
 from src import utils
 from aiofile import AIOFile
 from .funcs import *
@@ -40,15 +40,20 @@ async def tweet(ctx, uid, msg):
         around(ct, 32, 32, 96, 96)
        
         ct.set_source_rgb(1, 1, 1)
-        ct.set_font_size(36)
-        a,b,x,y,n,m = ct.text_extents(account)
-        ct.select_font_face("Arial", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
-        ct.move_to(144, 80)
-        ct.show_text(account)
-       
-        ct.set_source_rgb(0, 1, 1)
-        ct.arc(180+x, 70, 14, 0, math.pi*2 )
-        ct.fill()
+        ct.move_to(144, 48)
+        putText(ct,
+            text=account,
+            size=26, 
+            align="LEFT",
+            width=768,
+            height=128,
+            wrap="None",
+            font="Arial")
+
+
+        #ct.set_source_rgb(0, 1, 1)
+        #ct.arc(180+x, 70, 14, 0, math.pi*2 )
+        #ct.fill()
 
         ct.set_source_rgb(0.5, 0.5, 0.5)
         ct.set_font_size(24)
@@ -100,5 +105,6 @@ async def tweet(ctx, uid, msg):
         im.write_to_png("media/twitter/tweet.png")
         async with AIOFile("media/twitter/tweet.png", 'rb') as file:
             img = await file.read()
-            await ctx.send_image(img)
+            from src.imageSend import send_image
+            await send_image(ctx, img)
         return

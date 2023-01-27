@@ -61,7 +61,8 @@ class Wordle(BaseInstance):
         im.write_to_png("media/wordle/output.png")  # Output to PNG
         async with AIOFile("media/wordle/output.png", 'rb') as file:
             img = await file.read()
-            await ctx.send_image(img)
+            from src.imageSend import send_image
+            await send_image(ctx, img)
         return None
 
     async def logic(self, ctx, key):

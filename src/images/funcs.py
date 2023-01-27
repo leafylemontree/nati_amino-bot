@@ -1,5 +1,8 @@
 import math
-import cairo
+import cairocffi        as cairo 
+import pangocffi        as pango
+import pangocairocffi   as pc
+
 
 def rounded(ct, x, y, lx, ly, p):
     lx = lx + x
@@ -44,3 +47,20 @@ def around(ct, x, y, lx, ly):
     ct.fill()
     return
 
+def putText(ct, text="text", size=24, align="LEFT", width=3200, height=3200, wrap="None", font="Monospace"):
+    ly = pc.create_layout(ct)
+    ly.set_width(pango.units_from_double(width))
+    ly.set_height(pango.units_from_double(height))
+
+    if   align == "LEFT"  : ly.set_alignment(pango.Alignment.LEFT)
+    elif align == "RIGHT" : ly.set_alignment(pango.Alignment.RIGHT)
+    elif align == "CENTER": ly.set_alignment(pango.Alignment.CENTER)
+    
+    if   wrap == "WORD" : ly.set_wrap(pango.WrapMode.WORD)
+    elif wrap == "CHAR" : ly.set_wrap(pango.WrapMode.CHAR)
+    elif wrap == "WCHAR": ly.set_wrap(pango.WrapMode.WORD_CHAR)
+    
+    ly.set_markup(f'<span font="{font}" font-size="{size*1000}">{text}</span>')
+    pc.show_layout(ct, ly)
+    ct.stroke()
+    return
