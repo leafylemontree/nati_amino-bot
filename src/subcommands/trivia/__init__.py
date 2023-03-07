@@ -1,1 +1,2 @@
-from .trivia import trivia
+from .trivia import *
+from .questions import *

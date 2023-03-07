@@ -33,11 +33,15 @@ class BaseInstance:
         self.run         = False
         self.auth.isOpen = True
 
+    def indexPlayer(self, uid):
+        for index, player in enumerate(self.players):
+            if player[0] == uid:    return index
+
     async def screen(self):
         return
     async def logic(self, ctx, key):
         return
-    async def win(self):
+    async def win(self, ctx):
         return
-    async def lose(self):
+    async def lose(self, ctx):
         return

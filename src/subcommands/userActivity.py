@@ -111,3 +111,15 @@ async def customMsg(ctx):
                                     reply=None) 
         return
 
+
+@utils.userId
+async def give(ctx, userId, message):
+    user = await ctx.client.get_user_info(userId)
+    await ctx.send(f"""
+[c]{ctx.msg.author.nickname} quiere darle un chocolate a {user.nickname}
+[c]¿Aceptas?
+[c]-si -no
+""")
+    state = await utils.waitConfirmation(ctx, userId)
+    if state: await ctx.send(f"{user.nickname} ha aceptado el chocolate, c:")
+    else    : await ctx.send(f"{user.nickname} ha rechazado el chocolate, unu")

@@ -5,3 +5,4 @@ from .leaderboard   import getLeaderboard
 from .instance      import instance
 from .role          import accept_role
 from .remove        import remove
+from .community     import newCommunity, removeCommunity

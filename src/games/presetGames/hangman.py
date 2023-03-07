@@ -37,12 +37,12 @@ class Hangman(BaseInstance):
             self.data.turn += 1
         return await self.screen(ctx)
 
-    async def win(self):
+    async def win(self, ctx):
         for key in self.data.word:
             if key not in self.data.keys: return False
         return True
     
-    async def lose(self):
+    async def lose(self, ctx):
         return
 
     def end(self):

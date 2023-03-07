@@ -3,7 +3,9 @@ from aiofile import async_open, AIOFile
 import asyncio
 import json
 import base64
+from src import utils
 
+@utils.disabled
 async def craiyon(ctx):
     token = ctx.msg.content.split()[1:]
     token = " ".join(token)

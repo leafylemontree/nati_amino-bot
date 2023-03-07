@@ -11,15 +11,19 @@ qTypes = [
             ['music',       'Música'],
         ]
 
+questions = {}
+
 def updateQuestions():
+    global questions
     import json
+
 
     with open('src/subcommands/trivia/data.json') as f:
         data = json.load(f)
 
-    return data["questions"]
+    questions = data["questions"]
+    return 
 
-questions = updateQuestions()
 
 def addQuestion(questionData):
     newQuestion = {
@@ -48,7 +52,7 @@ def question(nick, step, answer, qArray):
     correct = questions[qType][q]['correct']
     wrong   = questions[qType][q]['wrong']
 
-    response = f"[cb]Pregunta {step + 1}:\n[c]--------------\n[c]{nick}\n[c]Tema: {getTopic(qType)}\n\n[c]{header}\n\n"
+    response = f"[cb]Pregunta {step + 1}:\n[c]--------------\n{f'[c]{nick}' if nick else ''}\n[c]Tema: {getTopic(qType)}\n\n[c]{header}\n\n"
 
     answers = wrong.copy()
     answers.insert(ANSWER.index(answer), correct)
@@ -86,7 +90,6 @@ def getQuestions(loc):
         for i in fullList: o.append([i, qType])
     return o
 
-
-
+updateQuestions()
 
 

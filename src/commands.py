@@ -12,7 +12,7 @@ from src import utils
 from src import shop
 from src.text import text
 from src.special.tareasAmino import TA
-
+from . import database
 import sys
 
 def login():
@@ -30,9 +30,14 @@ async def message(ctx: Context):
         await antispam.messageRegister(ctx)
         
         response = await antispam.detectAll(ctx)
-        if response: return
+        #if response: return
         if msg is not None:
-            if ctx.msg.content.upper().find("--CONFIG") == 0: await config.config(ctx)
+            com = ctx.msg.content.upper()
+            if      com.find("--CONFIG") == 0: await config.config(ctx)
+            elif    com.find("--LOG") == 0:    await config.logConfig(ctx)
+
+        userDB = database.db.getUserData(ctx.msg.author)
+
         d = await config.get(ctx)
         if   d == -1: return None
         elif d ==  1: return await subcommands.enter(ctx)
@@ -45,6 +50,8 @@ async def message(ctx: Context):
         if ctx.msg.author:   nick = ctx.msg.author.nickname
 
         if   com.find("--SETLOG") == 0 :                                            reply.msg = await antispam.set_logging(ctx)
+        elif com.find("-SI") == 0:                                                  await utils.confirm(ctx, True)
+        elif com.find("-NO") == 0:                                                  await utils.confirm(ctx, False)
         elif com.find("--BAN") == 0:                                                await antispam.ban_user(ctx)
         elif com.find("--UNBAN") == 0:                                              await antispam.unban_user(ctx)
         elif com.find("--WARN") == 0:                                               await antispam.warn_user(ctx)
@@ -59,18 +66,26 @@ async def message(ctx: Context):
         elif com.find("--DEEPANALYZE") == 0:                                        await antispam.deepAnalyze.run(ctx)
         elif com.find("--CHATANALYZE") == 0:                                        await antispam.chatAnalyze(ctx)
         elif com.find("--LISTATA_CA") == 0:                                         await TA.run(ctx)
-        elif com.find("--STATS2") == 0:                                             await images.botstats2(ctx)
-        elif com.find("--STATS") == 0:                                              await images.stats(ctx)
+        elif com.find("--REPORTES") == 0:                                             await images.botstats2(ctx)
+        elif com.find("--BOTINFO") == 0:                                              await images.stats(ctx)
         elif com.find("--JOINPUBLICCHATS") == 0:                                    await admin.joinChats(ctx)
         elif com.find("--DELETEMSG") == 0:                                          await antispam.del_(ctx)
         elif com.find("--INSTANCE") == 0:                                           await admin.instance(ctx)
         elif com.find("--ACEPTAR") == 0:                                            await admin.accept_role(ctx)
         elif com.find("--PURGA") == 0:                                              await admin.remove(ctx)
+        elif com.find("--GOTOCOMMUNITY") == 0:                                      await admin.newCommunity(ctx)
+        elif com.find("--QUITCOMMUNITY") == 0:                                      await admin.removeCommunity(ctx)
         elif d != 100: 
             if   com.find("NATI")   == 0:                                               reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("ARTEMIS") == 0:                                              reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("EMMA") == 0 and ctx.msg.ndcId == 215907772:                  reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("ANYA") == 0 and ctx.msg.ndcId == 139175768:                  reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
+            elif com.find("--HELP") == 0:                                               await subcommands._help(ctx)
+            elif com.find("--INTERACCI") == 0:                                          await subcommands._help(ctx, hType="INTERACCION")
+            elif com.find("--IMAGENES") == 0 or com.find("--IMÁGENES") == 0:            await subcommands._help(ctx, hType="IMAGENES")
+            elif com.find("--MATES") == 0:                                              await subcommands._help(ctx, hType="MATEMATICAS")
+            elif com.find("--JUEGOS") == 0:                                             await subcommands._help(ctx, hType="JUEGOS")
+            elif com.find("--STAFF") == 0:                                              await subcommands._help(ctx, hType="MODERACION")
             elif com.find("--ANIMALES") == 0:                                           await images.animals(ctx)
             elif com.find("--SEX") == 0:                                                reply.msg = text['sex']
             elif com.find("--RATE") == 0:                                               await subcommands.rateBlog(ctx)
@@ -79,11 +94,14 @@ async def message(ctx: Context):
             elif com.find("--DOWNLOAD") == 0:                                           await subcommands.videoDownload(ctx)
             elif com.find("--TRIVIA") == 0:                                             await subcommands.trivia(ctx)
             elif com.find("--ESCUCHAR") == 0:                                           await subcommands.audioRecognize(ctx)
+            elif com.find("--DAR") == 0:                                                await subcommands.give(ctx)
+            elif com.find("--BLOGINFO") == 0:                                                await subcommands.blogInfo(ctx)
             elif com.find("--NANO") == 0 :                                              reply.msg = text['nano']
             elif com.find("--CARD1") == 0:                                              await images.card(ctx)
             elif com.find("--CRAIYON") == 0:                                            await images.craiyon(ctx)
             elif com.find("--TIENDA") == 0:                                             await shop.shop(ctx)
-            elif com.find("--JUEGOS") == 0:                                             await games.main(ctx)
+            elif com.find("--TTS") == 0:                                                await subcommands.tts(ctx)
+            elif com.find("--SALA") == 0:                                             await games.main(ctx)
             elif com.find("-J") == 0:                                                   await games.turn(ctx)
             elif com.find("--WORDLE") == 0:                                           reply     = await commands.wordle(ctx, com)
             elif ((com.find("--SIGUEME") == 0) | (com.find("--SÍGUEME") == 0)) :        reply     = await subcommands.follow(ctx)
@@ -107,7 +125,6 @@ async def message(ctx: Context):
             elif com.find("--INFO") == 0 :                                              await subcommands.userInfo(ctx)
             elif com.find("PLEBEYOS") == 0 :                                            reply.msg = f"{text['plebeyos']} {nick}"
             elif com.find("LA NAVE") == 0 :                                             reply.msg = text['la_nave']
-            elif com.find("--HELP") == 0:                                               reply     = subcommands._help(msg, ctx.msg.ndcId)
             elif com == "--NOMBRE":                                                     reply.msg = f"[c]Tu nombre es:\n\n[c]{nick}";
             elif ((msg.find("--say") < 5) & (msg.find("--say") != -1)) :                reply.msg = msg[6:]
             elif ((com.find("KIWILATIGO") != -1) | (com.find("KIWILÁTIGO") != -1)):     reply     = subcommands.kiwilatigo(ctx)
@@ -126,7 +143,6 @@ async def message(ctx: Context):
             elif com.find("DOXXEA A") != -1:                                            reply     = await subcommands.doxx(ctx, 1)
             elif com.find("--THREADID") == 0:                                           reply.msg = ctx.msg.threadId
             elif com.find("--COMID") == 0:                                              reply.msg = str(ctx.msg.ndcId)
-            elif com.find("--LOG") == 0:                                                reply.msg = await config.logConfig(ctx)
             elif com.find("--ABSTRACT") == 0:                                          await images.abstractImage(ctx)
             elif com.find("--VIEW") == 0:                                               reply.msg = await antispam.view(ctx)
             elif com.find("--CUSTOMMSG") == 0:                                          await subcommands.customMsg(ctx)

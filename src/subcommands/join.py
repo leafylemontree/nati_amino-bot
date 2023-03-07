@@ -1,10 +1,12 @@
+import time
 
-
-#async def joinChat(ctx):
-#    return
-
-async def joinCom(ctx):
-    return
+async def join_chat(ctx, threadId: str):
+        data = {"timestamp": int(time.time() * 1000)}
+        return await ctx.client.request(
+                'POST',
+                f'chat/thread/{threadId}/member/{ctx.client.uid}',
+                json=data
+                )
 
 async def joinChat(ctx):
         link = ctx.msg.content.split(" ")
@@ -14,7 +16,7 @@ async def joinChat(ctx):
             chatId = await ctx.client.get_info_link(link=link[1])
             print(chatId.linkInfo.objectId)
             if chatId.linkInfo.objectType == 12:
-               await ctx.client.join_chat(chat_id=chatId.linkInfo.objectId)
+               await join_chat(ctx, threadId=chatId.linkInfo.objectId)
             #else if chatId.linkInfo.objectType == 12:
             #   await ctx.client.join_chat(chat_id=chatId.linkInfo.objectId)
         except:

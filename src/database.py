@@ -22,7 +22,7 @@ class LogConfig:
             cur = cur[0]
         except IndexError as e:
             return None
-        self.comId, self.threadId, self.nowarn, self._ignore, self.ban, self.stalk, self.staff, self.bot, *self.unused = cur
+        self.comId, self.threadId, self.nowarn, self._ignore, self.ban, self.stalk, self.staff, self.bot, self.instance, self.blogCheck, self.active = cur
         return self
 
 class Config:
@@ -99,11 +99,11 @@ class Database:
         return data
 
     def setLogConfig(self, comId, mode, value):
-        if mode not in ['threadId', 'nowarn', '_ignore', 'ban', 'stalk', 'staff', 'bot'] : return None
+        if mode not in ['threadId', 'nowarn', '_ignore', 'ban', 'stalk', 'staff', 'bot', 'blogCheck', 'active'] : return None
         self.cursor.execute(f'SELECT * FROM Log WHERE comId={comId};')
         a = []
         for c in self.cursor: a.append(c)
-        if a == []: self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0);')
+        if a == []: self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 0 0);')
         if mode == "threadId" : value = f'"{value}"'
         self.cursor.execute(f'UPDATE Log SET {mode}={value} WHERE comId={comId};')
         return True
@@ -112,7 +112,7 @@ class Database:
         self.cursor.execute(f'SELECT * FROM Log WHERE comId={comId};')
         data = LogConfig(self.cursor)
         if not data:
-            self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 1);')
+            self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 1, 0 0);')
             self.cursor.execute(f'SELECT * FROM Log WHERE comId={comId};')
             data = LogConfig(self.cursor)
         return data

@@ -38,4 +38,5 @@ async def instance(ctx):
                  await send_image(ctx, img)
                  return
 
-    await ctx.send(f"Esta instancia de Nati es la número: {ba.instance + 1}\n\nDato:\n{jokes[int(random() * len(jokes))]}")
+    wallet = await ctx.client.get_wallet_info()
+    await ctx.send(f"Esta instancia de Nati es la número: {ba.instance + 1}\nPosee: {wallet.totalCoinsFloat} AC\n\nDato:\n{jokes[int(random() * len(jokes))]}")

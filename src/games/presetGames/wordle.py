@@ -74,7 +74,7 @@ class Wordle(BaseInstance):
         self.data.state += 1
         return
 
-    async def win(self):
+    async def win(self, ctx):
         if len(self.data.keys) < 6 and self.data.keys[-1] == self.data.word:
             self.data.turn += 1
             self.data.keys = []
@@ -84,7 +84,7 @@ class Wordle(BaseInstance):
             return True
         return False
 
-    async def lose(self):
+    async def lose(self, ctx):
         if len(self.data.keys) > 4 and self.data.keys[-1] != self.data.word:
             self.data.turn += 1
             self.data.keys = []

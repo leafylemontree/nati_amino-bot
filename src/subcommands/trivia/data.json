@@ -83,7 +83,7 @@
 		    	]
 		    },
 		{
-		    "question"	: "¡Quién fue el primer presidente de los Estados Unidos?",
+		    "question"	: "¿Quién fue el primer presidente de los Estados Unidos?",
 		    "correct"	: "George Washington",
 		    "wrong"	: [
 		    	    "George Bush",
@@ -660,7 +660,7 @@
 			]
 		  },
 		  {
-		   "question"	: "ompleta la frase: “Pon tu fe en lo que tú más creas. Un ser, dos mundos son, te guiará tu corazón y…",
+		   "question"	: "Completa la frase: “Pon tu fe en lo que tú más creas. Un ser, dos mundos son, te guiará tu corazón y…",
 		   "correct"	: "decidirá por ti”",
 		   "wrong"	: [
 			    "sabrás lo que decir”",
@@ -679,7 +679,7 @@
 		  },
 		  {
 		   "question"	: "Completa la frase: “Se oye una canción, que hace suspirar…”",
-		   "correct"	: "Y habla el corazón de una sección",
+		   "correct"	: "Y habla el corazón de una sensación",
 		   "wrong"	: [
 			    "Bella y bestia son",
 			    "Tiemblan de emoción",

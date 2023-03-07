@@ -1,5 +1,6 @@
 from src import utils
 from src.text import reload as textReload
+from src import subcommands
 
 bio = """
 [c]°•○●°•○●°•○●°•○●°•○●°•○●°•○●°•○●°•○●°•○●
@@ -83,4 +84,7 @@ async def nati(ctx):
         textReload()
     elif com[1].upper() == "-CLEARAWAITER":
         await utils.clearAW(ctx)
+    elif com[1].upper() == "-RELOADQUESTIONS":
+        subcommands.updateQuestions()
+        await ctx.send("Preguntas recargadas")
     return

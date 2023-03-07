@@ -81,7 +81,7 @@ async def sendLog(ctx, warnings):
 ------------------
 Nick: {ctx.msg.author.nickname}
 ID: {ctx.msg.author.uid}
-Chat: {ctx.msg.threadId}
+Chat: ndc://chat-thread/{ctx.msg.threadId}
 Tipo: {ctx.msg.type}
 Mensaje:
 {ctx.msg.content}
@@ -177,3 +177,38 @@ Mensaje:
                                     reply=None )
     return
 
+
+async def blogLog(ctx, blog, warnings):
+    ndcId   = ctx.client.ndc_id[1:]
+    log     = db.getLogConfig(ndcId)
+    threadId= log.threadId
+    if not threadId: return
+
+    def FNick(fnick):
+        return '\n'.join(list(map(lambda warning: f'  {warning} - {objects.AntiSpam.msg_desc[str(warning)]}', fnick)))
+    
+    def FContent(fcontent):
+        return '\n'.join(list(map(lambda warning: f'  {warning} - {objects.AntiSpam.msg_desc[str(warning)]}', fcontent)))
+    base_msg=f"""
+Análisis de blogs automático
+------------------
+Nick: {blog.author.nickname}
+link: ndc://blog/{blog.blogId}
+Autor: {blog.author.nickname}
+Fecha: {blog.createdTime}
+------------------
+Advertencias:
+{FNick(warnings[0])}
+{FContent(warnings[1])}
+------------------
+Contenido:
+{blog.content[:500]}
+-----------------"""
+
+    embed = Embed(title="Blog", object_type=1, object_id=blog.blogId, content=blog.title)
+
+    await ctx.client.send_message(
+                message=base_msg,
+                chat_id=threadId,
+                embed=embed
+                )

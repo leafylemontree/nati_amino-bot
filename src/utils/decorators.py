@@ -168,6 +168,10 @@ def checkType(*listargs):
     return mn
 
 
+def disabled(func):
+    async def wrapper(ctx):
+        return await ctx.send("Comando deshabilitado hasta nuevo aviso")
+    return wrapper
 
 
 ###########################
@@ -178,7 +182,7 @@ def checkType(*listargs):
 
 
 class AW:
-    def __init__(self, userId, ndcId, threadId, message, func, content, fcargs=None):
+    def __init__(self, userId, ndcId, threadId, message, func, content, fcargs=None, instantKill=False):
         self.userId     = userId
         self.ndcId      = ndcId
         self.threadId   = threadId
@@ -187,13 +191,16 @@ class AW:
         self.content    = content
         self.data       = None
         self.fcargs     = fcargs
+        self.kill       = instantKill
+        self.accessed   = False
 
 class Waiting:
     aw = []
+    cn = []
 
-    def add(self, userId, ndcId, threadId, message, func, content, fcargs):
+    def add(self, userId, ndcId, threadId, message, func, content, fcargs, instantKill):
         self.aw.append(
-                AW(userId, ndcId, threadId, message, func, content, fcargs)
+                AW(userId, ndcId, threadId, message, func, content, fcargs, instantKill)
             )
         return
 
@@ -246,7 +253,7 @@ async def clbdefault(ctx):
     print("CALLBACK NOT SET")
     return
 
-def waitForMessage(message="-si", timeout=None, callback=clbdefault, fcargs=None):
+def waitForMessage(message="-si", timeout=None, callback=clbdefault, fcargs=None, instantKill=False):
     def main(func):
         async def wrapper(ctx, *args, **kwargs):
             threadId    = ctx.msg.threadId
@@ -258,15 +265,28 @@ def waitForMessage(message="-si", timeout=None, callback=clbdefault, fcargs=None
             if ins: return
 
             #waiting.clearIfUserRegistered(userId)
-            waiting.add(userId, ndcId, threadId, message.upper(), callback, content, fcargs)
+            waiting.add(userId, ndcId, threadId, message.upper(), callback, content, fcargs, instantKill)
             response = await func(ctx, *args, **kwargs)
-            if response: waiting.editData(userId, ndcId, threadId, data=response)
+            print(response, bool(response))
+            if response != -1: waiting.editData(userId, ndcId, threadId, data=response)
+            else: 
+                index = waiting.retrieve(userId, ndcId, threadId)
+                if index != -1: waiting.delete(index)
+
             return
         return wrapper
     return main
 
 
 async def waitForCallback(ctx):
+
+    def deleteInstance(userId, ndcId, threadId):
+        while True:
+                index = waiting.retrieve(userId, ndcId, threadId)
+                if index == -1: break
+                waiting.delete(index)
+        return
+
     threadId    = ctx.msg.threadId
     ndcId       = ctx.client.ndc_id
     userId      = ctx.msg.author.uid
@@ -275,20 +295,113 @@ async def waitForCallback(ctx):
     index, ins = waiting.look(userId, ndcId, threadId, msg.upper())
     if not ins: return
     
+
+    print(ins.kill, ins.accessed)
+    if ins.kill and ins.accessed:
+        deleteInstance(userId, ndcId, threadId)
+        return
+    if ins.kill:
+        ins.accessed = True
+
     response = False
     try:
-        if ins.fcargs: response = await ins.func(ctx, ins, ins.fcargs)
-        else         : response = await ins.func(ctx, ins)
+        if ins.fcargs   : response = await ins.func(ctx, ins, ins.fcargs)
+        else            : response = await ins.func(ctx, ins)
     except Exception as e:
         print(e)
 
-    if response:
-        while True:
-            index = waiting.retrieve(userId, ndcId, threadId)
-            if index == -1: break
-            waiting.delete(index)
+    if response: deleteInstance(userId, ndcId, threadId)
     return 
 
 async def clearAW(ctx):
     waiting.eraseEverything()
     await ctx.send("Se han limpiado los registros de mensajes en cadena")
+
+
+
+
+
+
+
+"""
+###############################
+
+        Sub Tasks
+
+################################
+"""
+
+import threading
+import asyncio
+import time
+
+
+subTaskId = 0
+
+class SubTask:
+
+    def __init__(self, pollingTime, callback, tableEntry):
+        global subTaskId
+        self.pollingTime    = pollingTime
+        self.callback       = callback
+        self.tableEntry     = tableEntry
+        self.subTaskId      = subTaskId
+        subTaskId          += 1
+        return
+
+class SubTaskScheduler:
+
+    subTasks    = []
+    timeCounter = 0
+    context     = None
+    loop        = None
+    active      = False
+
+    def __init__(self):
+        return
+
+    async def set(self, ctx):
+        self.context = ctx
+        self.loop    = asyncio.get_event_loop()
+
+    def create(self, newSubTask):
+        print("Attempt to create a subtask")
+        for subTask in self.subTasks:
+            if subTask.subTaskId == newSubTask.subTaskId: return None
+            if subTask.callback  == newSubTask.callback : return None
+        print("Task created!")
+        self.subTasks.append(newSubTask)
+        return
+
+    async def run(self, ctx=None):
+        if ctx: await self.set(ctx)
+        
+        print("run st")
+        while True:
+
+            for subTask in self.subTasks:
+                if ((self.timeCounter % subTask.pollingTime) != 0): continue
+                try :
+                    await subTask.callback(self.context)
+                except Exception as e:   
+                    print(f'Coroutine errored!:\n\t - {e}')
+                    pass
+
+            await asyncio.sleep(1)
+            self.timeCounter += 1
+
+st = SubTaskScheduler()
+
+def runSubTask(pollingTime=300, tableEntry=None):
+    def wrapper(func):
+        task = SubTask(
+                        pollingTime=pollingTime,
+                        callback=func,
+                        tableEntry=tableEntry
+                        )
+        print(task)
+        st.create(task)
+        async def run(*args, **kwargs):
+            return
+        return run
+    return wrapper

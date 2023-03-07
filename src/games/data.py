@@ -4,7 +4,7 @@ from src import utils
 from typing import List, Any
 from edamino import Context, Client
 from .functions import Functions
-from .presetGames import Hangman, Auth, Wordle
+from .presetGames import Hangman, Auth, Wordle, Trivia
 from asyncio import sleep
 from src import database
 
@@ -72,6 +72,7 @@ Jugadores:
 
         if   msg[0].upper() == "AHORCADO": data = Hangman
         elif msg[0].upper() == "WORDLE"  : data = Wordle
+        elif msg[0].upper() == "TRIVIA"  : data = Trivia
         else                             :
             print("No game")
             data = None
@@ -147,15 +148,15 @@ Jugadores:
         if t: await self.functions.send(self.ctx, self.instances[r].threadId, t, self.instances[r].ndcId)
 
         await sleep(1)
-        if await self.instances[r].win():
+        if await self.instances[r].win(ctx):
             player = self.instances[r].players[(self.instances[r].data.turn-1) % len(self.instances[r].players)]
             database.db.modifyRecord(43, await ctx.client.get_user_info(player[0]), 250)
-            await self.functions.send(self.ctx, self.instances[r].threadId, f"¡{player[0]} es el ganador!", self.instances[r].ndcId)
+            await self.functions.send(self.ctx, self.instances[r].threadId, f"¡{player[1]} es el ganador!", self.instances[r].ndcId)
             await sleep(1)
             await self.functions.send(self.ctx, self.instances[r].threadId, f"La sala {self.instances[r].roomId} ha finalizado el juego", self.instances[r].ndcId, ghost=True)
             self.instances[r].end()
         
-        if await self.instances[r].lose():
+        if await self.instances[r].lose(ctx):
             player1 = self.instances[r].players[(self.instances[r].data.turn) % len(self.instances[r].players)][1]
             player2 = self.instances[r].players[(self.instances[r].data.turn-1) % len(self.instances[r].players)][1]
             await self.functions.send(self.ctx, self.instances[r].threadId, f"{player1} ha perdido\nTurno de {player2}", self.instances[r].ndcId)

@@ -6,7 +6,7 @@ from src.database import db
 async def logConfig(ctx):
         com = ctx.msg.content.upper().split(" ")
         
-        if len(com) == 1: return """
+        msg = """
 Esta opción debe usarse para configurar partes de moderación del bot. No funciona si quien lo efectúa no es staff en la comunidad:
 ---------------------------
 
@@ -14,7 +14,7 @@ Esta opción debe usarse para configurar partes de moderación del bot. No funci
 El bot no enviará reportes
 
 --log -wAll   :
-El bot enviará todos los reportes
+El bot enviará todos los reportes (por defecto)
 
 --log -ignore :
 EL bot no atacará ante spam de comunidades
@@ -23,7 +23,7 @@ EL bot no atacará ante spam de comunidades
 El bot expulsará inmediatamente
 
 --log -normal :
-El bot expulsará solo ante pedido
+El bot expulsará solo ante pedido (por defecto)
 
 --log -stalk :
 El bot revisará a cada momento perfiles de usuarios conectados.
@@ -35,16 +35,28 @@ El bot dejará de ser Gran Hermana
 El bot solo reacciona al staff
 
 --log -everyone :
-El bot reacciona a todos
+El bot reacciona a todos (por defecto)
 
 --log -disable :
 Desactiva el bot
 
 --log -enable :
-Reactiva el bot
+Reactiva el bot (por defecto)
+
+--log -blogEnable:
+El bot revisará recientes en búsqueda de spam
+
+--log -blogEnable:
+El bot ya no revisará recientes en búsqueda de spam (por defecto)
+
+--log -beActive
+El bot enviará cada 15 minutos una petición para estar activo. Esto significa que será más sensible a spam por privado, a cambio de que puede aparecer en la parte superior de miembros destacados, y esté más propenso a recibir ban de IP
+
+--log -beInactive
+El bot permanecerá con estado inactivo (por defecto)
     """
         
-        msg   = None 
+        if len(com) == 1: return await ctx.send(msg)
         comId = ctx.msg.ndcId
 
         if   com[1] == "-NO-WARN":
@@ -86,9 +98,26 @@ Reactiva el bot
         
         elif com[1] == "-ENABLE" :
             db.setLogConfig(comId, 'bot', 0)
-            msg = "El bot está apagado en esta comunidad"
+            msg = "El bot está encendido en esta comunidad"
         
         elif com[1] == "-DISABLE" :
             db.setLogConfig(comId, 'bot', 1)
-            msg = "El bot está encendido en esta comunidad"
-        return msg
+            msg = "El bot está apagado en esta comunidad"
+
+        elif com[1] == "-BLOGENABLE" :
+            db.setLogConfig(comId, 'blogCheck', 1)
+            msg = "El bot revisará los blogs recientes de esta comunidad"
+        
+        elif com[1] == "-BLOGDISABLE" :
+            db.setLogConfig(comId, 'blogCheck', 0)
+            msg = "El bot ya no revisará los blogs recientes en esta comunidad"
+
+        elif com[1] == "-BEACTIVE" :
+            db.setLogConfig(comId, 'active', 1)
+            msg = "El bot enviará cada 15 minutos una petición para estar activo. Esto significa que será más sensible a spam por privado, a cambio de que puede aparecer en la parte superior de miembros destacados, y esté más propenso a recibir ban de IP."
+
+        elif com[1] == "-BEINACTIVE" :
+            db.setLogConfig(comId, 'active', 1)
+            msg = "El bot permancerá con estado inactivo"
+
+        return await ctx.send(msg)

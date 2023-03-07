@@ -1,6 +1,7 @@
 from src            import objects
 from src            import commands
 from src            import subprocess
+from src            import utils
 import asyncio
 from edamino import Bot, Context, Client, api
 
@@ -28,7 +29,10 @@ def main():
 
     @bot.event(message_types=api.MessageType.ALL, media_types=api.MediaType.ALL)
     async def on_message(ctx: Context):
-        if objects.ba.loop is False: loop = asyncio.get_event_loop()
+        if objects.ba.loop is False:
+            objects.ba.loop = asyncio.get_event_loop()
+            await utils.st.set(ctx)
+
         subprocess.run(objects.ba.loop, ctx)
         objects.ba.counter = 300
         await commands.message(ctx);
@@ -38,6 +42,7 @@ def main():
     except Exception as e:
         print("Login failed!")
         print("Exception caught:", e)
+        sys.exit()
         objects.botStats.write()
 
 if __name__ == "__main__":
