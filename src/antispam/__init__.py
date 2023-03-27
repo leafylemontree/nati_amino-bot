@@ -7,3 +7,4 @@ from .deepAnalyze   import deepAnalyze
 from .chat          import chatAnalyze
 from .delete        import del_
 from .register      import messageRegister
+from .community     import communityanalyze

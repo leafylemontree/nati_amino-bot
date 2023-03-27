@@ -4,6 +4,7 @@ from pydantic       import BaseModel
 from typing         import List, Dict, Optional, Any, Tuple
 from edamino.objects import Author
 
+import logging
 import time
 import json
 import os
@@ -345,7 +346,7 @@ class AntiSpam:
 class Bot_attributes:
     counter = 0
     loop  = False 
-    instane = -1
+    instance = -1
 
     def kill(self, r):
         import os, sys, signal
@@ -361,12 +362,203 @@ ba = Bot_attributes()
 # Missing objects in Edamino
 
 class WallComment(BaseModel):
-    author          : Optional[Author]
-    content         : Optional[str]
-    extensions      : Any
-    parentId        : Optional[str]
-    createdTime     : Optional[str]
-    subCommentsCount: Any
-    commentType     : Optional[int]
+    author:                     Optional[Author]
+    content:                    Optional[str]
+    extensions:                 Any
+    parentId:                   Optional[str]
+    createdTime:                Optional[str]
+    subCommentsCount:           Any
+    commentType:                Optional[int]
 
+class LeaderboardUserProfile(BaseModel):
+    status:                     Optional[int]
+    isNicknameVerified:         Any
+    activeTime:                 Optional[int]
+    uid:                        Optional[str]
+    level:                      Optional[int]
+    followingStatus:            Optional[int]
+    accountMembershipStatus:    Optional[int]
+    isGlobal:                   Any
+    membershipStatus:           Optional[int]
+    reputation:                 Optional[int]
+    role:                       Optional[int]
+    ndcId:                      Optional[int]
+    membersCount:               Optional[int]
+    nickname:                   Optional[str]
+    icon:                       Optional[str]
+
+class TipOption(BaseModel):
+    value:                      Optional[int]
+    icon:                       Optional[str]
+
+class TipInfo(BaseModel):
+    tipOptionList:              Optional[Tuple[TipOption, ...]]
+    tipMaxCoin:                 Optional[int]
+    tippersCount:               Optional[int]
+    tippable:                   Any
+    tipMinCoin:                 Optional[int]
+    tipCustomOption:            Optional[TipOption]
+    tippedCoins:                Optional[int]
+
+class refObjectStyle(BaseModel):
+    coverMediaIndexList:        Optional[Tuple[int]]
+
+class refObjectExtensions(BaseModel):
+    style:                      Optional[refObjectStyle]
+    fansOnly:                   Any
+    featuredType:               Optional[int]
+
+class RefObject(BaseModel):
+    globalVotesCount:           Optional[int]
+    globalVotedValue:           Optional[int]
+    votedValue:                 Optional[int]
+    keywords:                   Optional[str]
+    strategyInfo:               Optional[str]
+    mediaList:                  Any
+    style:                      Optional[int]
+    totalQuizPlayCount:         Optional[int]
+    title:                      Optional[str]
+    tipInfo:                    Optional[TipInfo]
+    contentRating:              Optional[int]
+    content:                    Optional[str]
+    needHidden:                 Any
+    guestVotesCount:            Optional[int]
+    type:                       Optional[int]
+    status:                     Optional[int]
+    globalCommentsCount:        Optional[int]
+    modifiedTime:               Any
+    widgetDisplayInterval:      Any
+    totalPollVoteCount:         Optional[int]
+    blogId:                     Optional[str]
+    viewCount:                  Optional[int]
+    author:                     Optional[Author]
+    extensions:                 Optional[refObjectExtensions]
+    votesCount:                 Optional[int]
+    ndcId:                      Optional[int]
+    createdTime:                Any
+    endTime:                    Any
+    commentsCount:              Optional[int]
+
+class Featured(BaseModel):
+    refObjectType:              Optional[int]
+    refObjectId:                Optional[str]
+    expiredTime:                Any
+    featuredType:               Optional[int]
+    createdTime:                Any
+    refObject:                  Optional[RefObject]
+
+
+class BackgroundColor(BaseModel):
+    backgroundColor:            Optional[str]
+
+class Operation(BaseModel):
+    operationType:              Optional[int]
+    text:                       Optional[str]
+
+class NoticesConfig(BaseModel):
+    showCommunity:              Optional[bool]
+    showOperator:               Optional[bool]
+    allowQuickOperation:        Optional[bool]
+    operationList:              Optional[Tuple[Operation, ...]] 
+
+class NoticeAttachedObjectInfo(BaseModel):
+    objectType:                 Optional[int]
+    objectId:                   Optional[str]
+    title:                      Optional[str]
+    content:                    Optional[str]
+    extensions:                 Optional[int]
+    link:                       Optional[str]
+    mediaList:                  Optional[Any]
+
+class NoticesExtensions(BaseModel):
+    style:                      Optional[BackgroundColor]
+    config:                     Optional[NoticesConfig]
+    attachedObjectInfo:         Optional[NoticeAttachedObjectInfo]
+
+class Notice(BaseModel):
+    notificationId:             Optional[str]
+    type:                       Optional[int]
+    community:                  Optional[bool]
+    title:                      Optional[str]
+    ndcId:                      Optional[int]
+    content:                    Optional[str]
+    createdTime:                Any
+    icon:                       Optional[str]
+    targetUser:                 Optional[Author]
+    modifiedTime:               Any
+    status:                     Optional[int]
+    operator:                   Optional[Author]
+    extensions:                 Optional[NoticesExtensions]
+    noticeId:                   Optional[str]
+   
+@dataclass
+class UserInfo:
+    userId:                     str
+    alias:                      str
+    hugs_r:                     int
+    hugs_g:                     int
+    kiss_r:                     int
+    kiss_g:                     int
+    pats_r:                     int
+    pats_g:                     int
+    doxx_r:                     int
+    doxx_g:                     int
+    kiwi:                       int
+    win:                        int
+    draw:                       int
+    lose:                       int
+    points:                     int
+    unused4:                    int
+    unused5:                    int
+    unused6:                    int
+    unused7:                    int
+    unused8:                    int
+
+@dataclass
+class LogConfig:
+    comId:                      int
+    threadId:                   str
+    nowarn:                     int
+    _ignore:                    int
+    ban:                        int
+    stalk:                      int
+    staff:                      int
+    bot:                        int
+    instance:                   int
+    blogCheck:                  int
+    active:                     int
+    userWelcome:                int
+
+@dataclass
+class ChatConfig:
+    threadId:                   str
+    comId:                      int
+    _check:                     int
+    welcome:                    int
+    goodbye:                    int
+    bot:                        int
+    slow:                       int
+    staff:                      int
+    nofun:                      int
+    safe:                       int
+   
+@dataclass
+class WelcomeMessage:
+    comId:                      int
+    message:                    str
+    chat:                       str
+
+@dataclass
+class SocketResponse:
+    dtype:          int
+    timestamp:      int
+    messageId:      str
+    content:        str
+    address:        str
+    instance:       int
+    origin:         int
+    destinatary:    int
+    nodeId:         str
+
+logging.basicConfig(level=logging.INFO, fmt=f"%(asctime)s %(levelname)s : ins={ba.instance} - %(message)s")
 alreadyChecked = []

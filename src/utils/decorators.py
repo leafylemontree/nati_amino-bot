@@ -1,9 +1,12 @@
 from edamino import Context
 from typing import List
+from src import objects
+import logging
 
 leafId    =  "17261eb7-7fcd-4af2-9539-dc69c5bf2c76"
 noMessage = "Usted no está autorizado para ejercer este comando"
 
+logging.basicConfig(level=logging.INFO, fmt=f"%(asctime)s %(levelname)s : ins={objects.ba.instance} - %(message)s")
 
 def isStaff(func):
     async def check(*args, **kwargs):
@@ -94,7 +97,7 @@ def cutes(func):
 def safe(func):
     async def wrapper(ctx):
         from src.database import db
-        chat = db.getChatConfig(ctx.msg.threadId)
+        chat = db.getChatConfig(ctx.msg.threadId, ctx.msg.ndcId)
         if chat.safe: return "Comando deshabilitado"
         r = await func(ctx)
         return r
@@ -209,7 +212,6 @@ class Waiting:
             if ins.userId   != userId           : continue
             if ins.ndcId    != ndcId            : continue
             if ins.threadId != threadId         : continue
-            print(ins.message, message)
             if (message.upper().find(ins.message.upper()) != 0) and (ins.message != '*')  : continue
             return index, ins
         return -1, None
@@ -250,7 +252,7 @@ class Waiting:
 waiting = Waiting()
 
 async def clbdefault(ctx):
-    print("CALLBACK NOT SET")
+    logging.error("CALLBACK NOT SET")
     return
 
 def waitForMessage(message="-si", timeout=None, callback=clbdefault, fcargs=None, instantKill=False):
@@ -267,7 +269,6 @@ def waitForMessage(message="-si", timeout=None, callback=clbdefault, fcargs=None
             #waiting.clearIfUserRegistered(userId)
             waiting.add(userId, ndcId, threadId, message.upper(), callback, content, fcargs, instantKill)
             response = await func(ctx, *args, **kwargs)
-            print(response, bool(response))
             if response != -1: waiting.editData(userId, ndcId, threadId, data=response)
             else: 
                 index = waiting.retrieve(userId, ndcId, threadId)
@@ -287,6 +288,8 @@ async def waitForCallback(ctx):
                 waiting.delete(index)
         return
 
+    if ctx.msg.author is None: return
+
     threadId    = ctx.msg.threadId
     ndcId       = ctx.client.ndc_id
     userId      = ctx.msg.author.uid
@@ -295,8 +298,6 @@ async def waitForCallback(ctx):
     index, ins = waiting.look(userId, ndcId, threadId, msg.upper())
     if not ins: return
     
-
-    print(ins.kill, ins.accessed)
     if ins.kill and ins.accessed:
         deleteInstance(userId, ndcId, threadId)
         return
@@ -308,7 +309,7 @@ async def waitForCallback(ctx):
         if ins.fcargs   : response = await ins.func(ctx, ins, ins.fcargs)
         else            : response = await ins.func(ctx, ins)
     except Exception as e:
-        print(e)
+        logging.error(f'Callback error: {e}')
 
     if response: deleteInstance(userId, ndcId, threadId)
     return 
@@ -365,30 +366,44 @@ class SubTaskScheduler:
         self.loop    = asyncio.get_event_loop()
 
     def create(self, newSubTask):
-        print("Attempt to create a subtask")
         for subTask in self.subTasks:
             if subTask.subTaskId == newSubTask.subTaskId: return None
             if subTask.callback  == newSubTask.callback : return None
-        print("Task created!")
         self.subTasks.append(newSubTask)
         return
 
     async def run(self, ctx=None):
         if ctx: await self.set(ctx)
         
-        print("run st")
-        while True:
+        def run_subprocess(subTask):
+            coro = asyncio.run_coroutine_threadsafe(subTask.callback(self.context), loop=self.loop)
+            coro.result()
 
-            for subTask in self.subTasks:
-                if ((self.timeCounter % subTask.pollingTime) != 0): continue
-                try :
-                    await subTask.callback(self.context)
-                except Exception as e:   
-                    print(f'Coroutine errored!:\n\t - {e}')
-                    pass
+        try:
+            while True:
 
-            await asyncio.sleep(1)
-            self.timeCounter += 1
+                for i,subTask in enumerate(self.subTasks):
+                    if ((self.timeCounter % subTask.pollingTime) != 0): continue
+                    try :
+                        logging.info(f'$.{objects.ba.instance} - Running subTak {i}. subTaskTimer={self.timeCounter}')
+                        t = threading.Thread(target=run_subprocess, args=(subTask,))
+                        t.start()
+                    except Exception as e:   
+                        logging.error(f'$.{objects.ba.instance} Corroutine {i} errored!: {e}')
+                        pass
+
+                await asyncio.sleep(1)
+                self.timeCounter += 1
+
+        except Exception as e:
+            self.active = False
+            logging.critical(f'Loop Errored! {e}')
+
+    async def reset(self, ctx):
+        logging.info('SUBTASKTIMER reseted')
+        self.timeCounter = -1
+        return
+
 
 st = SubTaskScheduler()
 
@@ -399,7 +414,6 @@ def runSubTask(pollingTime=300, tableEntry=None):
                         callback=func,
                         tableEntry=tableEntry
                         )
-        print(task)
         st.create(task)
         async def run(*args, **kwargs):
             return

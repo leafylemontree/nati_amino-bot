@@ -194,7 +194,6 @@ Análisis de blogs automático
 ------------------
 Nick: {blog.author.nickname}
 link: ndc://blog/{blog.blogId}
-Autor: {blog.author.nickname}
 Fecha: {blog.createdTime}
 ------------------
 Advertencias:

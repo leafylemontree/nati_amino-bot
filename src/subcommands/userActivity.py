@@ -4,7 +4,7 @@ from src.database import db
 
 
 def kiwilatigo(ctx):
-        utils.database(32, ctx.msg.author.uid)
+        db.modifyRecord(32, ctx.msg.author)
         return objects.Reply(f"[ci]¡Oh no! Han hecho enfadar a {ctx.msg.author.nickname}\n\n[ci]/c skpa.", False)
 
 async def alias(ctx, msg):
@@ -59,7 +59,7 @@ async def kick(ctx, msg):
 
         return objects.Reply(msg, False)
 
-def papulince(com):
+async def papulince(ctx):
 
         grasa = [
                     ":V",
@@ -73,27 +73,28 @@ def papulince(com):
                     "PRRO",
                     "MAQUINOLA",
                     "LINCE",
+                    "MEMEZUKI",
+                    "GRASOSO",
+                    "HAIL",
+                    "GRASA",
+                    "SDLG",
+                    "PASA PACK",
+                    "PASA EL PACK",
+                    "MAMU",
+                    "FIERA",
+                    "SALVAJE",
+                    "MAQUINÓN",
+                    "PACMAN",
+                    "VVVV"
                 ]
 
-        com = com.split(" ")
+        com = ctx.msg.content.upper().split(" ")
+        if len(com) < 2: return await ctx.send("Debe colocar un texto después del comando.")
+        msg = " ".join(com[1:])
 
-        papuh = [-1, False]
-
-        for i,j in enumerate(com):
-            if j in grasa:
-                papuh = [i, True] 
-                break
-
-        print(papuh)
-
-        
-        if len(com) < 8:
-            return papuh[1]
-        else:
-            if ((papuh[0] < (len(com) / 4)) | (papuh[0] > (3*len(com) / 4))):
-                return papuh[1]
-
-        return False
+        for word in grasa:
+            if msg.find(word) != -1 : return await ctx.send("[CB]¡Papulince detectado! :v")
+        return await ctx.send("No hay grasa en este mensaje")
 
 async def customMsg(ctx):
 
@@ -123,3 +124,14 @@ async def give(ctx, userId, message):
     state = await utils.waitConfirmation(ctx, userId)
     if state: await ctx.send(f"{user.nickname} ha aceptado el chocolate, c:")
     else    : await ctx.send(f"{user.nickname} ha rechazado el chocolate, unu")
+
+
+async def fmt(ctx):
+    msg = ctx.msg.content.split('\n')
+
+    if len(msg) < 2: return await ctx.send("Debe colocar el mensaje que desee dar formato tras un salto de línea.")
+
+    msg.pop(0)
+    
+    message = await utils.formatter(ctx, '\n'.join(msg))
+    await ctx.send(message)

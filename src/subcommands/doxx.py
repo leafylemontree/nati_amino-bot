@@ -1,6 +1,6 @@
 from src    import objects
 from src    import utils
-
+from src.database import db
 
 async def doxx(ctx, mode):
         uid = ctx.msg.author.uid
@@ -16,6 +16,9 @@ async def doxx(ctx, mode):
             msg += f"\n[c]uid: {uid}"
             msg += f"\n[c]IP: {(key >> 24) & 0xFF}.{(key >> 16) & 0xFF}.{(key >> 8) & 0xFF}.{key & 0xFF}."
 
+            db.modifyRecord(14, ctx.msg.author)
+            db.modifyRecord(14, ctx.msg.author)
+
         else:
             msg = f"[cb]Doxxeando a:"
             for i in arr:
@@ -28,7 +31,7 @@ async def doxx(ctx, mode):
                 msg += f"\n[c]uid: {uid}"
                 msg += f"\n[c]IP: {(key >> 24) & 0xFF}.{(key >> 16) & 0xFF}.{(key >> 8) & 0xFF}.{key & 0xFF}\n"
 
-                utils.database(14, uid)
-                utils.database(24, ctx.msg.author.uid)
+                db.modifyRecord(14, user)
+                db.modifyRecord(14, ctx.msg.author)
 
         return objects.Reply(msg, False)

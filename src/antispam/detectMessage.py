@@ -21,7 +21,7 @@ async def findContent(content, comId=None):
         if content.find("T.ME") != -1                  : warnings.append("101")
         if content.find("AMINOAPPS.COM/C/") != -1      : warnings.append("102")
         if content.find("AMINOAPPS.COM/INVITE/") != -1 : warnings.append("103")
-        if content.find("T.CO") != -1                  : warnings.append("104")
+        if content.find("T.CO/") != -1                  : warnings.append("104")
         if content.upper().find("{}") != -1            : warnings.append("111")
         if len(content) > 3200                         : warnings.append("151") 
         if len(content) > 32000                        : warnings.append("152") 

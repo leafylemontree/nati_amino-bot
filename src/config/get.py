@@ -3,8 +3,10 @@ from src.database import db
 
 async def get(ctx):
         chatId = ctx.msg.threadId
-        chat   = db.getChatConfig(chatId) 
+        chat   = db.getChatConfig(chatId, ctx.msg.ndcId) 
         com    = db.getLogConfig(ctx.msg.ndcId)
+
+        if ctx.msg.author is None:          return -1
 
         if review('chat', chatId)           : return -1 
         if chat.bot : return -1
@@ -22,14 +24,12 @@ async def get(ctx):
             if ctx.msg.author.role not in [100, 101, 102]: return -1
        
         if   ctx.msg.type == 101:
-            print("welcome!")
             #if chatId in Config.check_on_enter  :
             #    await AS.review_user(ctx)
             if chat.welcome : return -1
             return 1
 
         elif ctx.msg.type == 102:
-            print("goodbye")
             if chat.goodbye  : return 2
         
         elif chat.nofun           : return 100

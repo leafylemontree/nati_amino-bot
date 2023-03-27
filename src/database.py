@@ -1,46 +1,19 @@
-import mariadb
-import json
-
-class UserInfo:
-    def __new__(self, cursor):
-        cur = []
-        for a in cursor: cur.append(a)
-        try:
-            cur = cur[0]
-        except IndexError as e:
-            return None
-
-        self.userId,self.alias,self.hugs_r,self.hugs_g,self.kiss_r,self.kiss_g,self.pats_r,self.pats_g,self.doxx_r,self.doxx_g,self.kiwi,self.win,self.draw,self.lose,self.points,*self.unused = cur
-        return self
-
-
-class LogConfig:
-    def __new__(self, cursor):
-        cur = []
-        for a in cursor: cur.append(a)
-        try:
-            cur = cur[0]
-        except IndexError as e:
-            return None
-        self.comId, self.threadId, self.nowarn, self._ignore, self.ban, self.stalk, self.staff, self.bot, self.instance, self.blogCheck, self.active = cur
-        return self
-
-class Config:
-    def __new__(self, cursor):
-        cur = []
-        for a in cursor: cur.append(a)
-        try:
-            cur = cur[0]
-        except IndexError as e:
-            return None
-        self.threadId, self._check, self.welcome, self.goodbye, self.bot, self.slow, self.staff, self.nofun, self.safe, *self.unused = cur
-        return self
+import  mariadb
+import  json
+import  redis
+from    src     import  objects
 
 class Database:
     base   = None
     cursor = None
+    redis  = None
+
+    r_chatTable = 'chatConfig'
+    r_comWelMsg = 'CommunityWelcome'
+    r_chatWelMsg= 'ChatWelcome'
 
     def __init__(self):
+        self.redis = redis.Redis()
         with open("data/base.json", "r") as fp:
             data = json.load(fp)
         try:
@@ -59,13 +32,12 @@ class Database:
 
     def getUserData(self, user):
         self.cursor.execute(f'SELECT * FROM UserInfo WHERE userId="{user.uid}";')
-        data = UserInfo(self.cursor)
-        print(data)
-        if data is None:
+        resp = self.cursor.fetchall()
+        if not resp:
             self.setUserData(user)
             self.cursor.execute(f'SELECT * FROM UserInfo WHERE userId="{user.uid}"')
-            data = UserInfo(self.cursor)
-        return data
+            resp = self.cursor.fetchall()
+        return objects.UserInfo(*resp[0])
 
     def setUserData(self, user):
         self.cursor.execute(f'INSERT INTO UserInfo VALUES ("{user.uid}", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)')
@@ -92,54 +64,97 @@ class Database:
         else:
             data = data[0]
 
-        if mode == 31 and value != 1:   data = f'"{value}"'.replace(";", "").replace("DROP TABLE", "").replace("drop table", "")
+        if mode == 31 and value != 1:   data = f'"{value}"'.replace(";", "").replace("DROP", "").replace("drop", "")
         else:                           data = data + value
         
-        self.cursor.execute(f'UPDATE UserInfo SET {column}={data} WHERE userId="{user.uid}";')
+        self.cursor.execute(f'UPDATE UserInfo SET {column}=? WHERE userId="{user.uid}";', (data,))
         return data
 
     def setLogConfig(self, comId, mode, value):
-        if mode not in ['threadId', 'nowarn', '_ignore', 'ban', 'stalk', 'staff', 'bot', 'blogCheck', 'active'] : return None
         self.cursor.execute(f'SELECT * FROM Log WHERE comId={comId};')
-        a = []
-        for c in self.cursor: a.append(c)
-        if a == []: self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 0 0);')
+        data = self.cursor.fetchall()
+        if data == []: self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 0, 0);')
         if mode == "threadId" : value = f'"{value}"'
         self.cursor.execute(f'UPDATE Log SET {mode}={value} WHERE comId={comId};')
         return True
 
     def getLogConfig(self, comId):
         self.cursor.execute(f'SELECT * FROM Log WHERE comId={comId};')
-        data = LogConfig(self.cursor)
-        if not data:
-            self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 1, 0 0);')
+        resp = self.cursor.fetchall()
+        if not resp:
+            self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 1, 0, 0, 0);')
             self.cursor.execute(f'SELECT * FROM Log WHERE comId={comId};')
-            data = LogConfig(self.cursor)
+            resp = self.cursor.fetchall()
+        return objects.LogConfig(*resp[0])
+
+    def setChatConfig(self, threadId, mode, value, ndcId):
+        self.cursor.execute(f'SELECT * FROM Chat WHERE threadId="{threadId}";')
+        data = self.cursor.fetchall()
+        if data == []: self.cursor.execute(f'INSERT INTO Chat VALUES ("{threadId}", {ndcId}, 0, 0, 0, 0, 0, 0, 0, 0, 0);')
+        self.cursor.execute(f'UPDATE Chat SET {mode}={value} WHERE threadId="{threadId}";')
+
+        self.cursor.execute(f'SELECT * FROM Chat WHERE threadId="{threadId}";')
+        resp = self.cursor.fetchall()
+        data = objects.ChatConfig(*resp[0])
+        self.redis.hset(self.r_chatTable, f'?{ndcId}&{threadId}', json.dumps(data.__dict__))
         return data
 
-    def setChatConfig(self, threadId, mode, value):
-        if mode not in ['_check', 'welcome', 'goodbye', 'bot', 'slow', 'staff', 'nofun', 'safe'] : return None
-        print(threadId, mode, value)
-        self.cursor.execute(f'SELECT * FROM Chat WHERE threadId="{threadId}";')
-        a = []
-        for c in self.cursor: a.append(c)
-        print(a, bool(a))
-        if not a: self.cursor.execute(f'INSERT INTO Chat VALUES ("{threadId}", 0, 0, 0, 0, 0, 0, 0, 0);')
-        self.cursor.execute(f'UPDATE Chat SET {mode}={value} WHERE threadId="{threadId}";')
-        return True
+    def getChatConfig(self, threadId, ndcId):
+        if self.redis.hexists(self.r_chatTable, f'?{ndcId}&{threadId}'):
+            data = self.redis.hget(self.r_chatTable, f'?{ndcId}&{threadId}')
+            return objects.ChatConfig(**json.loads(data))
 
-    def getChatConfig(self, threadId):
         self.cursor.execute(f'SELECT * FROM Chat WHERE threadId="{threadId}";')
-        data = Config(self.cursor)
-        if not data:
-            self.cursor.execute(f'INSERT INTO Chat VALUES ("{threadId}", 0, 0, 0, 0, 0, 0, 0, 0);')
+        resp = self.cursor.fetchall()
+        if not resp:
+            self.cursor.execute(f'INSERT INTO Chat VALUES ("{threadId}", {ndcId}, 0, 0, 0, 0, 0, 0, 0, 0);')
             self.cursor.execute(f'SELECT * FROM Chat WHERE threadId="{threadId}";')
-            data = Config(self.cursor)
+            resp = self.cursor.fetchall()
+        
+        data = objects.ChatConfig(*resp[0])
+        if not data.comId:
+            data.comId = ndcId
+            self.cursor.execute(f'UPDATE Chat SET comId={ndcId} WHERE threadId="{threadId}";')
+        self.redis.hset(self.r_chatTable, f'?{ndcId}&{threadId}', json.dumps(data.__dict__))
         return data
 
     def registerReport(self, userId, comId, threadId, warnings):
         self.cursor.execute(f'INSERT INTO Reports VALUES ("{userId}", {comId}, "{threadId}", NOW(), {1 if "1" in warnings else 0}, {1 if "2" in warnings else 0}, {1 if "3" in warnings else 0}, {1 if "101" in warnings else 0}, {1 if "102" in warnings else 0}, {1 if "103" in warnings else 0}, {1 if "104" in warnings else 0}, {1 if "111" in warnings else 0}, {1 if "151" in warnings else 0}, {1 if "152" in warnings else 0}, {1 if "200" in warnings else 0});')
         return
 
+    def r_addBlog(self, ndcId, blogId):
+        hashName    = 'viewedBlogs'
+        entry       = f'?{ndcId}&{blogId}'
+        resp        = self.redis.hexists(hashName, entry)
+        self.redis.hset(hashName, entry, 1)
+        return resp
+
+    def getWelcomeMessage(self, ndcId, mode='ALL'):
+        if mode.upper() not in ['ALL', 'COMMUNITY', 'CHAT']:
+            raise Exception('Incorrect Value for getWelcomeMessage')
+            return
+
+        output = objects.WelcomeMessage(ndcId, None, None)
+
+        if not (self.redis.hexists(self.r_comWelMsg, f'?{ndcId}') or self.redis.hexists(self.r_chatWelMsg, f'?{ndcId}')): 
+            self.cursor.execute(f'SELECT * FROM WelcomeMsg WHERE comId={ndcId}')
+            resp = self.cursor.fetchall()
+            if resp == []: return None
+            data = objects.WelcomeMessage(*resp[0])
+            self.redis.hset(self.r_comWelMsg,  f'?{ndcId}', data.message)
+            self.redis.hset(self.r_chatWelMsg, f'?{ndcId}', data.chat   )
+
+        if mode.upper() in ['ALL', 'COMMUNITY']:
+                message         = self.redis.hget(self.r_comWelMsg,  f'?{ndcId}')
+                if message      : output.message = message.decode('utf-8')
+        if mode.upper() in ['ALL', 'CHAT']:
+                chat            = self.redis.hget(self.r_chatWelMsg, f'?{ndcId}')
+                if not chat     : output.chat = '-DEFAULT'
+                else            : output.chat = chat.decode('utf-8')
+
+        if mode.upper() == 'COMMUNITY'  : return output.message
+        if mode.upper() == 'CHAT'       : return output.chat
+        if mode.upper() == 'ALL'        : return output
+        return output 
 
 db = Database()

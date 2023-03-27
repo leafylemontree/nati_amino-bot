@@ -2,6 +2,12 @@ from src import objects
 from src import utils
 from edamino.api import Embed
 from src.database import db
+import time
+
+async def get_user_checkins(ctx, userId):
+    timezone = time.timezone
+    resp = await ctx.client.request('GET', f"check-in/stats/{userId}?timezone={-timezone // 1000}")
+    return resp['consecutiveCheckInDays']
 
 @utils.userId
 async def userInfo(ctx, uid, content):
@@ -10,9 +16,10 @@ async def userInfo(ctx, uid, content):
         # print(user)
         role = "Curador" if user.role == 101 else "Líder" if user.role == 102 else "Ninguno"
 
+        checkInDays = await get_user_checkins(ctx, user.uid)
         dia = ["día", "dias"]
         a = 1
-        if user.consecutiveCheckInDays == 1: a = 0
+        if checkInDays == 1: a = 0
         activo = "No activo" if user.onlineStatus == 0 else "Conectado"
 
         usr_db = db.getUserData(user)
@@ -24,7 +31,7 @@ Estado: {activo}
 Nivel: {user.level}
 Seguidores: {user.membersCount}
 Siguiendo a: {user.joinedCount}
-Chek-in: {user.consecutiveCheckInDays} {dia[a]}
+Chek-in: {checkInDays} {dia[a]}
 Rol: {role}
 uid: {user.uid}
 Comunidad: {user.aminoId}

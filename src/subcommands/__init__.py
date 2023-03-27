@@ -1,7 +1,7 @@
 from .getBlogs      import getBlogs
 from .userInfo      import userInfo
 from .dices         import dices, rand
-from .userActivity  import kiwilatigo, ghost, follow, replyMsg, kick, alias, papulince, customMsg, give 
+from .userActivity  import kiwilatigo, ghost, follow, replyMsg, kick, alias, papulince, customMsg, give, fmt 
 from .chatActivity  import enter, leave
 from .help          import _help
 from .join          import joinChat

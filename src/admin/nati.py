@@ -87,4 +87,9 @@ async def nati(ctx):
     elif com[1].upper() == "-RELOADQUESTIONS":
         subcommands.updateQuestions()
         await ctx.send("Preguntas recargadas")
+    elif com[1].upper() == "-RESETSUBTASKTIMER":
+        await utils.st.reset(ctx)
+        await ctx.send("Contador de subtareas reiniciado")
+    elif com[1].upper() == "-ASKSUBTASKTIMER":
+        await ctx.send(f"Contador: {utils.st.timeCounter}")
     return

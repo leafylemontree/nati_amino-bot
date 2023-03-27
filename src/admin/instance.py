@@ -39,4 +39,4 @@ async def instance(ctx):
                  return
 
     wallet = await ctx.client.get_wallet_info()
-    await ctx.send(f"Esta instancia de Nati es la número: {ba.instance + 1}\nPosee: {wallet.totalCoinsFloat} AC\n\nDato:\n{jokes[int(random() * len(jokes))]}")
+    await ctx.send(f"Esta instancia de Nati es la número: {ba.instance + 1}\nPosee: {wallet.totalCoins} AC\n\nDato:\n{jokes[int(random() * len(jokes))]}")

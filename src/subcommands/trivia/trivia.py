@@ -1,11 +1,9 @@
 from src import utils
 from . import questions
 from src import database
+from src.games.base import BaseGame
 
-class TriviaData:
-    userId          : str
-    nick            : str
-    data            = []
+class TriviaData(BaseGame):
     step            : int
     nextAnswer      : str
     questionArray   = []

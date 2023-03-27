@@ -2,6 +2,6 @@ from src.database import db
 from src.objects import ba
 
 async def messageRegister(ctx):
-    content = str(ctx.msg.content).replace('"', '')
-    db.cursor.execute(f'INSERT INTO MessageHistory VALUES ("{ctx.msg.author.uid}", NOW(), {ba.instance + 1}, "{content}");')
+    if ctx.msg.author is None: return
+    db.cursor.execute(f'INSERT INTO MessageHistory VALUES (?, NOW(), {ba.instance + 1}, ?);', (ctx.msg.author.uid, ctx.msg.content))
     return

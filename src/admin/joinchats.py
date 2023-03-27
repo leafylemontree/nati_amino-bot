@@ -32,7 +32,7 @@ async def joinChats(ctx):
                         message      = base_msg,
                         message_type = 109
                     )
-            if not active: db.setChatConfig(chat.threadId, "bot", 1)
+            if not active: db.setChatConfig(chat.threadId, "bot", 1, ctx.msg.ndcId)
         except Exception as e:
             print(e)
             failed  += 1

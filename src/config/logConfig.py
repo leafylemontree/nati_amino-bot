@@ -2,6 +2,107 @@ from src.antispam.data import AS
 from src import utils
 from src.database import db
 
+async def welcomeCallback(ctx, ins):
+    if ins.data['messageId'] == ctx.msg.messageId: return False
+
+    if ctx.msg.content.upper().find("-DESACTIVAR") != -1:
+            db.setLogConfig(ctx.msg.ndcId, 'userWelcome', 0)
+            await ctx.send("Bienvenida a usuarios desactivada")
+            return True
+    
+    db.setLogConfig(ctx.msg.ndcId, 'userWelcome', 1)
+    db.cursor.execute(f'SELECT * FROM WelcomeMsg WHERE comId="{ctx.msg.ndcId}"')
+    data = db.cursor.fetchall()
+    if data == []:  db.cursor.execute('INSERT INTO WelcomeMsg VALUES (?, ?, "-DEFAULT")', (ctx.msg.ndcId, ctx.msg.content))
+    else         :  db.cursor.execute('UPDATE WelcomeMsg SET message=? WHERE comId=?', (ctx.msg.content, ctx.msg.ndcId))
+
+    db.redis.hset(db.r_comWelMsg, f'?{ctx.msg.ndcId}', ctx.msg.content)
+    await ctx.send(f"Mensaje de bienvenida activado y fijado a: {ctx.msg.content[:120]}...")
+    return True
+
+async def chatWelcomeCallback(ctx, ins):
+    if ins.data['messageId'] == ctx.msg.messageId: return False
+    
+    if ctx.msg.content.upper().find("-CANCELAR") == 0:
+        await ctx.send("Ha cancelado la edición del mensaje de bienvenida, :c.")
+        return True
+
+    if ctx.msg.content.upper().find("-VER") == 0:
+        await ctx.send("Este es el mensaje que tiene para esta comunidad")
+        chat = db.getWelcomeMessage(ctx.msg.ndcId, 'CHAT')
+        await ctx.send(str(chat))
+        return False
+    
+    db.cursor.execute(f'SELECT chat FROM WelcomeMsg WHERE comId="{ctx.msg.ndcId}"')
+    data = db.cursor.fetchall()
+    if data == []:  db.cursor.execute('INSERT INTO WelcomeMsg VALUES (?, ?, ?)', (ctx.msg.ndcId, ' ', ctx.msg.content))
+    else         :  db.cursor.execute('UPDATE WelcomeMsg SET chat=? WHERE comId=?', (ctx.msg.content, ctx.msg.ndcId))
+    await ctx.send(f"Mensaje de bienvenida de chats fijado a: {ctx.msg.content[:120]}...")
+    
+    db.redis.hset(db.r_chatWelMsg, f'?{ctx.msg.ndcId}', ctx.msg.content)
+    return True
+
+@utils.waitForMessage(message="*", callback=welcomeCallback)
+async def welcome(ctx, com):
+    return {
+        "messageId" : ctx.msg.messageId
+}
+
+@utils.waitForMessage(message="*", callback=chatWelcomeCallback)
+async def chatWelcome(ctx, com):
+    return {
+        "messageId" : ctx.msg.messageId
+    }
+
+welcomeMsg_default = """
+Bienvenida de usuarios en muros:
+---------------------------------
+
+Cada media hora, Nati pasará revisando si hay usuarios nuevos en la comunidad para darles la bienvenida. Aquellos que ya hayan sido saludados no se les volverá a dar el mensaje, sin embargo, solo se les dará a los miembros más recientes que se hayan unido a la comunidad
+
+Para activarlo:
+El siguiente mensaje que coloque será aquel que se les será repartido a los usuarios
+
+Para desactivarlo:
+El siguiente mensaje que coloque debe ser el siguiente: -desactivar
+"""
+
+chatWelcomeMsg_default = """
+Cambiar bienvenida de usuarios en chats:
+----------------------------------
+
+El siguiente mensaje que coloque será el que se pondrá como mensaje de bienvenida del bot en esta comunidad. Puede darle formato al mensaje poniendo lo siguiente:
+
+Información general
+-------------------------------
+(NICK)     : Nick del usuario
+(ALIAS)    : Alias del usuario
+(USERID)   : Id de usuario
+(COMUNIDAD): Nombre de la comunidad
+
+Tiempo
+-------------------------------
+(HORA.HM)  : hora y minutos
+(HORA.HMS) : hora, minutos y segundos
+(FECHA.A)  : Año
+(FECHA.M)  : Mes
+(FECHA.D)  : Día del mes
+(FECHA.F)  : Fecha en formato dd/mm/yy
+
+Chat
+-------------------------------
+(CHAT.NOMBRE) : Nombre del chat
+(CHAT.ANFI)   : Nick del anfitrión del chat
+(CHAT.COAN.NL): Coanfitriones del chat, separador por salto de línea
+(CHAT.COAN.CO): Coanfitriones del chat, separador por comas
+
+Puede solicitar más informacipon si lo desea, tan solo hable con el autor.
+
+Comandos:
+-CANCELAR : Cancela la edición
+-VER      : Ve el último mensaje de bienvenida guardado
+"""
+
 @utils.isStaff
 async def logConfig(ctx):
         com = ctx.msg.content.upper().split(" ")
@@ -117,7 +218,15 @@ El bot permanecerá con estado inactivo (por defecto)
             msg = "El bot enviará cada 15 minutos una petición para estar activo. Esto significa que será más sensible a spam por privado, a cambio de que puede aparecer en la parte superior de miembros destacados, y esté más propenso a recibir ban de IP."
 
         elif com[1] == "-BEINACTIVE" :
-            db.setLogConfig(comId, 'active', 1)
+            db.setLogConfig(comId, 'active', 0)
             msg = "El bot permancerá con estado inactivo"
+
+        elif com[1] == "-WELCOME" :
+            await welcome(ctx, com)
+            msg = welcomeMsg_default
+
+        elif com[1] == "-CHAT" :
+            await chatWelcome(ctx, com)
+            msg = chatWelcomeMsg_default
 
         return await ctx.send(msg)

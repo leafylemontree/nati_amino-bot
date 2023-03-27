@@ -1,30 +1,37 @@
+from src.database import db
+import edamino
+from src import utils
 from src import objects
 from src.text import text
-from edamino.api import Embed
 
 async def enter(ctx):
-        user = await ctx.get_user_info()    
-        if user.nickname in objects.AntiSpam.banned_nicks : return None
-        objects.botStats.register(0)
+        user = await ctx.get_user_info()
+        if user.nickname in objects.AntiSpam.banned_nicks :
+            objects.botStats.register(0)
+            return None
 
-        thread = await ctx.get_chat_info()
-        msg = f"{text['enter'][0]}{thread.membersCount}{text['enter'][1]}<$@{ctx.msg.author.nickname}$>"
-        embed = Embed(
+        chatWelcome = db.getWelcomeMessage(ctx.msg.ndcId, 'CHAT')
+        if chatWelcome is None: return
+
+        if chatWelcome.find("-DEFAULT") != -1:
+            thread   = await ctx.get_chat_info()
+            message = f"{text['enter'][0]}{thread.membersCount}{text['enter'][1]}<$@{ctx.msg.author.nickname}$>"
+        else:
+            message = await utils.formatter(ctx, chatWelcome)
+
+        embed = edamino.api.Embed(
                 title="Bella personita",
                 object_type=0,
                 object_id=ctx.msg.author.uid,
                 content="se ha unido, uwu."
             )
 
-        return await ctx.client.send_message(  message=msg,
+        return await ctx.client.send_message(
+                                    message=message,
                                     chat_id=ctx.msg.threadId,
-                                    message_type=0,
-                                    ref_id=None,
                                     mentions=[ctx.msg.author.uid],
-                                    embed=embed,
-                                    link_snippets_list=None,
-                                    reply=None )
-        return
+                                    embed=embed
+                                    )
 
 async def leave(ctx):
         user = await ctx.get_user_info()    

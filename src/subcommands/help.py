@@ -32,7 +32,6 @@ pages = {
 
 
 async def showPicture(ctx, insData):
-    print(insData)
     filename = f'media/help/{insData["type"]}{insData["page"] if insData["type"] != "help" else ""}.png'
     async with AIOFile(filename, 'rb') as f:
         img = await f.read()
@@ -40,7 +39,6 @@ async def showPicture(ctx, insData):
     
 
 async def rewindPage(ctx, ins):
-    print(ins.data)
     page    = ins.data['page']
     hType   = ins.data['type']
 
@@ -50,13 +48,11 @@ async def rewindPage(ctx, ins):
     return
 
 async def advancePage(ctx, ins):
-    print(ins.data)
     page    = ins.data['page']
     hType   = ins.data['type']
 
     if    page >= pages[hType]  : pass
     else                        : ins.data['page'] += 1
-    print(ins.data)
     await showPicture(ctx, ins.data)
     return
 
@@ -87,5 +83,4 @@ async def _help(ctx, hType=None):
    
     await showPicture(ctx, insData)
     data = insData if h != "help" else -1
-    print(data)
     return data

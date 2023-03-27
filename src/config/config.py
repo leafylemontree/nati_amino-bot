@@ -16,10 +16,10 @@ async def config(ctx):
 
         if   msg[1] == "-CHECK":
             if    msg[2] in Config._true :
-                    db.setChatConfig(chatId, "_check", 1)
+                    db.setChatConfig(chatId, "_check", 1, ctx.msg.ndcId)
                     out = "Revisión al entrar activada"
             elif  msg[2] in Config._false:
-                    db.setChatConfig(chatId, "_check", 0)
+                    db.setChatConfig(chatId, "_check", 0, ctx.msg.ndcId)
                     out = "Revisión al entrar desactivada"
 
         elif msg[1] == "-TIMEOUT":
@@ -29,58 +29,58 @@ async def config(ctx):
 
         elif msg[1] == "-WELCOME":
             if    msg[2] in Config._true :
-                    db.setChatConfig(chatId, "welcome", 0)
+                    db.setChatConfig(chatId, "welcome", 0, ctx.msg.ndcId)
                     out = "Mensaje de bienvenida activado"
             elif  msg[2] in Config._false:
-                    db.setChatConfig(chatId, "welcome", 1)
+                    db.setChatConfig(chatId, "welcome", 1, ctx.msg.ndcId)
                     out = "Mensaje de bienvenida desactivado"
 
         elif msg[1] == "-GOODBYE":
             if    msg[2] in Config._true :
-                    db.setChatConfig(chatId, "goodbye", 1)
+                    db.setChatConfig(chatId, "goodbye", 1, ctx.msg.ndcId)
                     out = "Mensaje de despedida activado"
             elif  msg[2] in Config._false:
-                    db.setChatConfig(chatId, "goodbye", 0)
+                    db.setChatConfig(chatId, "goodbye", 0, ctx.msg.ndcId)
                     out = "Mensaje de despedida desactivado"
 
         elif msg[1] == "-BOT":
             if    msg[2] in Config._true :
-                    db.setChatConfig(chatId, "bot", 0)
+                    db.setChatConfig(chatId, "bot", 0, ctx.msg.ndcId)
                     out = "Bot activado"
             elif  msg[2] in Config._false:
-                    db.setChatConfig(chatId, "bot", 1)
+                    db.setChatConfig(chatId, "bot", 1, ctx.msg.ndcId)
                     out = "Bot desactivado"
 
         elif msg[1] == "-SLOW":
             if    msg[2] in Config._true :
-                    db.setChatConfig(chatId, "slow", 1)
+                    db.setChatConfig(chatId, "slow", 1, ctx.msg.ndcId)
                     out = "Modo lento activado"
             elif  msg[2] in Config._false:
-                    db.setChatConfig(chatId, "slow", 0)
+                    db.setChatConfig(chatId, "slow", 0, ctx.msg.ndcId)
                     out = "Modo lento desactivado"
 
         elif msg[1] == "-STAFF":
             if    msg[2] in Config._true :
-                    db.setChatConfig(chatId, "staff", 1)
+                    db.setChatConfig(chatId, "staff", 1, ctx.msg.ndcId)
                     out = "Modo solo staff activado"
             elif  msg[2] in Config._false:
-                    db.setChatConfig(chatId, "staff", 0)
+                    db.setChatConfig(chatId, "staff", 0, ctx.msg.ndcId)
                     out = "Modo solo staff desactivado"
 
         elif msg[1] == "-1984":
             if    msg[2] in Config._true :
-                    db.setChatConfig(chatId, "nofun", 1)
+                    db.setChatConfig(chatId, "nofun", 1, ctx.msg.ndcId)
                     out = "Modo Orwelliano activado\n\nEra la patrulla de policía encargada de vigilar a la gente a través de los balcones y ventanas. Sin embargo, las patrullas eran lo de menos. Lo que importaba verdaderamente era la Policia del Pensamiento."
             elif  msg[2] in Config._false:
-                    db.setChatConfig(chatId, "nofun", 0)
+                    db.setChatConfig(chatId, "nofun", 0, ctx.msg.ndcId)
                     out = "Modo Orwelliano desactivado"
 
         elif msg[1] == "-SAFE":
             if    msg[2] in Config._true :
-                    db.setChatConfig(chatId, "safe", 1)
+                    db.setChatConfig(chatId, "safe", 1, ctx.msg.ndcId)
                     out = "Modo seguro activado"
             elif  msg[2] in Config._false:
-                    db.setChatConfig(chatId, "safe", 0)
+                    db.setChatConfig(chatId, "safe", 0, ctx.msg.ndcId)
                     out = "Modo seguro desactivado"
         
         await ctx.send(out)
