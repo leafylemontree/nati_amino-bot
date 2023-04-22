@@ -1,12 +1,12 @@
 import time
 
-async def send_image(ctx, image):
+async def send_image(ctx, image=None, media=None, itype='jpg'):
     """
     ctx is Context
     image is a bytes object
     """
 
-    media = await ctx.client.upload_media(image, "image/jpg")
+    if media is None:   media = await ctx.client.upload_media(image, f"image/{itype}")
     data = {
             "content": None,
             "clientRefId": int(time.time() / 10 % 1000000000),
@@ -19,13 +19,13 @@ async def send_image(ctx, image):
             }
     return await ctx.client.request("POST", f"chat/thread/{ctx.msg.threadId}/message", json=data)
 
-async def send_gif(ctx, image):
+async def send_gif(ctx, image=None, media=None):
     """
     ctx is Context
     image is a bytes object
     """
-
-    media = await ctx.client.upload_media(image, "image/gif")
+    
+    if media is None:   media = await ctx.client.upload_media(image, "image/gif")
     data = {
             "content": None,
             "clientRefId": int(time.time() / 10 % 1000000000),
@@ -35,8 +35,9 @@ async def send_gif(ctx, image):
             "type": 0,
             "uploadId": 0,
             "mediaValue": media
-            }
-    return await ctx.client.request("POST", f"chat/thread/{ctx.msg.threadId}/message", json=data)
+        }
+    await ctx.client.request("POST", f"chat/thread/{ctx.msg.threadId}/message", json=data)
+    return media
 
 async def send_audio(ctx, audio):
     """

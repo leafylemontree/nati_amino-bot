@@ -1,6 +1,9 @@
 from src import objects
 from src import utils
 
+
+
+
 @utils.isStaff
 async def everyone(ctx):
         user = await ctx.get_user_info()
@@ -9,11 +12,11 @@ async def everyone(ctx):
         userCount = thread.membersCount
 
         uidList = []
-        for i in range(userCount % 25):
+        for i in range(userCount % 100):
             users = await ctx.client.get_chat_users(
                                                 ctx.msg.threadId,
                                                 i * 25,
-                                                (i + 1) *25
+                                                100
                                                 )
             for j in users:
                 uidList.append(j.uid)

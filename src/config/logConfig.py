@@ -5,11 +5,29 @@ from src.database import db
 async def welcomeCallback(ctx, ins):
     if ins.data['messageId'] == ctx.msg.messageId: return False
 
+    if ctx.msg.content.upper().find("-CANCELAR") == 0:
+        await ctx.send("Ha cancelado la edición del mensaje de bienvenida, :c.")
+        return True
+
     if ctx.msg.content.upper().find("-DESACTIVAR") != -1:
             db.setLogConfig(ctx.msg.ndcId, 'userWelcome', 0)
             await ctx.send("Bienvenida a usuarios desactivada")
             return True
     
+    if ctx.msg.content.upper().find("-INFO") == 0:
+        await utils.showFormatterInfo(ctx)
+        return False
+
+    if ctx.msg.content.upper().find("-VER") == 0:
+        await ctx.send("Este es el mensaje que tiene para esta comunidad")
+        chat = db.getWelcomeMessage(ctx.msg.ndcId, 'COMMUNITY')
+        await ctx.send(str(chat))
+        return False
+
+    if ctx.msg.content.upper().find("(CHAT.") != -1:
+        await ctx.send('Advertencia:\n-------------------\nNo está permitido usar comandos de chat para bienvenidas de muros.')
+        return False
+
     db.setLogConfig(ctx.msg.ndcId, 'userWelcome', 1)
     db.cursor.execute(f'SELECT * FROM WelcomeMsg WHERE comId="{ctx.msg.ndcId}"')
     data = db.cursor.fetchall()
@@ -26,6 +44,10 @@ async def chatWelcomeCallback(ctx, ins):
     if ctx.msg.content.upper().find("-CANCELAR") == 0:
         await ctx.send("Ha cancelado la edición del mensaje de bienvenida, :c.")
         return True
+
+    if ctx.msg.content.upper().find("-INFO") == 0:
+        await utils.showFormatterInfo(ctx)
+        return False
 
     if ctx.msg.content.upper().find("-VER") == 0:
         await ctx.send("Este es el mensaje que tiene para esta comunidad")
@@ -60,47 +82,30 @@ Bienvenida de usuarios en muros:
 
 Cada media hora, Nati pasará revisando si hay usuarios nuevos en la comunidad para darles la bienvenida. Aquellos que ya hayan sido saludados no se les volverá a dar el mensaje, sin embargo, solo se les dará a los miembros más recientes que se hayan unido a la comunidad
 
-Para activarlo:
+[b]Para activarlo:
 El siguiente mensaje que coloque será aquel que se les será repartido a los usuarios
 
-Para desactivarlo:
+[b]Para desactivarlo:
 El siguiente mensaje que coloque debe ser el siguiente: -desactivar
+
+Comandos:
+-INFO       : Ver detalles de formato de texto
+-VER        : Ve el último mensaje de bienvenida guardado
+-DESACTIVAR : Desactiva el mensaje de bienvenida
+-CANCELAR   : Cancela la edición
 """
 
 chatWelcomeMsg_default = """
 Cambiar bienvenida de usuarios en chats:
 ----------------------------------
 
-El siguiente mensaje que coloque será el que se pondrá como mensaje de bienvenida del bot en esta comunidad. Puede darle formato al mensaje poniendo lo siguiente:
-
-Información general
--------------------------------
-(NICK)     : Nick del usuario
-(ALIAS)    : Alias del usuario
-(USERID)   : Id de usuario
-(COMUNIDAD): Nombre de la comunidad
-
-Tiempo
--------------------------------
-(HORA.HM)  : hora y minutos
-(HORA.HMS) : hora, minutos y segundos
-(FECHA.A)  : Año
-(FECHA.M)  : Mes
-(FECHA.D)  : Día del mes
-(FECHA.F)  : Fecha en formato dd/mm/yy
-
-Chat
--------------------------------
-(CHAT.NOMBRE) : Nombre del chat
-(CHAT.ANFI)   : Nick del anfitrión del chat
-(CHAT.COAN.NL): Coanfitriones del chat, separador por salto de línea
-(CHAT.COAN.CO): Coanfitriones del chat, separador por comas
-
-Puede solicitar más informacipon si lo desea, tan solo hable con el autor.
+El siguiente mensaje que coloque será el que se pondrá como mensaje de bienvenida del bot en esta comunidad. Es posible dar formato al texto para que este se adecúe al chat donde es mandado. Vea más información abajo
 
 Comandos:
--CANCELAR : Cancela la edición
+-INFO     : Ver detalles de formato de texto
+-DEFAULT  : Deja el mensaje por defecto
 -VER      : Ve el último mensaje de bienvenida guardado
+-CANCELAR : Cancela la edición
 """
 
 @utils.isStaff

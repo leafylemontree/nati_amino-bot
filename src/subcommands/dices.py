@@ -1,5 +1,7 @@
 from random import random
 from src import objects
+from src import utils
+
 
 def dices(msg):
         if len(msg.split(" ")) == 1:

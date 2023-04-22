@@ -12,7 +12,7 @@ from src import utils
 from src import shop
 from src import communication
 from src.text import text
-from src.special.tareasAmino import TA
+from src.special import TA, LA
 from . import database
 import sys
 
@@ -29,7 +29,8 @@ async def message(ctx: Context):
 
         objects.botStats.register(2)
         await antispam.messageRegister(ctx)
-        
+
+        if ctx.msg.content is not None:  await utils.waitForCallback(ctx)
         response = await antispam.detectAll(ctx)
         #if response: return
         if msg is not None:
@@ -45,14 +46,13 @@ async def message(ctx: Context):
         elif d ==  2: return await subcommands.leave(ctx)
         if msg is None: return None;
 	
-        await utils.waitForCallback(ctx)
         com = msg.upper()
         nick = ""
         if ctx.msg.author:   nick = ctx.msg.author.nickname
 
         if   com.find("--SETLOG") == 0 :                                            reply.msg = await antispam.set_logging(ctx)
-        elif com.find("-SI") == 0:                                                  await utils.confirm(ctx, True)
-        elif com.find("-NO") == 0:                                                  await utils.confirm(ctx, False)
+        elif com.find("-SI") == 0:                                                  await utils.registerConfirmation(ctx, True)
+        elif com.find("-NO") == 0:                                                  await utils.registerConfirmation(ctx, False)
         elif com.find("--BAN") == 0:                                                await antispam.ban_user(ctx)
         elif com.find("--UNBAN") == 0:                                              await antispam.unban_user(ctx)
         elif com.find("--WARN") == 0:                                               await antispam.warn_user(ctx)
@@ -80,6 +80,7 @@ async def message(ctx: Context):
         elif com.find("--CREARBLOG") == 0:                                          await admin.createBlog(ctx)
         elif com.find("--ELIMINARCOMENTARIOS") == 0:                                await admin.deleteComments(ctx)
         elif com.find("--NOTICE") == 0:                                             await admin.giveNotice(ctx)
+        elif com.find("--CUTESALL") == 0:                                           await images.cutes_sendall(ctx)
         elif d != 100: 
             if   com.find("NATI")   == 0:                                               reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("ARTEMIS") == 0:                                              reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
@@ -93,6 +94,7 @@ async def message(ctx: Context):
             elif com.find("--MATES") == 0:                                              await subcommands._help(ctx, hType="MATEMATICAS")
             elif com.find("--JUEGOS") == 0:                                             await subcommands._help(ctx, hType="JUEGOS")
             elif com.find("--STAFF") == 0:                                              await subcommands._help(ctx, hType="MODERACION")
+            elif com.find("--ENVIARTODOS") == 0:                                        await admin.sendEveryone(ctx)
             elif com.find("--ANIMALES") == 0:                                           await images.animals(ctx)
             elif com.find("--SEX") == 0:                                                reply.msg = text['sex']
             elif com.find("--RATE") == 0:                                               await subcommands.rateBlog(ctx)
@@ -101,7 +103,14 @@ async def message(ctx: Context):
             elif com.find("--DOWNLOAD") == 0:                                           await subcommands.videoDownload(ctx)
             elif com.find("--TRIVIA") == 0:                                             await subcommands.trivia(ctx)
             elif com.find("--ESCUCHAR") == 0:                                           await subcommands.audioRecognize(ctx)
-            elif com.find("--DAR") == 0:                                                await subcommands.give(ctx)
+            elif com.find("--CHOCOLATE") == 0:                                          await subcommands.giveChocolate(ctx)
+            elif com.find("--MATRIMONIO") == 0:                                         await subcommands.askMarry(ctx)
+            elif com.find("--OFRECERSTAFF") == 0:                                       await LA.ofrecer(ctx)
+            elif com.find("--BUSCARSTAFF") == 0:                                        await LA.buscar(ctx)
+            elif com.find("--OFRECERPUBLICAR") == 0:                                    await LA.publish_ofrecer(ctx)
+            elif com.find("--BUSCARPUBLICAR") == 0:                                     await LA.publish_buscar(ctx)
+            elif com.find("--MEDIAVALUE") == 0:                                         await subcommands.mediaValue(ctx)
+            elif com.find("--FROMSTICKER") == 0:                                        await subcommands.fromSticker(ctx)
             elif com.find("--BLOGINFO") == 0:                                           await subcommands.blogInfo(ctx)
             elif com.find("--NANO") == 0 :                                              reply.msg = text['nano']
             elif com.find("--CARD1") == 0:                                              await images.card(ctx)
@@ -126,7 +135,9 @@ async def message(ctx: Context):
             elif com.find("--MATRIX") == 0:                                             reply.msg = subcommands._math.matrix(com)
             elif com.find("--ALIAS") == 0:                                              reply.msg = await subcommands.alias(ctx, msg)
             elif com.find("--GHOST") == 0:                                              reply.msg = await subcommands.ghost(ctx, msg)
-            elif com.find("--CUTES") == 0:                                              reply     = await images.cutes(ctx)
+            elif com.find("--CUTES") == 0:                                              await images.cutes(ctx)
+            elif com.find("--MATAR") == 0:                                              await images.interaction(ctx, 'MATAR')
+            elif com.find("--GOLPEAR") == 0:                                              await images.interaction(ctx, 'GOLPEAR')
             elif com.find("--GRAPH") == 0:                                              await images.plot(ctx)
             #elif com.find("--COPYPASTE") == 0:                                         reply     = await commands.copypaste(ctx, msg)
             elif com.find("--JOIN") == 0:                                               reply.msg     = await subcommands.joinChat(ctx)

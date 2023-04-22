@@ -22,7 +22,15 @@ async def userInfo(ctx, uid, content):
         if checkInDays == 1: a = 0
         activo = "No activo" if user.onlineStatus == 0 else "Conectado"
 
+
         usr_db = db.getUserData(user)
+        marry = None
+        if usr_db.marry != 'none':
+            try:
+                resp = await ctx.client.get_user_info(usr_db.marry)
+                marry = resp.nickname
+            except:
+                marry = 'No está en esta comunidad, unu.'
         msg = f"""[cu]Información de perfil:
        
 Nick: {user.nickname}
@@ -40,6 +48,7 @@ Blogs: {user.blogsCount}
 Comentarios: {user.commentsCount}
 Unido en: {user.createdTime}
 Última modificación: {user.modifiedTime}
+Casado con: {'nadie' if marry is None else marry}
 
 [u]Ha recibido: 
     - {usr_db.hugs_r} abrazos. 

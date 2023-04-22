@@ -8,6 +8,7 @@ from src import objects
 import random
 from src.antispam import get_wall_comments
 import logging
+import traceback
 
 async def get_my_communities(ctx, start=0, size=25):
         data = {"timestamp": int(time.time() * 1000)}
@@ -58,29 +59,56 @@ async def blogs(ctx):
 
             if fnick or fcont: await antispam.blogLog(ctx, blog, [fnick, fcont]) 
 
-def timers():
-    return {
-            'start':    int(time.time()),
-            'end':      int(time.time() + 2500)
-            }
+def timers(amount=50):
+    delta = 300
+    return [{
+            'start':    int(time.time() - (i+1) * delta) ,
+            'end':      int(time.time() - (i  ) * delta)
+            } for i in range(amount)]
 
+async def send_active_obj(ctx, optInAdsFlags: int = 2147483647):
+        data = {
+            "userActiveTimeChunkList": timers(5),
+            "timestamp": int(time.time() * 1000),
+            "optInAdsFlags": optInAdsFlags,
+            "timezone": -time.timezone // 1000,
+            "uid": ctx.client.uid
+        }
 
+        await ctx.client.request('POST', f"community/stats/user-active-time", json=data)
+        return
 
 def ws_activity_data(ndcId, objectId, objectType):
     return {
             "o": {
                 "actions": ["Browsing"],
-                "target": f'ndc://x{ndcId}/blog/{objectId}',
+                "target": f'ndc://x{ndcId}/featured',
                 "ndcId": ndcId,
                 "params": {
-                    "duration": 600,
+                    "duration": 27605,
                     "blogType": 0
                     },
-                "id": str(int(random.random() * 999999)),
+                "id": "363483",
             },
             "t": 306,
         }
-    
+
+async def send_action(ctx, blogId):
+        data = {
+            "o": {
+                "actions": ['Browsing', ],
+                "target": f"ndc://x{ctx.client.ndc_id}/blog/{blogId}",
+                "ndcId": ctx.client.ndc_id,
+                "params": {
+                    "topicIds": [45841, 17254, 26542, 42031, 22542, 16371, 6059, 41542, 15852],
+                    "duration": 27605,
+                    "blogType": 0
+                    },
+                "id": "831046"
+            },
+            "t": 306
+        }
+        return await ctx.ws.send_json(data)
 
 async def activity_status(ctx, status=1):
     data = {
@@ -101,18 +129,26 @@ async def beActive(ctx):
         log = db.getLogConfig(com)
         if not log.active : continue
         await asyncio.sleep(5)
-       
+        status = 0
+
         try:
             ctx.client.set_ndc(com)
             blogs = await get_featured_blogs(ctx, start=0, size=100)
             blog  = blogs[int(random.random() * len(blogs))]
             data = ws_activity_data(com, blog.refObjectId, blog.refObjectType)
-            await ctx.ws.send_json(data) if (int(random.random() * 2)) else None
+            status = 1
+            await ctx.ws.send_json(data) 
+            status = 2
             await activity_status(ctx, status=1)
-            await ctx.client.send_active_object(timers=(timers(),))
+            status = 3
+            await send_active_obj(ctx)
+            status = 4
+            await send_action(ctx, blog.refObjectId)
+            status = 5
             logging.info(f"{objects.ba.instance} Activity - {com}")
         except Exception as e:
-            pass
+            traceback.print_exc()
+            logging.error(f"Errored $.{objects.ba.instance} beActive - {status} - {com} - {e}")
 
 
 
@@ -128,10 +164,11 @@ async def giveWelcome(ctx):
         ctx.client.set_ndc(com)
 
         welcomeMsg = db.getWelcomeMessage(com, mode='COMMUNITY')
+        welcomeMsg = await utils.formatter(ctx, welcomeMsg)
         logging.info(f"$.{objects.ba.instance} - Welcome ndcId={com}:")
         if welcomeMsg is None:
-                logging.info(f"$.{objects.ba.instance} - Message not found for ndcId={com}")
-                continue
+            logging.info(f"$.{objects.ba.instance} - Message not found for ndcId={com}")
+            continue
 
         users = await ctx.client.get_all_users(users_type='recent', start=0, size=100)
         for user in users:

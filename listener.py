@@ -9,6 +9,8 @@ import threading
 import time
 import sys
 
+from src.special import LA
+
 def keepAlive():
     def clock():
         objects.ba.counter = 300
@@ -31,6 +33,7 @@ def main():
     async def on_message(ctx: Context):
         if objects.ba.loop is False:
             objects.ba.loop = asyncio.get_event_loop()
+            await LA.config(ctx)
             await utils.st.set(ctx)
 
         subprocess.run(objects.ba.loop, ctx)

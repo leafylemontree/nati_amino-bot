@@ -1,4 +1,4 @@
-from .sendAll       import send_all
+from .sendAll       import send_all, sendEveryone
 from .nati          import nati
 from .joinchats     import joinChats
 from .leaderboard   import getLeaderboard

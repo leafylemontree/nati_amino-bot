@@ -26,10 +26,11 @@ async def getRole(ctx, role):
 def getMonth(month):
         return ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto','Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][month - 1]
 
-async def get_cohosts(ctx, coHost, sep='\n'):
+async def get_cohosts(ctx, coHost, start='', sep='\n'):
     if coHost is None: return ''
-    cohostlist = [await ctx.client.get_user_info(user) for user in coHost]
-    return sep.join([f'{cohost.nickname}' for cohost in cohostlist])
+    ndcId = ctx.client.ndc_id
+    cohostlist = [await db.getUserNickname(ctx, ndcId, userId=user) for user in coHost]
+    return sep.join([f'{start}{cohost}' for cohost in cohostlist])
 
 async def formatter(ctx, text):
        
@@ -54,7 +55,7 @@ async def formatter(ctx, text):
             text = text.replace('(CHAT.UNIDOS)',    str(thread.membersCount))
             text = text.replace('(CHAT.ANFI)',      str(thread.author.nickname))
             if text.find('(CHAT.COAN') != -1:
-                text = text.replace('(CHAT.COAN.NL)',   await get_cohosts(ctx, thread.extensions.coHost, sep='\n[c]'))
+                text = text.replace('(CHAT.COAN.NL)',   await get_cohosts(ctx, thread.extensions.coHost, start='[c]', sep='\n'))
                 text = text.replace('(CHAT.COAN.CO)',   await get_cohosts(ctx, thread.extensions.coHost, sep=', '))
             
         if multipleFind(text, ['(HORA', '(FECHA']):
@@ -67,3 +68,38 @@ async def formatter(ctx, text):
             text = text.replace('(FECHA.F)',        date.strftime('%d/%m/%Y'))
        
         return text
+
+
+async def showFormatterInfo(ctx):
+    await ctx.send('''
+[cb]Información de usuario
+[c]-------------------------------
+    (NICK)     : Nick del usuario
+    (ALIAS)    : Alias del usuario
+    (USERID)   : Id de usuario
+    (ROL)      : Rol del usuario
+
+[cb]Información de la comunidad
+[c]-------------------------------
+    (COMUNIDAD): Nombre de la comunidad
+    (AGENTE)   : Nick del agente
+    (MIEMBROS) : Miembros de la comunidad
+    (NDCID)    : ndcId de la comunidad
+
+[cb]Información de hora y fecha
+[c]-------------------------------
+    (HORA.HM)  : hora y minutos
+    (HORA.HMS) : hora, minutos y segundos
+    (FECHA.A)  : Año
+    (FECHA.M)  : Mes
+    (FECHA.D)  : Día del mes
+    (FECHA.F)  : Fecha en formato dd/mm/yy
+
+[cb]Información del chat
+[c]-------------------------------
+    (CHAT.NOMBRE) : Nombre del chat
+    (CHAT.ANFI)   : Nick del anfitrión del chat
+    (CHAT.COAN.NL): Coanfitriones del chat, separador por salto de línea
+    (CHAT.COAN.CO): Coanfitriones del chat, separador por comas
+
+[c]Puede solicitar más información si lo desea, tan solo hable con el autor.''')

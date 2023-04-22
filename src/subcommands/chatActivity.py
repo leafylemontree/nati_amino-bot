@@ -11,7 +11,7 @@ async def enter(ctx):
             return None
 
         chatWelcome = db.getWelcomeMessage(ctx.msg.ndcId, 'CHAT')
-        if chatWelcome is None: return
+        if chatWelcome is None: chatWelcome = "-DEFAULT"
 
         if chatWelcome.find("-DEFAULT") != -1:
             thread   = await ctx.get_chat_info()

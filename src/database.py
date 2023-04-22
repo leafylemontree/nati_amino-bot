@@ -9,8 +9,10 @@ class Database:
     redis  = None
 
     r_chatTable = 'chatConfig'
+    r_logTable  = 'logConfig'
     r_comWelMsg = 'CommunityWelcome'
     r_chatWelMsg= 'ChatWelcome'
+    r_userNickname = "UserNickname"
 
     def __init__(self):
         self.redis = redis.Redis()
@@ -40,7 +42,7 @@ class Database:
         return objects.UserInfo(*resp[0])
 
     def setUserData(self, user):
-        self.cursor.execute(f'INSERT INTO UserInfo VALUES ("{user.uid}", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)')
+        self.cursor.execute(f'INSERT INTO UserInfo VALUES ("{user.uid}", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, "none")')
     
     def modifyRecord(self, mode, user, value=1):
         column = "version"
@@ -54,38 +56,49 @@ class Database:
         elif mode == 24: column = "givenDoxx"
         elif mode == 31: column = "alias"
         elif mode == 43: column = "unused3"
-
+        elif mode == 50: column = "marry"
 
         self.cursor.execute(f'SELECT {column} FROM UserInfo WHERE userId="{user.uid}";')
         data = self.cursor.fetchall()[0]
         if not data:
-            self.cursor.execute(f'INSERT INTO UserInfo VALUES ("{user.uid}", "-", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)')
+            self.cursor.execute(f'INSERT INTO UserInfo VALUES ("{user.uid}", "-", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, "none")')
             data = 0
         else:
             data = data[0]
 
-        if mode == 31 and value != 1:   data = f'"{value}"'.replace(";", "").replace("DROP", "").replace("drop", "")
+        if mode in [31, 50] and value != 1:   data = f'"{value}"'.replace(";", "").replace("DROP", "").replace("drop", "")
         else:                           data = data + value
         
         self.cursor.execute(f'UPDATE UserInfo SET {column}=? WHERE userId="{user.uid}";', (data,))
         return data
 
     def setLogConfig(self, comId, mode, value):
-        self.cursor.execute(f'SELECT * FROM Log WHERE comId={comId};')
+        self.cursor.execute(f'SELECT * FROM Log WHERE comId="{comId}";')
         data = self.cursor.fetchall()
         if data == []: self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 0, 0);')
-        if mode == "threadId" : value = f'"{value}"'
-        self.cursor.execute(f'UPDATE Log SET {mode}={value} WHERE comId={comId};')
-        return True
+        self.cursor.execute(f'UPDATE Log SET {mode}=? WHERE comId={comId};', (value,))
+
+        self.cursor.execute(f'SELECT * FROM Log WHERE comId="{comId}";')
+        resp = self.cursor.fetchall()
+        data = objects.LogConfig(*resp[0])
+        self.redis.hset(self.r_logTable, f'?{comId}', json.dumps(data.__dict__))
+        return data
 
     def getLogConfig(self, comId):
-        self.cursor.execute(f'SELECT * FROM Log WHERE comId={comId};')
+        if self.redis.hexists(self.r_logTable, f'?{comId}'):
+            data = self.redis.hget(self.r_logTable, f'?{comId}')
+            return objects.LogConfig(**json.loads(data))
+
+        self.cursor.execute(f'SELECT * FROM Log WHERE comId="{comId}";')
         resp = self.cursor.fetchall()
         if not resp:
             self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 1, 0, 0, 0);')
             self.cursor.execute(f'SELECT * FROM Log WHERE comId={comId};')
             resp = self.cursor.fetchall()
-        return objects.LogConfig(*resp[0])
+        
+        data = objects.LogConfig(*resp[0])
+        self.redis.hset(self.r_logTable, f'?{comId}', json.dumps(data.__dict__))
+        return data
 
     def setChatConfig(self, threadId, mode, value, ndcId):
         self.cursor.execute(f'SELECT * FROM Chat WHERE threadId="{threadId}";')
@@ -139,10 +152,11 @@ class Database:
         if not (self.redis.hexists(self.r_comWelMsg, f'?{ndcId}') or self.redis.hexists(self.r_chatWelMsg, f'?{ndcId}')): 
             self.cursor.execute(f'SELECT * FROM WelcomeMsg WHERE comId={ndcId}')
             resp = self.cursor.fetchall()
-            if resp == []: return None
-            data = objects.WelcomeMessage(*resp[0])
-            self.redis.hset(self.r_comWelMsg,  f'?{ndcId}', data.message)
-            self.redis.hset(self.r_chatWelMsg, f'?{ndcId}', data.chat   )
+            if resp == []:  output.chat = '-DEFAULT'
+            else:
+                data = objects.WelcomeMessage(*resp[0])
+                self.redis.hset(self.r_comWelMsg,  f'?{ndcId}', data.message)
+                self.redis.hset(self.r_chatWelMsg, f'?{ndcId}', data.chat   )
 
         if mode.upper() in ['ALL', 'COMMUNITY']:
                 message         = self.redis.hget(self.r_comWelMsg,  f'?{ndcId}')
@@ -156,5 +170,22 @@ class Database:
         if mode.upper() == 'CHAT'       : return output.chat
         if mode.upper() == 'ALL'        : return output
         return output 
+
+    async def getUserNickname(self, ctx, ndcId, user=None, userId=None):
+        if user:
+            if self.redis.hexists(self.r_userNickname, f'?{ndcId}&{user.uid}'):
+                data = self.redis.hget(self.r_userNickname, f'?{ndcId}&{user.uid}')
+                return data.decode()
+        elif userId:
+            if self.redis.hexists(self.r_userNickname, f'?{ndcId}&{userId}'):
+                data = self.redis.hget(self.r_userNickname, f'?{ndcId}&{userId}')
+                return data.decode()
+
+        if ctx is None and user is None: return None
+
+        if not user and userId is not None:  user = await ctx.client.get_user_info(userId)
+        self.redis.hset(self.r_userNickname, f'?{ndcId}&{user.uid}', f'{user.nickname}')
+        return user.nickname
+
 
 db = Database()

@@ -2,6 +2,7 @@ from edamino import Context
 from typing import List
 from src import objects
 import logging
+#from src.utils.text import helpFunction
 
 leafId    =  "17261eb7-7fcd-4af2-9539-dc69c5bf2c76"
 noMessage = "Usted no está autorizado para ejercer este comando"
@@ -23,14 +24,15 @@ def isStaff(func):
     return check
 
 def userId(func):
-    async def check(ctx):
+    async def check(*args, **kwargs):
+        ctx = args[0]
         uid = ctx.msg.author.uid
         msg = ctx.msg.content
         if ctx.msg.extensions.mentionedArray:
             uid = ctx.msg.extensions.mentionedArray[0].uid
             msg = msg.split("\u200e")[0]
         elif ctx.msg.extensions.replyMessage:             uid = ctx.msg.extensions.replyMessage.author.uid
-        await func(ctx, uid, msg)
+        await func(*args, uid, msg, **kwargs)
         return
     return check
 
@@ -77,7 +79,8 @@ def ban(func):
     return check
 
 def cutes(func):
-    async def wrapper(ctx):
+    async def wrapper(*args, **kwargs):
+        ctx = args[0]
         uid = None
         if ctx.msg.extensions.mentionedArray:
             uid = ctx.msg.extensions.mentionedArray[0].uid
@@ -90,8 +93,7 @@ def cutes(func):
         msg = msg.upper().split(" ")
         msg = list(filter(("").__ne__, msg))
         if len(msg) == 1: return await ctx.send("Falta un argumento para la acción.\n\nPista: hug, pat, kiss")
-        print(uid)
-        await func(ctx, uid, msg)
+        await func(*args, uid, msg, **kwargs)
     return wrapper
 
 def safe(func):
@@ -386,8 +388,10 @@ class SubTaskScheduler:
                     if ((self.timeCounter % subTask.pollingTime) != 0): continue
                     try :
                         logging.info(f'$.{objects.ba.instance} - Running subTak {i}. subTaskTimer={self.timeCounter}')
-                        t = threading.Thread(target=run_subprocess, args=(subTask,))
-                        t.start()
+                        self.loop.create_task(subTask.callback(self.context))
+                        
+                        #t = threading.Thread(target=run_subprocess, args=(subTask,))
+                        #t.start()
                     except Exception as e:   
                         logging.error(f'$.{objects.ba.instance} Corroutine {i} errored!: {e}')
                         pass
@@ -417,5 +421,22 @@ def runSubTask(pollingTime=300, tableEntry=None):
         st.create(task)
         async def run(*args, **kwargs):
             return
+        return run
+    return wrapper
+
+
+
+# Help
+
+def showHelp(name=None, textClass=None):
+    def wrapper(func):
+        async def run(*args, **kwargs):
+            ctx         = args[0]
+            response    = await func(*args, **kwargs)
+            return response
+            if response:
+                await ctx.send("Ha ocurrido un error en la sintaxis")
+                #await ctx.send(helpFunction(name, textClass))
+
         return run
     return wrapper

@@ -3,6 +3,10 @@ from src import utils
 from src.database import db
 
 
+class FakeUser:
+    def __init__(self, userId):
+        self.uid = userId
+
 def kiwilatigo(ctx):
         db.modifyRecord(32, ctx.msg.author)
         return objects.Reply(f"[ci]¡Oh no! Han hecho enfadar a {ctx.msg.author.nickname}\n\n[ci]/c skpa.", False)
@@ -114,18 +118,48 @@ async def customMsg(ctx):
 
 
 @utils.userId
-async def give(ctx, userId, message):
+async def giveChocolate(ctx, userId, message):
+
+    if userId == ctx.client.uid:    return await ctx.send("Lamentablemente, no se le pueden dar chocolates a Nati, unu")
+    if userId == ctx.msg.author.uid: return await ctx.send("¿Te quieres dar un chocolate a ti mismo? Qué malote")
+
     user = await ctx.client.get_user_info(userId)
     await ctx.send(f"""
 [c]{ctx.msg.author.nickname} quiere darle un chocolate a {user.nickname}
 [c]¿Aceptas?
 [c]-si -no
 """)
-    state = await utils.waitConfirmation(ctx, userId)
+    state = await utils.confirmation(ctx, ctx.msg.threadId, userId, ctx.msg.ndcId, timeout=False)
     if state: await ctx.send(f"{user.nickname} ha aceptado el chocolate, c:")
     else    : await ctx.send(f"{user.nickname} ha rechazado el chocolate, unu")
 
+@utils.userId
+async def askMarry(ctx, userId, message):
 
+    if userId == ctx.client.uid:     return await ctx.send("Por fin alguien se quiere casar conmigo, uwu.")
+    if userId == ctx.msg.author.uid: return await ctx.send("Dile no al autoamor, espera, ¿eso existe?")
+
+    user = await ctx.client.get_user_info(userId)
+    await ctx.send(f"""
+[c]{ctx.msg.author.nickname} quiere proponerle matrimonio a {user.nickname}
+[c]¿Aceptas?
+[c]-si -no
+""")
+    state = await utils.confirmation(ctx, ctx.msg.threadId, userId, ctx.msg.ndcId, timeout=False)
+
+    if state: await ctx.send(f"{user.nickname} ha aceptado el matrimonio, c:")
+    else    : return await ctx.send(f"{user.nickname} ha rechazado el matrimonio, unu")
+   
+    u_db = db.getUserData(user)
+    a_db = db.getUserData(ctx.msg.author)
+
+    if u_db.marry != 'none': db.modifyRecord(50, FakeUser(u_db.marry), value='none')
+    if a_db.marry != 'none': db.modifyRecord(50, FakeUser(a_db.marry), value='none')
+
+    db.modifyRecord(50, user,           value=ctx.msg.author.uid)
+    db.modifyRecord(50, ctx.msg.author, value=user.uid)
+    await ctx.send(f"{ctx.msg.author.nickname}, {user.nickname}, los declaro marido y mujer.\n[c]Puede besar a la novia")
+    return
 async def fmt(ctx):
     msg = ctx.msg.content.split('\n')
 
@@ -135,3 +169,21 @@ async def fmt(ctx):
     
     message = await utils.formatter(ctx, '\n'.join(msg))
     await ctx.send(message)
+
+
+async def mediaValue(ctx):
+    if not ctx.msg.extensions.replyMessage:             return await ctx.send("Debe ejecutar este comando respondiendo a otro")
+    if not ctx.msg.extensions.replyMessage.mediaValue:  return await ctx.send("El mensaje no posee mediaValue")
+
+    await ctx.send(str(ctx.msg.extensions.replyMessage.mediaValue))
+    print(str(ctx.msg.extensions.replyMessage.mediaValue))
+
+async def fromSticker(ctx):
+    if not ctx.msg.extensions.replyMessage:             return await ctx.send("Debe ejecutar este comando respondiendo a otro")
+    if not ctx.msg.extensions.replyMessage.mediaValue:  return await ctx.send("El mensaje no posee mediaValue")
+
+    print(ctx.msg.extensions.replyMessage.mediaValue)
+    from src.imageSend import send_image, send_gif
+    if ctx.msg.extensions.replyMessage.mediaValue.find(".png") != -1: await send_gif(ctx, media=ctx.msg.extensions.replyMessage.mediaValue)
+    else                                    : await send_image(ctx, media=ctx.msg.extensions.replyMessage.mediaValue)
+    return

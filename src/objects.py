@@ -513,6 +513,7 @@ class UserInfo:
     unused6:                    int
     unused7:                    int
     unused8:                    int
+    marry:                      str
 
 @dataclass
 class LogConfig:
