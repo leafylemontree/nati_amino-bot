@@ -1,7 +1,6 @@
 media/amongus.mp3
 media/cutes/*.png
 media/cutes/*.gif
-media
 
 *.so
 src/fortran
