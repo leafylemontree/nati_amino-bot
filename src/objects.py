@@ -2,12 +2,14 @@ from __future__     import annotations
 from dataclasses    import dataclass
 from pydantic       import BaseModel
 from typing         import List, Dict, Optional, Any, Tuple
-from edamino.objects import Author
+from edamino.objects import Author, UserProfile
 
 import logging
 import time
-import json
+import ujson as json
 import os
+import datetime
+import random
 
 m_error = {
         "error_2400" : "Error 2400: No ha ingresado los parámetros suficientes para el comando 'math'.",
@@ -22,10 +24,10 @@ m_error = {
 def error(num):
     return f"error_{m_error[str(num)]}"
 
-@dataclass
 class Reply:
-    msg     :  str  = ""
-    reply   :  bool = False
+    def __init__(self, msg, reply=True):
+        self.msg = msg
+        self.reply = reply
 
 class Database_return:
     alias   : str   = ""
@@ -96,6 +98,10 @@ class Status:
             for i in self.instance:
                 user_list.append(i.uid)
             return user_list
+
+        def check_user(self, userId):
+            users = self.get_users()
+            return userId in users
 
         def set_difficulty(self, number):
             self.diff = number
@@ -177,6 +183,8 @@ class Status:
         self.challenge  = self.Challenge()
         self.wordle.instance = []
         return
+
+status = Status()
 
 @dataclass
 class Server:
@@ -297,6 +305,12 @@ class Stats:
 botStats = Stats()
 botStats.write()
 
+class MessageEvents:
+    FORBIDDEN       =  -1
+    MEMBER_JOIN     =   1
+    MEMBER_LEAVE    =   2
+    NO_FUN          =   100
+
 class AntiSpam:
     banned_nicks = [
                     "MAMBLL",
@@ -305,7 +319,15 @@ class AntiSpam:
                     "ᴍᴀᴍʙʟʟ",
                     "ᴀᴍɪɴᴏ ᴄᴏɪɴs",
                     "CULT_OF_KOMARU",
-                    "FOXY"
+                    "LUNAR",
+                    "BOT",
+                    "LUNARINFERNAL",
+                    "LUNARBOT",
+                    "TOXINA",
+                    "𝕋ᴏ֟֯xɪɴᴀ!"
+                    "FOXY",
+                    "HEPHA",
+                    "SAY_"
                     ]
 
     sexual_nicks = [
@@ -330,11 +352,18 @@ class AntiSpam:
                 "1"  : "Usuario con nombre baneado anteriormente",
                 "2"  : "Contenido sexual en el nick",
                 "3"  : "Palabras clave en nick",
+                "4"  : "Nombre del usuario contiene caracteres no ASCII. Posible spam",
 
-                "101": "Spam a Telegram",
+                "101": "Spam de Telegram",
                 "102": "Spam de comunidad",
                 "103": "Spam de comunidad",
                 "104": "Spam de Twitter",
+                "105": "Spam de Discord",
+                "106": 'Spam de "La app esa"',
+                "107": "Spam de Whatsapp",
+                "108": "Spam de link global",
+                "109": "Link no identificado",
+
                 "111": "Mensaje reconocido por cerrar la app",
                 "151": "Mensaje de gran longitud que cierra la app",
                 "152": "Biografía que cierra la app",
@@ -491,6 +520,61 @@ class Notice(BaseModel):
     extensions:                 Optional[NoticesExtensions]
     noticeId:                   Optional[str]
    
+class AdminLogList(BaseModel):
+    author:                     Author
+    createdTime:                Optional[Any]
+    objectType:                 Optional[int]
+    operationName:              Optional[str]
+    comId:                      Optional[int]
+    referTicketId:              Optional[str]
+    extData:                    Optional[Any]
+    operationDetail:            Optional[Any]
+    operationLevel:             Optional[Any]
+    moderationLevel:            Optional[str]
+    operation:                  Optional[Any]
+    objectId:                   Optional[str]
+    logId:                      Optional[str]
+    objectUrl:                  Optional[str]
+    content:                    Optional[str]
+    value:                      Optional[Any]
+
+class CommentList(BaseModel):
+    author:                     Author
+    votesSum:                   Optional[int]     
+    votedValue:                 Optional[Any]     
+    mediaList:                  Optional[Any]     
+    parentComId:                Optional[int]     
+    parentId:                   Optional[str]     
+    parentType:                 Optional[Any]     
+    content:                    Optional[str]  
+    extensions:                 Optional[Any]     
+    comId:                      Optional[int]     
+    modifiedTime:               Optional[Any]     
+    createdTime:                Optional[Any]     
+    commentId:                  Optional[str]     
+    subcommentsCount:           Optional[int]     
+    type:                       Optional[Any]     
+
+class VotedValueMapV2(BaseModel):
+    createdTime:                Optional[Any]
+    uid:                        Optional[str]
+    value:                      Optional[int]
+
+@dataclass
+class PostLikes:
+    votedValueMap:              Optional[Tuple[str]]
+    votedValueMapV2:            Optional[Tuple[VotedValueMapV2]]
+    UserProfile:                Optional[Tuple[UserProfile]]
+    votedCount:                 Optional[int]
+
+    def __init__(self, response):
+        self.votedValueMap      = tuple(response['votedValueMap'].keys())
+        self.votedValueMapV2    = tuple(map(lambda voteMap: VotedValueMapV2(**voteMap[1]), response['votedValueMapV2'].items())) 
+        self.UserProfile        = tuple(map(lambda userProfile: UserProfile(**userProfile), response['userProfileList'])) 
+        self.votedCount         = len(self.votedValueMap)
+
+
+
 @dataclass
 class UserInfo:
     userId:                     str
@@ -550,16 +634,189 @@ class WelcomeMessage:
     chat:                       str
 
 @dataclass
+class Report:
+    userId:                     str
+    ndcId:                      str
+    threadId:                   str
+    timestamp:                  datetime.datetime
+    registeredNick:             bool
+    sexualNick:                 bool
+    susNick:                    bool
+    telegram:                   bool
+    aminoCommunity:             bool
+    aminoInvite:                bool
+    twitter:                    bool
+    crash:                      bool
+    length:                     bool
+    highLength:                 bool
+    messageType:                bool
+    discord:                    bool
+    projz:                      bool
+    whatsapp:                   bool
+    globalLink:                 bool
+    nonASCII:                   bool
+    unidentifiedLink:           bool
+
+
+@dataclass
 class SocketResponse:
     dtype:          int
     timestamp:      int
     messageId:      str
     content:        str
+    checksum:       int
     address:        str
     instance:       int
     origin:         int
     destinatary:    int
     nodeId:         str
+
+@dataclass
+class InventoryElement:
+    objectId:       int
+    amount:         int
+    metadata:       Any
+
+    def export(self):
+        return {
+            "objectId": self.objectId,
+            "amount":   self.amount,
+            "metadata": self.metadata
+        }
+
+
+class UserInventory:
+    userId:         str
+    length:         int
+    data:           Any
+
+    def __init__(self, userId=None, length=None, data=None):
+        self.userId     = userId
+        self.length     = len(data)
+        self.data       = [InventoryElement(**element) for element in data]
+
+    @classmethod
+    def Blank(Self, userId):
+        return Self(userId, 0, [])
+    
+    def add(self, objectId, amount, data=None):
+        if len(self.data) >= 10: return True
+        remove = None
+        found  = False
+
+        for i,element in enumerate(self.data):
+            if element.objectId != objectId: continue
+            element.amount += amount
+            if data: element.metadata = data
+            if element.amount <= 0: remove = i
+            found = True
+       
+        if remove is not None   :   self.data.pop(remove); return
+        if found                :    return
+
+        self.data.append(
+                    InventoryElement(objectId, amount, data)
+                )
+        return
+
+    def remove(self, objectId):
+        index = None
+        for i,element in enumerate(self.data):
+            if element.objectId == objectId: index = i
+
+        if index is not None: self.data.pop(i)
+        return None if index is None else True
+
+    def clear(self):
+        self.data   = []
+        self.length = 0
+
+    def export(self):
+        data_dict = {
+                "userId":   self.userId,
+                "length":   len(self.data),
+                "data"  :   [element.export() for element in self.data]
+            }
+        return data_dict
+
+@dataclass
+class InvAPrs: #Inventory API Preset
+    name        : str
+    limit       : int
+    stackable   : bool
+    value       : int
+    weight      : float
+    rarity      : int
+    description : str
+
+class InventoryAPI:
+    data = {
+        0  : InvAPrs("Botella de agua",     -1, True, 300,  50, 0, "Quita la sed."),
+        1  : InvAPrs("Botella de cerveza",  -1, True, 1200, 10, 1, "Quita la sed, pero, ¿a qué costo?"),
+        2  : InvAPrs("Botella de leche",    -1, True, 500,  20, 1, "Quita todos los efectos de estado."),
+        3  : InvAPrs("Pastelito",           -1, True, 800,  15, 0, "Mucha azúcar hace a Nati doler la pancita."),
+        4  : InvAPrs("Hamburguesa",         -1, True, 800,  15, 1, "Quita el hambre. Puede hacer a Nati perezosa."),
+        5  : InvAPrs("Manzana",             -1, True, 300,  20, 0, "Quita el hambre y da energía a Nati."),
+        6  : InvAPrs("Trozo de pizza",      -1, True, 1000, 10, 1, "Quita el hambre. Hace a Nati perezosa."),
+        7  : InvAPrs("Sobras",              -1, True, 100,  7.5,1, "¿Quién sabe lo que hay aquí? Es un misterio"),
+        8  : InvAPrs("Sopa de gato",        -1, True, 1500, 5,  2, "Ñom ñom ñom, delicious!"),
+        9  : InvAPrs("Ensalada",            -1, True, 600,  5,  2, "Quita el hambre y da mucha energía a Nati."),
+        10 : InvAPrs("Peine",                1, False,2000, 5,  1, "¡La melena alineada como nunca!"),
+        11 : InvAPrs("Espejo",               1, False,2500, 5,  1, "Cuidado, si eres muy feo se rompe."),
+        12 : InvAPrs("Correa",               1, False,2500, 5,  2, "Saca a pasear a tu Nati, solo no la acerques a los perros."),
+        13 : InvAPrs("Silla",               -1, True, 2000, 15, 3, "Corrije a tu Nati antes que sea tarde."),
+        14 : InvAPrs("Frasco de vidrio",    -1, True, 2500, 13, 2, "Química o alquimia, sea lo que sea, dale uno de estos y saldrán cosas."),
+        15 : InvAPrs("Reloj mecánico",      -1, True, 4000, 3.8,2, "Nati se calma al oir su tic tac."),
+        16 : InvAPrs("Mantita",             -1, True, 2200, 7.5,1, "El frío está fuerte. Cubre a tu Nati con ella."),
+        17 : InvAPrs("Tenedor",              1, False,700,  5,  2, "No acercar a los enchufes."),
+        18 : InvAPrs("Plato",               -1, True, 1000, 5,  2, "¿A que no te apetece arrojarlo como frisbee?"),
+        19 : InvAPrs("Corneta",             -1, True, 1500, 2,  3, "Nati ruidosa ha ingresado al chat."),
+        20 : InvAPrs("Cuchillo",             1, False,700,  5,  2, "NO acercar a Nati o se enoja."),
+        21 : InvAPrs("Bate",                 1, False,3000, 3,  2, "Las reglas están hechas para romperse."),
+        22 : InvAPrs("Martillo",             1, False,3500, 3,  3, "A este punto, ¿la corriges o la mandas al lobby?"),
+        23 : InvAPrs("Serrucho",             1, False,4500, 3,  3, "Dale a Nati una sierra y te hará una choza... con una persona dentro."),
+        24 : InvAPrs("Atornillador",         1, False,2500, 3,  3, "Nati puede reparar cosas con esto."),
+        25 : InvAPrs("Llave Inglesa",        1, False,3500, 3,  3, "Nati puede reparar cosas con esto."),
+        26 : InvAPrs("Tu vieja",            -1, True, 10000,0.5,4, "El objeto más masivo del universo.")
+    }
+
+    def __init__(self):
+        self.totalWeight = self.getWeight()
+        return
+
+    def getWeight(self):
+        accumulator = 0
+        for _,element in self.data.items():   accumulator += element.weight
+        return accumulator
+
+    def name(self, objectId):
+        try             :    return self.data[objectId].name
+        except Exception:    return "Error"
+
+    def properties(self, objectId):
+        try             :    return self.data[objectId]
+        except Exception:    return "Error"
+
+    def getRandomItem(self):
+        r = random.random() * self.totalWeight
+        accumulator = 0
+        for key,element in self.data.items():
+            accumulator += element.weight
+            if r < accumulator: return key
+        
+        return None
+
+
+inventoryAPI = InventoryAPI()
+
+
+@dataclass
+class Yincana:
+    userId:             str
+    ndcId:              int
+    level:              int
+
+
 
 logging.basicConfig(level=logging.INFO, fmt=f"%(asctime)s %(levelname)s : ins={ba.instance} - %(message)s")
 alreadyChecked = []

@@ -2,7 +2,7 @@ from src import objects
 from src.communication import protocol
 import logging
 import uuid
-import json
+import ujson as json
 import asyncio
 import time
 
@@ -191,6 +191,29 @@ async def socketJoin(data):
                         },
                     nodeId=data.nodeId)
 
+async def socketRemoteChat(data):
+    from src.communication.chat import rc
+    from .client import sc
+
+    data.content = protocol.SocketRemoteChat(**json.loads(data.content))
+    
+    for chat in rc.chatrooms:
+        if chat.remoteChatId != data.content.remoteChatId: continue
+        
+        ctx = sc.context 
+        ctx.client.set_ndc(data.content.ndcId)
+        
+        print(data)
+        if      chat.content.status == 'OPEN'   :
+            await chat.connectionReady(data)
+            await ctx.client.send_message(message="Conexión establecida", thread_id=data.content.threadId)
+        elif    chat.content.status == 'CLOSE'  :
+            await chat.remoteClose(data)
+            await ctx.client.send_message(message="Conexión cerrada por el par", thread_id=data.content.threadId)
+        elif    chat.content.status == 'SEND'  :
+            await ctx.client.send_message(message=data.content.content, thread_id=data.content.threadId)
+    return
+
 async def listener(data):
 
     if   data.dtype == 0: await socketInfo(data)
@@ -198,5 +221,6 @@ async def listener(data):
     elif data.dtype == 2: await socketChat(data)
     elif data.dtype == 3: await socketRaw(data)
     elif data.dtype == 4: await socketJoin(data)
+    elif data.dtype == 6: await socketRemoteChat(data)
     
     return

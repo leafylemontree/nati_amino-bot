@@ -4,10 +4,12 @@ from src            import subprocess
 from src            import utils
 import asyncio
 from edamino import Bot, Context, Client, api
+from src.database import db
 
 import threading
 import time
 import sys
+import traceback
 
 from src.special import LA
 
@@ -26,29 +28,39 @@ def keepAlive():
     clk_t.start()
 
 def main():
-    #server = objects.Server()
     bot = commands.login()
+
+    @bot.ready()
+    async def on_ready(ctx: Context):
+        objects.ba.loop = asyncio.get_event_loop()
+        #db.dumpAllChats()
+        subprocess.run(objects.ba.loop, ctx)
+        await LA.config(ctx)
+        await utils.st.set(ctx)
+        return
+
+    @bot.reload(message="Bot reloaded")
+    async def on_reload(ctx: Context):
+        objects.ba.loop = asyncio.get_event_loop()
+        objects.ba.context = ctx
+        subprocess.reloadContext(objects.ba.loop, ctx)
+        return
 
     @bot.event(message_types=api.MessageType.ALL, media_types=api.MediaType.ALL)
     async def on_message(ctx: Context):
-        if objects.ba.loop is False:
-            objects.ba.loop = asyncio.get_event_loop()
-            await LA.config(ctx)
-            await utils.st.set(ctx)
-
-        subprocess.run(objects.ba.loop, ctx)
         objects.ba.counter = 300
         await commands.message(ctx);
+        return
 
     try:
         bot.start();
     except Exception as e:
         print("Login failed!")
         print("Exception caught:", e)
-        sys.exit()
-        objects.botStats.write()
+        traceback.print_exc()
+        objects.ba.kill(0)
 
 if __name__ == "__main__":
+    print(sys.argv)
     objects.ba.instance = int(sys.argv[3])
-    keepAlive()
     main()

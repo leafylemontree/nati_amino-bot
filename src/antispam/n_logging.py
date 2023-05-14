@@ -144,21 +144,24 @@ Rzones:"""
         print("Message sent")
     return
 
-async def chatAnalyzeLog(ctx, message, warnings):
+async def chatAnalyzeLog(ctx, message, warnings, auto=None):
     log = db.getLogConfig(ctx.msg.ndcId)
     db.registerReport(ctx.msg.author.uid, ctx.msg.ndcId, ctx.msg.threadId, warnings)
     chat = log.threadId if log.threadId else ctx.msg.threadId
     
     if log.ban:
         try:    
-                await ctx.client.kick_from_chat(ctx.msg.threadId, ctx.msg.uid, allow_rejoin=True)
-                await banUser(ctx, ctx.msg.author.uid, ctx.msg.ndcId, str(warnings))
+            await ctx.client.kick_from_chat(ctx.msg.threadId, ctx.msg.uid, allow_rejoin=True)
+            await banUser(ctx, ctx.msg.author.uid, ctx.msg.ndcId, str(warnings))
         except Exception:
-                pass
-    
+            pass
+
+    title = "Análisis de chat manual"
+    if auto: title = "Análisis de chat automático"
+
     embed = Embed(title="Perfil del usuario", object_type=0, object_id=message.author.uid, content=message.author.nickname)
     base_msg=f"""
-Análisis de chat manual
+{title}
 ------------------
 Nick: {message.author.nickname}
 ID: {message.author.uid}
@@ -178,8 +181,7 @@ Mensaje:
     return
 
 
-async def blogLog(ctx, blog, warnings):
-    ndcId   = ctx.client.ndc_id[1:]
+async def blogLog(ctx, blog, ndcId, warnings):
     log     = db.getLogConfig(ndcId)
     threadId= log.threadId
     if not threadId: return
@@ -189,6 +191,13 @@ async def blogLog(ctx, blog, warnings):
     
     def FContent(fcontent):
         return '\n'.join(list(map(lambda warning: f'  {warning} - {objects.AntiSpam.msg_desc[str(warning)]}', fcontent)))
+    
+    if log.ban:
+        try:    
+            await banUser(ctx, blog.author.uid, ctx.msg.ndcId, str(warnings))
+        except Exception:
+            pass
+
     base_msg=f"""
 Análisis de blogs automático
 ------------------
@@ -211,3 +220,85 @@ Contenido:
                 chat_id=threadId,
                 embed=embed
                 )
+
+async def userNicknameLog(ctx, user, ndcId, warnings):
+    log     = db.getLogConfig(ndcId)
+    threadId= log.threadId
+    if not threadId: return
+    ctx.client.set_ndc(ndcId)
+
+    def FNick(fnick):
+        return '\n'.join(list(map(lambda warning: f'  {warning} - {objects.AntiSpam.msg_desc[str(warning)]}', fnick)))
+    
+    def FContent(fcontent):
+        return '\n'.join(list(map(lambda warning: f'  {warning} - {objects.AntiSpam.msg_desc[str(warning)]}', fcontent)))
+    
+    if log.ban:
+        try:    
+            await banUser(ctx, user.uid, ndcId, str(warnings))
+        except Exception:
+            pass
+
+    base_msg=f"""
+Análisis de usuarios automático
+------------------
+Nick: {user.nickname}
+ndc://x{ndcId}/user-profile/{user.uid}
+------------------
+Advertencias:
+{FNick(warnings[0])}
+{FContent(warnings[1])}
+------------------
+Contenido:
+{str(user.content)[:500]}
+-----------------"""
+
+    embed = Embed(title="Usuario", object_type=0, object_id=user.uid, content=user.nickname)
+
+    await ctx.client.send_message(
+                message=base_msg,
+                chat_id=threadId,
+                embed=embed
+                )
+
+async def wallLogAuto(ctx, comment, warnings, user):
+    ndcId   = ctx.client.ndc_id[1:]
+    log     = db.getLogConfig(ndcId)
+    threadId= log.threadId
+    if not threadId: return
+
+    def FNick(fnick):
+        return '\n'.join(list(map(lambda warning: f'  {warning} - {objects.AntiSpam.msg_desc[str(warning)]}', fnick)))
+    
+    def FContent(fcontent):
+        return '\n'.join(list(map(lambda warning: f'  {warning} - {objects.AntiSpam.msg_desc[str(warning)]}', fcontent)))
+
+    if log.ban:
+        try:    
+            await banUser(ctx, comment.author.uid, ctx.msg.ndcId, str(warnings))
+        except Exception:
+            pass
+
+    base_msg=f"""
+Análisis de usuarios automático
+------------------
+Nick: {comment.author.nickname}
+ID: {content.author.uid}
+Comentó en el muro de {user.nickname}
+------------------
+Advertencias:
+{FNick(warnings[0])}
+{FContent(warnings[1])}
+------------------
+Contenido:
+{str(comment.content)[:500]}
+-----------------"""
+
+    embed = Embed(title="Usuario", object_type=0, object_id=comment.author.uid, content=comment.author.nickname)
+
+    await ctx.client.send_message(
+                message=base_msg,
+                chat_id=threadId,
+                embed=embed
+                )
+

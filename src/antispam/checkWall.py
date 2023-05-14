@@ -5,7 +5,7 @@ from .detectMessage import findNickname, findContent
 async def get_wall_comments(ctx, user_id=None, sorting="oldest", start=0, size=25):
         if sorting not in ["oldest", "newest"]: return None
         response = await ctx.client.request('GET', f"user-profile/{user_id}/comment?sort={sorting}&start={start}&size={size}")
-        return tuple(map(lambda comment : objects.WallComment(**comment), response['commentList'] ))
+        return tuple(map(lambda comment : objects.CommentList(**comment), response['commentList'] ))
 
 @utils.userId
 async def check_wall(ctx, uid, msg):

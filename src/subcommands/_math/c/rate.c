@@ -7,8 +7,6 @@ double rate(char *text, int len){
 	int   		mt = (len >> 3) + 1;
 	unsigned char  *mr = malloc(mt * 8);
 
-	printf("%i %i\n", len, mt);
-
 	// copy input to matrix and add padding
 	for(int i = 0; i < mt*8; i++){
 		if (i < len) mr[i] = (text[i] & 0xDF) - 0x30;
@@ -35,7 +33,6 @@ double rate(char *text, int len){
 	    };
 	};
 
-	printf("\n");
 	// Multiply text matrix with Kernel
 	float matrix2[8][8];
 	int result = 0;
@@ -51,7 +48,6 @@ double rate(char *text, int len){
 	};
 	
 	// Create 3x3 subkernel
-	printf("\n");
 	float ker2[3][3];
 	for(int y = 0; y < 3; y++){
 	    for(int x = 0; x < 3; x++){

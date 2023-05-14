@@ -4,12 +4,18 @@ import logging
 import threading
 import time
 import random
-import json
+import ujson as json
 from src import objects
 from .listener import listener
 from src.communication import protocol
+import ctypes
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(name)s - [%(levelname)s]: %(message)s')
+
+c_HELPER = ctypes.cdll.LoadLibrary('src/communication/checksum.so')
+c_HELPER.checksum.argtypes = (ctypes.c_char_p, ctypes.c_int)
+c_HELPER.checksum.restype  = ctypes.c_int
+
 
 class Socket:
     
@@ -28,6 +34,10 @@ class Socket:
     def config(self, host='localhost', port='31000'):
         self.host = host
         self.port = port
+
+    def reloadContext(self, loop, ctx):
+        self.context    = ctx
+        self.loop       = loop
        
     async def run(self, ctx):
         self.loop = asyncio.get_event_loop()
@@ -89,11 +99,23 @@ class Socket:
             elif dtype == 3       :       raw = (protocol.SocketRaw(request)).__dict__
             elif dtype == 4       :       raw = (protocol.SocketJoin(**request)).__dict__
             elif dtype == 5       :       raw = (protocol.SocketConfig(**request)).__dict__
+            elif dtype == 6       :       raw = (protocol.SocketRemoteChat(**request)).__dict__
 
             data = self.signature(dtype=dtype, raw=raw, destinatary=destinatary, nodeId=nodeId)
             await self.loop.sock_sendall(self.socket, data.encode())
         except Exception as e:
             logging.error(f"Sender Errored! {e}")
+
+    def getChecksum(self, text):
+        try:
+            raw = text.encode('utf-8')
+        except Exception as e:
+            return 'error'
+        
+        l   = len(raw)
+
+        checksum = c_HELPER.checksum(raw, l)
+        return checksum
 
     def signature(self, dtype=1, raw=None, destinatary=-1, nodeId=None):
         try:
@@ -102,6 +124,7 @@ class Socket:
                 'timestamp' :   int(time.time() * 1000),
                 'messageId' :   f'92{int(time.time()) ^ int(random.randint(0,0xFFFFFFFF))}',
                 'content'   :   json.dumps(raw),
+                'checksum'  :   self.getChecksum(json.dumps(raw)),
                 'address'   :   str(self.address),
                 'instance'  :   objects.ba.instance,
                 'origin'    :   objects.ba.instance,

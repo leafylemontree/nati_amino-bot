@@ -11,6 +11,8 @@ from src import subprocess
 from src import utils
 from src import shop
 from src import communication
+from src import network
+from src import challenges
 from src.text import text
 from src.special import TA, LA
 from . import database
@@ -24,33 +26,30 @@ def login():
 
 async def message(ctx: Context):
         reply = objects.Reply(None, False)
-        img   = None
         msg = ctx.msg.content;
+        com = msg.upper() if msg is not None else None
+        nick = ctx.msg.author.nickname if ctx.msg.author is not None else None
 
+        if ctx.msg.author: userDB = database.db.getUserData(ctx.msg.author)
         objects.botStats.register(2)
         await antispam.messageRegister(ctx)
+        await antispam.checkIfNewChat(ctx)
+        await antispam.detectAll(ctx)
+        if ctx.msg.content is not None :  await utils.waitForCallback(ctx)
 
-        if ctx.msg.content is not None:  await utils.waitForCallback(ctx)
-        response = await antispam.detectAll(ctx)
-        #if response: return
         if msg is not None:
             com = ctx.msg.content.upper()
             if      com.find("--CONFIG") == 0: await config.config(ctx)
             elif    com.find("--LOG") == 0:    await config.logConfig(ctx)
 
-        if ctx.msg.author: userDB = database.db.getUserData(ctx.msg.author)
-
-        d = await config.get(ctx)
-        if   d == -1: return None
-        elif d ==  1: return await subcommands.enter(ctx)
-        elif d ==  2: return await subcommands.leave(ctx)
+        message_event = await config.get(ctx)
+        if   message_event == objects.MessageEvents.FORBIDDEN   : return None
+        elif message_event == objects.MessageEvents.MEMBER_JOIN : return await subcommands.enter(ctx)
+        elif message_event == objects.MessageEvents.MEMBER_LEAVE: return await subcommands.leave(ctx)
         if msg is None: return None;
-	
-        com = msg.upper()
-        nick = ""
-        if ctx.msg.author:   nick = ctx.msg.author.nickname
 
-        if   com.find("--SETLOG") == 0 :                                            reply.msg = await antispam.set_logging(ctx)
+        if objects.status.wordle.check_user(ctx.msg.author.uid):   reply = await subcommands.wordle(ctx, msg)
+        elif com.find("--SETLOG") == 0 :                                            reply.msg = await antispam.set_logging(ctx)
         elif com.find("-SI") == 0:                                                  await utils.registerConfirmation(ctx, True)
         elif com.find("-NO") == 0:                                                  await utils.registerConfirmation(ctx, False)
         elif com.find("--BAN") == 0:                                                await antispam.ban_user(ctx)
@@ -81,12 +80,30 @@ async def message(ctx: Context):
         elif com.find("--ELIMINARCOMENTARIOS") == 0:                                await admin.deleteComments(ctx)
         elif com.find("--NOTICE") == 0:                                             await admin.giveNotice(ctx)
         elif com.find("--CUTESALL") == 0:                                           await images.cutes_sendall(ctx)
-        elif d != 100: 
+
+        elif message_event != objects.MessageEvents.NO_FUN: 
+
             if   com.find("NATI")   == 0:                                               reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("ARTEMIS") == 0:                                              reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("EMMA") == 0 and ctx.msg.ndcId == 215907772:                  reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("ANYA") == 0 and ctx.msg.ndcId == 139175768:                  reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("--TESTWELCOME") == 0:                                        await subcommands.enter(ctx)
+            elif com.find("--PUNTOS") == 0:                                             await shop.walletCard(ctx)
+
+            elif com.find("--INVENTARIO") == 0:                                         await shop.inventory(ctx)
+            elif com.find("--AÑADIRITEM") == 0:                                         await shop.add_item(ctx, 'ADD', use_text=True)
+            elif com.find("--QUITARITEM") == 0:                                         await shop.add_item(ctx, 'DEL', use_text=True)
+            elif com.find("--RANDOMITEM") == 0:                                         await shop.giveRandomItem(ctx)
+            elif com.find("--VACIARINVENTARIO") == 0:                                   await shop.clearInventory(ctx)
+        
+
+            elif com.find("--VER-YINCANA") == 0:                                   await challenges.getChallenges(ctx)
+            elif com.find("--ENTREGAR-YINCANA") == 0:                                   await challenges.validate(ctx)
+
+
+
+            elif com.find("--HISTORIAL") == 0:                                          await admin.get_history(ctx)
+            elif com.find("--VERLIKES")  == 0:                                          await challenges.get_likes_from_link(ctx)
             elif com.find("--FORMAT") == 0:                                             await subcommands.fmt(ctx)
             elif com.find("--HELP") == 0:                                               await subcommands._help(ctx)
             elif com.find("--INTERACCI") == 0:                                          await subcommands._help(ctx, hType="INTERACCION")
@@ -112,6 +129,7 @@ async def message(ctx: Context):
             elif com.find("--MEDIAVALUE") == 0:                                         await subcommands.mediaValue(ctx)
             elif com.find("--FROMSTICKER") == 0:                                        await subcommands.fromSticker(ctx)
             elif com.find("--BLOGINFO") == 0:                                           await subcommands.blogInfo(ctx)
+            elif com.find("--USUARIOSACTIVOS") == 0:                                    await subcommands.userActivity.activeUsers(ctx)
             elif com.find("--NANO") == 0 :                                              reply.msg = text['nano']
             elif com.find("--CARD1") == 0:                                              await images.card(ctx)
             elif com.find("--CRAIYON") == 0:                                            await images.craiyon(ctx)
@@ -123,7 +141,9 @@ async def message(ctx: Context):
             elif com.find("--SOCKETCOM") == 0:                                          await communication.get_communities(ctx)
             elif com.find("--SOCKETWALLET") == 0:                                       await communication.get_wallets(ctx)
             elif com.find("--SOCKETACTIVITY") == 0:                                     await communication.get_activity(ctx)
-            elif com.find("--WORDLE") == 0:                                             reply     = await commands.wordle(ctx, com)
+            elif com.find("--ISINSTANCE") == 0:                                     await communication.is_instance_in(ctx)
+            elif com.find("--REMOTECHAT") == 0:                                     await communication.rc.handler(ctx)
+            elif com.find("--WORDLE") == 0:                                             reply     = await subcommands.wordle(ctx, com)
             elif ((com.find("--SIGUEME") == 0) | (com.find("--SÍGUEME") == 0)) :        reply     = await subcommands.follow(ctx)
             elif com.find("--COMPLETAR") == 0:                                          reply.msg = await subcommands.web_tools.generateText(ctx)
             elif com.find("--BIBLIA") == 0:                                             reply.msg = await subcommands.web_tools.bible(ctx)
@@ -153,6 +173,7 @@ async def message(ctx: Context):
             elif com.find("--NORMAS") == 0  :                                           reply.msg = text['normas']
             elif com.find("--SOPORTE") == 0  :                                          reply.msg = "support.aminoapps.com/hc/es-419/requests/new?from_aminoapp=1"
             elif com.find("--CENTRO") == 0  :                                           reply.msg = "support.aminoapps.com/hc/es-419?from_aminoapp=1"
+            elif com.find("--AYUDA") == 0  :                                            reply.msg = "https://leafylemontree.github.io/lider-amino/resume.html"
             elif msg.find("--Mensaje Oculto") == 0 :                                    reply.msg = text['msg_oculto']
             elif msg.find("👀") != -1:                                                  reply     = subcommands.replyMsg(text['ojos'])
             elif msg.find("Toy Chica") != -1 :                                          reply     = subcommands.replyMsg(text['toy_chica'])
@@ -177,8 +198,6 @@ async def message(ctx: Context):
             elif com.find("Y LOS RESULTADOS?") != -1:                                   reply.msg = "Y los blogs?"
             elif com.find("--XKCD") != -1:                                              await subcommands.web_tools.xfcd(ctx)
         
-        #print(ctx.msg.content, ctx.msg.author.nickname)
-
         if   ((reply.msg is not None) & (reply.reply is True))           : await ctx.reply(reply.msg)
         elif ((reply.msg is not None) & (reply.reply is False))          : await ctx.send(reply.msg)
 

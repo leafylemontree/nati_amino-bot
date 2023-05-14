@@ -187,3 +187,10 @@ async def fromSticker(ctx):
     if ctx.msg.extensions.replyMessage.mediaValue.find(".png") != -1: await send_gif(ctx, media=ctx.msg.extensions.replyMessage.mediaValue)
     else                                    : await send_image(ctx, media=ctx.msg.extensions.replyMessage.mediaValue)
     return
+
+async def activeUsers(ctx):
+    users = await ctx.client.get_online_users(start=0, size=100)
+
+    userFormattedList = "\n".join(list(map(lambda user: f'{user.uid} - {user.nickname[:12]}', users)))
+
+    await ctx.send(f"Estos son los usuarios que están activos:\n\n{userFormattedList}"[:2000])

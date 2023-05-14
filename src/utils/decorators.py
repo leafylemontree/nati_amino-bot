@@ -2,6 +2,7 @@ from edamino import Context
 from typing import List
 from src import objects
 import logging
+import traceback
 #from src.utils.text import helpFunction
 
 leafId    =  "17261eb7-7fcd-4af2-9539-dc69c5bf2c76"
@@ -312,6 +313,7 @@ async def waitForCallback(ctx):
         else            : response = await ins.func(ctx, ins)
     except Exception as e:
         logging.error(f'Callback error: {e}')
+        traceback.print_exc()
 
     if response: deleteInstance(userId, ndcId, threadId)
     return 
@@ -367,6 +369,10 @@ class SubTaskScheduler:
         self.context = ctx
         self.loop    = asyncio.get_event_loop()
 
+    def reloadContext(self, loop, ctx):
+        self.context = ctx
+        self.loop    = loop
+
     def create(self, newSubTask):
         for subTask in self.subTasks:
             if subTask.subTaskId == newSubTask.subTaskId: return None
@@ -377,10 +383,6 @@ class SubTaskScheduler:
     async def run(self, ctx=None):
         if ctx: await self.set(ctx)
         
-        def run_subprocess(subTask):
-            coro = asyncio.run_coroutine_threadsafe(subTask.callback(self.context), loop=self.loop)
-            coro.result()
-
         try:
             while True:
 
@@ -390,8 +392,6 @@ class SubTaskScheduler:
                         logging.info(f'$.{objects.ba.instance} - Running subTak {i}. subTaskTimer={self.timeCounter}')
                         self.loop.create_task(subTask.callback(self.context))
                         
-                        #t = threading.Thread(target=run_subprocess, args=(subTask,))
-                        #t.start()
                     except Exception as e:   
                         logging.error(f'$.{objects.ba.instance} Corroutine {i} errored!: {e}')
                         pass

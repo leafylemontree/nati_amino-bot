@@ -35,10 +35,8 @@ async def rateBlog(ctx):
     l    = len(content)
 
     score = rt.rate(text, l)
-    
     score = math.sin(score)
     score = (2/((math.e ** score) + (math.e ** -score)))**2
-    print(score)
 
     if score < 0.5: return await ctx.send(f"A Nati no le ha gustado tu blog. Lo ha calificado con:\n[b]{(score*10):.2}/10")
     

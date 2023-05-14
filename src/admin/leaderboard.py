@@ -2,11 +2,13 @@ from __future__ import annotations
 from src import objects
 from src.database import db
 
+async def get_leaderboard_info(ctx, rankingType=2):
+    response = await ctx.client.request("GET", f"https://service.narvii.com/api/v1/g/s-{ctx.client.ndc_id}/community/leaderboard?rankingType={rankingType}&start=0&size=100", full_url=True)
+    return tuple(map(lambda user: objects.LeaderboardUserProfile(**user), response['userProfileList']))
+
+
 async def getLeaderboard(ctx):
-    response = await ctx.client.request("GET", f"https://service.narvii.com/api/v1/g/s-{ctx.client.ndc_id}/community/leaderboard?rankingType=2&start=0&size=100", full_url=True)
-
-    users = tuple(map(lambda user: objects.LeaderboardUserProfile(**user), response['userProfileList']))
-
+    user = await get_leaderboard_info(ctx, rankingType=2)
     msg = ""
     for rank, user in enumerate(users):
         msg += f"{rank+1}\t{user.activeTime/60:.2f}\t{user.nickname}\n"

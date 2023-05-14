@@ -22,15 +22,18 @@ class Process:
         return
 
 def st_run(loop, ctx):
-    coro = asyncio.run_coroutine_threadsafe(utils.st.run(), loop=loop)
-    coro.result()
-
+    loop.create_task(utils.st.run())
+    return
 
 def socket_run(loop, ctx):
     sc.config(host='localhost', port=31000)
     loop.create_task(sc.run(ctx))
     #coro = asyncio.run_coroutine_threadsafe(sc.run(ctx,), loop=loop)
     #coro.result()
+
+def reloadContext(loop, ctx):
+    sc.reloadContext(loop, ctx)
+    utils.st.reloadContext(loop, ctx)
 
 
 def run(loop, ctx):

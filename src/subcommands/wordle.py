@@ -1,18 +1,18 @@
 from src import utils
+from src.objects import status
 from src import objects
-
-status = objects.Status()
+from src.database import db
 
 async def wordle(ctx, msg):
         global status
 
         reply = objects.Reply(None, True)
 
-
+        msg = msg.upper()
         msg = msg.split(" ")
         if len(msg) == 2:
-            if ((msg[0] == "--WORDLE") & (msg[1] == "-INIT")):
-                if ctx.msg.author.uid in status.wordle.get_users():  return objects.replyMsg("Usted ya está ingresado")
+            if ((msg[0] == "--WORDLE") & (msg[1].find("INI") != -1)):
+                if ctx.msg.author.uid in status.wordle.get_users():  return objects.Reply("Usted ya está ingresado")
                 status.wordle.new_instance(ctx.msg.author.uid)
                 reply.msg = f"""
 [cb]Wordle
@@ -22,9 +22,27 @@ async def wordle(ctx, msg):
                 for i in status.wordle.word: reply.msg += "_   "
                 return reply
             elif ((msg[0] == "--WORDLE") & (msg[1] == "-INFO")) :
-                return objects.replyMsg("Placeholder normas")
+                return objects.Reply("""
+[cb]Normas del Wordle:
+[c]Se le será dado un espacio de cinco letras, el cual oculta una palabra de cinco letras. Su misión es encontrarla antes de los cinco intentos, si no, habrá perdido.
+
+[c]¿Cómo jugar?
+[c]Ponga el comando --wordle -iniciar, y Nati les dará un tablero de juego, que es único para cada jugador.
+
+[c]Para contestar, solo ponga la palabra que quiera añadir, por ejemplo:
+[c]acosa
+[c]torno
+
+[c]Si una de las letras ha coincidido exactamente con la de la palabra oculta, se pondrá un [] alrededor de la letra. Por ejemplo:
+
+[c] Palabra: C   o   r   t   e
+[c] [c] [o]  s   e   r
+[c]  p  [o] [r] [t] [e]
+ 
+[c]Para salir, solo pongan -SALIR
+""")
             elif ((msg[0] == "--WORDLE") & (msg[1] == "-WORD")) :
-                word = c.get_word(status.wordle.diff);
+                word = utils.get_word(status.wordle.diff);
                 status.wordle.change_word(word)
                 reply.msg = "La palabra ha sido cambiada. ¿Podrán resolverla ahora? uwu."
                 return reply
@@ -42,27 +60,27 @@ async def wordle(ctx, msg):
         elif len(msg) == 4:
             if ((msg[0] == "--WORDLE") & (msg[1] == "SUDO") & (msg[2] == "-WORD")):
                 status.wordle.change_word(msg[3])
-                return objects.replyMsg(f"Palabra cambiada por {status.wordle.word}")
+                return objects.Reply(f"Palabra cambiada por {status.wordle.word}")
         else:
             if msg[0] == "--WORDLE" :
-                return objects.replyMsg("""
+                return objects.Reply("""
 Los comandos disponibles para esta función son:
---WORDLE -INIT: inicia el juego
+--WORDLE -INICIAR: inicia el juego
 --WORDLE -INFO: entrega las normas""")
-            if msg[0] == "-EXIT":
-                index = 0
+            if msg[0] == "-EXIT" or msg[0] == '-SALIR':
+                index = None
                 for i, j in enumerate(status.wordle.instance):
                     if j.uid == ctx.msg.author.uid :
                         status.wordle.instance.pop(i)
                         break
-                return objects.replyMsg(f"[c]{ctx.msg.author.nickname} se ha retirado.")
+                return objects.Reply(f"[c]{ctx.msg.author.nickname} se ha retirado.")
             else:
                 index = 0
                 for i, j in enumerate(status.wordle.instance):
                     if j.uid == ctx.msg.author.uid :
                         index = i
                         break
-                if ((len(msg[0]) != len(status.wordle.word)) & (msg[0].find("//") == -1)) : return objects.replyMsg("La palabra ingresada no es válida")
+                if ((len(msg[0]) != len(status.wordle.word)) & (msg[0].find("//") == -1)) : return objects.Reply("La palabra ingresada no es válida")
 
                 status.wordle.instance[index].data.append(msg[0])
 
@@ -77,10 +95,14 @@ Los comandos disponibles para esta función son:
                     if i == status.wordle.word:
                         status.wordle.instance.pop(index)
                         reply.msg += f"\n\n[c]¡{ctx.msg.author.nickname} ha ganado!"
+                        word = utils.get_word(status.wordle.diff);
+                        status.wordle.change_word(word)
+                        db.modifyRecord(43, ctx.msg.author, 500)
                         return reply
 
                 if len(status.wordle.instance[index].data) > status.wordle.step_cnt:
                     status.wordle.instance.pop(index)
-                    return objects.replyMsg(f"[c]{ctx.msg.author.nickname} ha perdido.")
+                    db.modifyRecord(43, ctx.msg.author, -250)
+                    return objects.Reply(f"[c]{ctx.msg.author.nickname} ha perdido.")
 
         return reply

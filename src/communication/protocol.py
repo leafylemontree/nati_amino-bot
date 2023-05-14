@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-import json
+import ujson as json
 
 ####################################
 #
@@ -86,6 +86,25 @@ class SocketJoin:
 @dataclass
 class SocketConfig:
     instance:       int
+
+
+
+
+####################################
+#
+#   data type = 6
+#   decription: remote chat
+#   
+#####################################
+
+@dataclass
+class SocketRemoteChat:
+    remoteChatId:       str
+    content     :       str
+    status      :       str
+    threadId    :       str
+    userId      :       str
+    ndcId       :       int
 
 
 

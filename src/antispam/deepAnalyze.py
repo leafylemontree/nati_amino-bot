@@ -91,6 +91,8 @@ Si tiene el modo estricto activo, el bot expulsará a quien haya detectado como 
         for index,user in enumerate(users):
             s1 = await findNickname(user.nickname)
             s2 = await findContent(user.content, comId)
+            if "4" in s1: s1.remove("4")
+            if "108" in s1: s2.remove("108")
             if "151" in s1: s2.remove("151")
 
             if s1 or s2:

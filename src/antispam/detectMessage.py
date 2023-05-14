@@ -2,15 +2,20 @@ from .data      import AS
 from .n_logging import sendLog
 from src        import objects
 from src.database import db
+import re
 
 async def findNickname(nick):
         warnings = []
+        nick = nick.upper()
         for i in objects.AntiSpam.banned_nicks:
-            if ((i in nick) & ("1" not in warnings)): warnings.append("1") 
+            if ((i.upper() in nick) & ("1" not in warnings)): warnings.append("1") 
         for i in objects.AntiSpam.sexual_nicks:
-            if ((i in nick) & ("2" not in warnings)): warnings.append("2") 
+            if ((i.upper() in nick) & ("2" not in warnings)): warnings.append("2") 
         #for i in objects.AntiSpam.sus_keywords:
         #    if ((i in nick) & ("3" not in warnings)): warnings.append("3") 
+        #try:    e = nick.encode("ascii")
+        #except Exception:
+        #    if ("4" not in warnings): warnings.append("4")
         return warnings
 
 async def findContent(content, comId=None):
@@ -18,14 +23,25 @@ async def findContent(content, comId=None):
         if content is None: return warnings
         else: content = content.upper()
 
-        if content.find("T.ME") != -1                  : warnings.append("101")
+        if content.find("T.ME/") != -1                 : warnings.append("101")
         if content.find("AMINOAPPS.COM/C/") != -1      : warnings.append("102")
         if content.find("AMINOAPPS.COM/INVITE/") != -1 : warnings.append("103")
-        if content.find("T.CO/") != -1                  : warnings.append("104")
+        if content.find("T.CO/") != -1                 : warnings.append("104")
+        if content.find("DISCORD.") != -1              : warnings.append("105")
+        if content.find("PROJZ") != -1                 : warnings.append("106")
+        if content.find("CHAT.WHATSAPP.") != -1        : warnings.append("107")
+        if content.find("AMINOAPPS.COM/U/") != -1      : warnings.append("108")
         if content.upper().find("{}") != -1            : warnings.append("111")
         if len(content) > 3200                         : warnings.append("151") 
         if len(content) > 32000                        : warnings.append("152") 
         
+        normalSpam = list(map(lambda w: str(w), range(101, 109)))
+        if not any(map(lambda w: True if w in normalSpam else False, warnings)):
+            if   content.find("AMINOAPPS")    != -1: pass
+            elif content.find("YOUTU")        != -1: pass
+            elif content.find("GOOGLE")       != -1: pass
+            elif re.search('.*\.[^ \n]*\/.*', content): warnings.append('109')
+
         if not comId: return warnings
         log = db.getLogConfig(comId)
         if log._ignore:
@@ -36,7 +52,7 @@ async def findContent(content, comId=None):
 async def msgType(mtype, content=None, author=None):
         warnings = []
 
-        if mtype in [58, 108, 109, 110, 113, 114] :
+        if mtype not in [0, 1, 2 ,3, 100, 101, 102, 103, 104]:
             if author  is None                 : pass 
             if content is None                 : pass 
             else                               : warnings.append("200")
@@ -54,10 +70,14 @@ async def detectAll(ctx):
 
         if int(comId) in AS.no_warnings: return
         
+        chat = db.getChatConfig(ctx.msg.threadId, ctx.msg.ndcId, exists=True)
+
         nick_warnings = await findNickname(nick)
         msg_warnings  = await findContent(content, comId)
         type_warnings = await msgType(ctx.msg.type, ctx.msg.content, ctx.msg.author)
-        
+
+        if chat is not None and "4" in nick_warnings: nick_warnings.remove("4")
+
         warnings.extend(nick_warnings)
         warnings.extend(msg_warnings)
         warnings.extend(type_warnings)

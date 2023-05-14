@@ -20,3 +20,6 @@ node_modules*
 pack*
 index.js
 git_token.txt
+*.json
+*.txt
+data/*

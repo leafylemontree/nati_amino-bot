@@ -1,6 +1,8 @@
 import aiohttp
 from aiofile import async_open, AIOFile
 import os
+import io
+import PIL
 
 async def downloadImage(url):
         async with aiohttp.ClientSession() as session:
@@ -24,3 +26,16 @@ async def getPfp(user):
         os.system("magick media/pfp.jpg media/pfp.png")
         return
 
+
+async def getImageBytes(ctx, url):
+
+    response    = await ctx.client.session.request(method='GET', url=url)
+    image       = io.BytesIO(await response.read())
+    image.seek(0)
+    result = io.BytesIO()
+
+    temp        = PIL.Image.open(image)
+    temp.save(result, format='PNG')
+    result.seek(0)
+    return        result
+    

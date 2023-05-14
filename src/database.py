@@ -1,7 +1,10 @@
 import  mariadb
-import  json
+import  ujson as json
 import  redis
 from    src     import  objects
+import  aiofile
+import  os
+import  threading
 
 class Database:
     base   = None
@@ -112,14 +115,15 @@ class Database:
         self.redis.hset(self.r_chatTable, f'?{ndcId}&{threadId}', json.dumps(data.__dict__))
         return data
 
-    def getChatConfig(self, threadId, ndcId):
+    def getChatConfig(self, threadId, ndcId, exists=False):
         if self.redis.hexists(self.r_chatTable, f'?{ndcId}&{threadId}'):
             data = self.redis.hget(self.r_chatTable, f'?{ndcId}&{threadId}')
             return objects.ChatConfig(**json.loads(data))
 
-        self.cursor.execute(f'SELECT * FROM Chat WHERE threadId="{threadId}";')
+        self.cursor.execute(f'SELECT * FROM Chat WHERE threadId="{threadId}" AND comId="{ndcId}";')
         resp = self.cursor.fetchall()
         if not resp:
+            if exists: return None
             self.cursor.execute(f'INSERT INTO Chat VALUES ("{threadId}", {ndcId}, 0, 0, 0, 0, 0, 0, 0, 0);')
             self.cursor.execute(f'SELECT * FROM Chat WHERE threadId="{threadId}";')
             resp = self.cursor.fetchall()
@@ -132,7 +136,24 @@ class Database:
         return data
 
     def registerReport(self, userId, comId, threadId, warnings):
-        self.cursor.execute(f'INSERT INTO Reports VALUES ("{userId}", {comId}, "{threadId}", NOW(), {1 if "1" in warnings else 0}, {1 if "2" in warnings else 0}, {1 if "3" in warnings else 0}, {1 if "101" in warnings else 0}, {1 if "102" in warnings else 0}, {1 if "103" in warnings else 0}, {1 if "104" in warnings else 0}, {1 if "111" in warnings else 0}, {1 if "151" in warnings else 0}, {1 if "152" in warnings else 0}, {1 if "200" in warnings else 0});')
+        w001 = 1 if "1"   in warnings else 0
+        w002 = 1 if "2"   in warnings else 0
+        w003 = 1 if "3"   in warnings else 0
+        w004 = 1 if "4"   in warnings else 0
+        w101 = 1 if "101" in warnings else 0
+        w102 = 1 if "102" in warnings else 0
+        w103 = 1 if "103" in warnings else 0
+        w104 = 1 if "104" in warnings else 0
+        w105 = 1 if "105" in warnings else 0
+        w106 = 1 if "106" in warnings else 0
+        w107 = 1 if "107" in warnings else 0
+        w108 = 1 if "108" in warnings else 0
+        w109 = 1 if "109" in warnings else 0
+        w111 = 1 if "111" in warnings else 0
+        w151 = 1 if "151" in warnings else 0
+        w152 = 1 if "152" in warnings else 0
+        w200 = 1 if "200" in warnings else 0
+        self.cursor.execute(f'INSERT INTO Reports VALUES ("{userId}", {comId}, "{threadId}", NOW(), {w001}, {w002}, {w003}, {w101}, {w102}, {w103}, {w104}, {w111}, {w151}, {w152}, {w200}, {w105}, {w106}, {w107}, {w108}, {w004}, {w109});')
         return
 
     def r_addBlog(self, ndcId, blogId):
@@ -186,6 +207,71 @@ class Database:
         if not user and userId is not None:  user = await ctx.client.get_user_info(userId)
         self.redis.hset(self.r_userNickname, f'?{ndcId}&{user.uid}', f'{user.nickname}')
         return user.nickname
+
+    def dumpAllChats(self):
+        self.cursor.execute('SELECT * FROM Chat')
+        data = self.cursor.fetchall()
+        chats = tuple(map(lambda chat: objects.ChatConfig(*chat), data))
+
+        for chat in chats:
+            chatData = json.dumps(chat.__dict__)
+            self.redis.hset(self.r_chatTable, f'?{chat.comId}&{chat.threadId}', chatData)
+    print("Dump complete")
+
+
+    async def getUserInventory(self, userId):
+        path = 'database/'
+
+        try:
+            async with aiofile.async_open(f'{path}{userId}.json', 'r+') as f:
+                text        = await f.read()
+
+                if not text: raise FileNotFoundError
+                response    = json.loads(text)
+                inventory   = objects.UserInventory(**response)
+                return inventory
+
+        except FileNotFoundError:
+            inventory = objects.UserInventory.Blank(userId)
+            return inventory
+
+    
+    async def setUserInventory(self, inventory):
+        path = 'database/'
+
+        with open(f'{path}{inventory.userId}.json', 'w+') as f:
+            json.dump(inventory.export(), f, indent=4)
+
+    def getYincanaData(self, userId, ndcId):
+        self.cursor.execute(f'SELECT * FROM Yincana WHERE userId="{userId}" AND ndcId={ndcId}')
+        resp = self.cursor.fetchall()
+        if resp == []:
+            self.cursor.execute(f'INSERT INTO Yincana VALUES ("{userId}", {ndcId}, 0);')
+            self.cursor.execute(f'SELECT * FROM Yincana WHERE userId="{userId}" AND ndcId={ndcId}')
+            resp = self.cursor.fetchall()
+
+        yincana = objects.Yincana(*resp[0])
+        return yincana
+
+
+    def setYincanaData(self, userId, ndcId, level=0):
+        yincana         = self.getYincanaData(userId, ndcId)
+        yincana.level  += level
+        self.cursor.execute(f'UPDATE Yincana SET level={yincana.level} WHERE userId="{userId}" AND ndcId={ndcId};')
+        return yincana
+
+    def checkYincanaExist(self, objectType, objectId, ndcId):
+        self.cursor.execute(f'SELECT * FROM YincanaCheck WHERE objectType={objectType} AND objectId="{objectId}" AND ndcId={ndcId}')
+        resp = self.cursor.fetchall()
+        return False if resp == [] else True
+
+    def setYincanaObject(self, objectType, objectId, ndcId):
+        resp = self.checkYincanaExist(objectType, objectId, ndcId)
+        self.cursor.execute(f'INSERT INTO YincanaCheck VALUES ({objectType}, "{objectId}", {ndcId}, NOW());')
+
+        
+
+
 
 
 db = Database()

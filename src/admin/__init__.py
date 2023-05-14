@@ -8,4 +8,5 @@ from .remove        import remove
 from .community     import newCommunity, removeCommunity
 from .blog          import createBlog
 from .comments      import deleteComments
-from .notices        import giveNotice
+from .notices       import giveNotice
+from .history       import get_history, moderation_history, get_user_moderation

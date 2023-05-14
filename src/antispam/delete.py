@@ -21,7 +21,7 @@ async def del_(ctx):
                 success += 1
             except:
                 failed += 1
-            await sleep(1)
+            await sleep(3)
 
     await ctx.send(f"""Se han intentado eliminar {l} mensajes
 --------------
