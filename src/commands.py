@@ -13,6 +13,7 @@ from src import shop
 from src import communication
 from src import network
 from src import challenges
+from src import pet
 from src.text import text
 from src.special import TA, LA
 from . import database
@@ -56,7 +57,7 @@ async def message(ctx: Context):
         elif com.find("--UNBAN") == 0:                                              await antispam.unban_user(ctx)
         elif com.find("--WARN") == 0:                                               await antispam.warn_user(ctx)
         elif com.find("--STRIKE") == 0:                                             await antispam.strike_user(ctx)
-        elif com.find("--RANK") == 0:                                               await admin.getLeaderboard(ctx)
+        elif com.find("--ACTIVOSSEMANALE") == 0:                                    await admin.getLeaderboard(ctx)
         elif com.find("--CHECK") == 0:                                              reply.msg = await antispam.check_wall(ctx)
         elif com.find("--TEST2") == 0:                                              reply.msg = "Aqui estoy"
         elif com.find("@STAFF") == 0:                                               reply.msg = await subcommands.staff(ctx)
@@ -79,6 +80,7 @@ async def message(ctx: Context):
         elif com.find("--CREARBLOG") == 0:                                          await admin.createBlog(ctx)
         elif com.find("--ELIMINARCOMENTARIOS") == 0:                                await admin.deleteComments(ctx)
         elif com.find("--NOTICE") == 0:                                             await admin.giveNotice(ctx)
+        elif com.find("--INVITAR") == 0:                                            await admin.inviteEveryone(ctx)
         elif com.find("--CUTESALL") == 0:                                           await images.cutes_sendall(ctx)
 
         elif message_event != objects.MessageEvents.NO_FUN: 
@@ -89,6 +91,9 @@ async def message(ctx: Context):
             elif com.find("ANYA") == 0 and ctx.msg.ndcId == 139175768:                  reply.msg = "¿Me llamaban? Utiliza --help para ver mis comandos, uwu."
             elif com.find("--TESTWELCOME") == 0:                                        await subcommands.enter(ctx)
             elif com.find("--PUNTOS") == 0:                                             await shop.walletCard(ctx)
+            elif com.find("--SOYTUNEKITA") == 0:                                        await subcommands.ayudaPsicologica(ctx)
+            elif com.find("--ADVERTENCIA") == 0:                                        await antispam.warningInfo(ctx)
+
 
             elif com.find("--INVENTARIO") == 0:                                         await shop.inventory(ctx)
             elif com.find("--AÑADIRITEM") == 0:                                         await shop.add_item(ctx, 'ADD', use_text=True)
@@ -97,10 +102,15 @@ async def message(ctx: Context):
             elif com.find("--VACIARINVENTARIO") == 0:                                   await shop.clearInventory(ctx)
         
 
-            elif com.find("--VER-YINCANA") == 0:                                   await challenges.getChallenges(ctx)
+            elif com.find("--VER-YINCANA") == 0:                                        await challenges.getChallenges(ctx)
             elif com.find("--ENTREGAR-YINCANA") == 0:                                   await challenges.validate(ctx)
+            elif com.find("--RANKING-YINCANA") == 0:                                    await challenges.getYincanaRanking(ctx)
+            elif com.find("--AVANZAR-YINCANA") == 0:                                    await challenges.advanceLevel(ctx)
+            elif com.find("--YINCANA") == 0:                                            await challenges.giveHelpYincana(ctx)
 
-
+            elif com.find("--MASCOTA") == 0:                                            await pet.info(ctx)
+            elif com.find("--NUEVA-MASCOTA") == 0:                                            await pet.initPet(ctx)
+            elif com.find("--DAR-ITEM") == 0:                                            await pet.giveItem(ctx)
 
             elif com.find("--HISTORIAL") == 0:                                          await admin.get_history(ctx)
             elif com.find("--VERLIKES")  == 0:                                          await challenges.get_likes_from_link(ctx)

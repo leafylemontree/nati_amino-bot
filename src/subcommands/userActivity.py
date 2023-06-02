@@ -1,7 +1,8 @@
 from src import objects
 from src import utils
 from src.database import db
-
+import edamino
+import random
 
 class FakeUser:
     def __init__(self, userId):
@@ -174,9 +175,13 @@ async def fmt(ctx):
 async def mediaValue(ctx):
     if not ctx.msg.extensions.replyMessage:             return await ctx.send("Debe ejecutar este comando respondiendo a otro")
     if not ctx.msg.extensions.replyMessage.mediaValue:  return await ctx.send("El mensaje no posee mediaValue")
+    
+    mediaValue      = ctx.msg.extensions.replyMessage.mediaValue
+    mediaValueFix   = mediaValue.replace('narvii', 'aminoapps')
 
-    await ctx.send(str(ctx.msg.extensions.replyMessage.mediaValue))
-    print(str(ctx.msg.extensions.replyMessage.mediaValue))
+
+    await ctx.client.send_message(message=f"Normal: {mediaValue}\n\nArreglado: {mediaValueFix}", chat_id=ctx.msg.threadId, linkSnippetRaw=mediaValueFix)
+
 
 async def fromSticker(ctx):
     if not ctx.msg.extensions.replyMessage:             return await ctx.send("Debe ejecutar este comando respondiendo a otro")
@@ -194,3 +199,67 @@ async def activeUsers(ctx):
     userFormattedList = "\n".join(list(map(lambda user: f'{user.uid} - {user.nickname[:12]}', users)))
 
     await ctx.send(f"Estos son los usuarios que están activos:\n\n{userFormattedList}"[:2000])
+
+
+psico_list = [
+    "No tienes que hacer esto solo",
+    "Busca otras maneras en las cuales canalizar tus fuertes deseo que te llevan aconsumir de forma excesiva",
+    "¿Alguna vez has pensado en salir a tocar el pasto?",
+    "Dime, ¿te sientes bien contigo mismo?",
+    "¿Hay algo que te incomode? Cuéntame",
+    "Deberías dejar de lado la vida en Amino y salir a ver si está lloviendo en la esquina",
+    "¿Hace cuanto no ves a tus padres y les dices como eres?",
+    "Si alguna vez necesitas a alguien, cuenta conmigo",
+    "No puedo ayudarte por este medio, pero",
+    "Ten presente un par de cosas",
+    "¿Te sientes mejor al escuchar esto?",
+    "Deja anoto lo que me digas",
+    "Necesito que te acomodes, para tener una mejor experiencia.",
+    "¿Desde cuando crees que comenzaron tus malestares?",
+    "¿Puedes decirme tu nombre?",
+    "Ajá, excelente. Cuéntame más",
+    "De momento, la sesión queda hasta acá.",
+    "¿Alguna pregunta que quieras hacerme?",
+    "Soy Santiago, y estoy aquí para ayudarte",
+    "Yo no soy Nati, pero...",
+    "Huh, ya veo.",
+    "Percibo algo raro en ti, mira",
+    "Te voy a pedir algo: puedes ser sincero conmigo",
+    "¿Cómo prefieres que te llame?",
+    "Súper",
+    "Me alegro mucho por ti, sí.",
+    "¿Quieres lo mejor para tu vida?",
+    "No es mucho, pero es algo",
+    "No te dejes vencer por la tentación",
+    "sé más fuerte",
+    "Si nadie te ha dicho te quiero, yo lo haré por ti; Te quiero",
+    "Eres una escoria",
+    "Hasta un cesto de basuta tiene más modales que tú",
+    "Cerdo asqueroso",
+    "Voy a avisarle de esto a las autoridades. Dame un momento",
+    "Esto que has dicho es demasiado fuerte"
+]
+
+
+
+async def AP_callback(ctx, ins):
+    if   ctx.msg.content.upper().find("-ESCUCHAR") == 0:
+        msg = [random.choice(psico_list) for i in range(random.randint(1, 7))]
+        await ctx.send('. '.join(msg))
+        return False
+
+    elif ctx.msg.content.upper().find("-SALIR") == 0:
+        await ctx.send("[ci]Vuelva pronto, u.u.")
+        return True
+    return False
+
+
+@utils.waitForMessage(message='*', callback=AP_callback)
+async def ayudaPsicologica(ctx):
+    user = db.getUserData(user=ctx.msg.author)
+    await ctx.send(f"""[ci]Buenas, {ctx.msg.author.nickname}, más conocido/a como {user.alias}
+
+[ci]Se está contactando con el servicio de ayuda psicológica de Nati, ya que hemos detectado comportamiento inusual de su persona, asociado a una fuerte dependencia al Anime y a las chicas neko. Puede elegir las siguientes opciones para su consulta:
+
+[ci]-ESCUCHAR: Seguir en línea. Un psicólogo se pondrá en contacto con usted por medio de Nati.
+[ci]-SALIR: Termina la sesión.""")

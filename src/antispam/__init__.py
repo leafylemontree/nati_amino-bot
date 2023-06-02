@@ -8,3 +8,4 @@ from .chat          import chatAnalyze, checkIfNewChat
 from .delete        import del_
 from .register      import messageRegister
 from .community     import communityanalyze
+from .info          import warningInfo

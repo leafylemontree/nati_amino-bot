@@ -5,17 +5,19 @@ from    src     import  objects
 import  aiofile
 import  os
 import  threading
+import  datetime
 
 class Database:
     base   = None
     cursor = None
     redis  = None
 
-    r_chatTable = 'chatConfig'
-    r_logTable  = 'logConfig'
-    r_comWelMsg = 'CommunityWelcome'
-    r_chatWelMsg= 'ChatWelcome'
-    r_userNickname = "UserNickname"
+    r_chatTable     = 'chatConfig'
+    r_logTable      = 'logConfig'
+    r_comWelMsg     = 'CommunityWelcome'
+    r_chatWelMsg    = 'ChatWelcome'
+    r_userNickname  = "UserNickname"
+    r_messageCom    = "MessagesSentCounter"
 
     def __init__(self):
         self.redis = redis.Redis()
@@ -35,19 +37,21 @@ class Database:
             self.cursor = self.base.cursor()
             self.base.autocommit = True
 
-    def getUserData(self, user):
-        self.cursor.execute(f'SELECT * FROM UserInfo WHERE userId="{user.uid}";')
+    def getUserData(self, user, userId=None):
+        if not userId: userId = user.uid
+        self.cursor.execute(f'SELECT * FROM UserInfo WHERE userId="{userId}";')
         resp = self.cursor.fetchall()
         if not resp:
             self.setUserData(user)
-            self.cursor.execute(f'SELECT * FROM UserInfo WHERE userId="{user.uid}"')
+            self.cursor.execute(f'SELECT * FROM UserInfo WHERE userId="{userId}"')
             resp = self.cursor.fetchall()
         return objects.UserInfo(*resp[0])
 
-    def setUserData(self, user):
-        self.cursor.execute(f'INSERT INTO UserInfo VALUES ("{user.uid}", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, "none")')
+    def setUserData(self, user, userId=None):
+        if not userId: userId = user.uid
+        self.cursor.execute(f'INSERT INTO UserInfo VALUES ("{userId}", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, "none")')
     
-    def modifyRecord(self, mode, user, value=1):
+    def modifyRecord(self, mode, user, value=1, userId=None):
         column = "version"
         if   mode == 11: column = "recvHugs"
         elif mode == 21: column = "givenHugs"
@@ -59,12 +63,15 @@ class Database:
         elif mode == 24: column = "givenDoxx"
         elif mode == 31: column = "alias"
         elif mode == 43: column = "unused3"
+        elif mode == 44: column = "unused4"
         elif mode == 50: column = "marry"
 
-        self.cursor.execute(f'SELECT {column} FROM UserInfo WHERE userId="{user.uid}";')
+        if not userId: userId = user.uid
+
+        self.cursor.execute(f'SELECT {column} FROM UserInfo WHERE userId="{userId}";')
         data = self.cursor.fetchall()[0]
         if not data:
-            self.cursor.execute(f'INSERT INTO UserInfo VALUES ("{user.uid}", "-", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, "none")')
+            self.cursor.execute(f'INSERT INTO UserInfo VALUES ("{userId}", "-", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, "none")')
             data = 0
         else:
             data = data[0]
@@ -72,7 +79,7 @@ class Database:
         if mode in [31, 50] and value != 1:   data = f'"{value}"'.replace(";", "").replace("DROP", "").replace("drop", "")
         else:                           data = data + value
         
-        self.cursor.execute(f'UPDATE UserInfo SET {column}=? WHERE userId="{user.uid}";', (data,))
+        self.cursor.execute(f'UPDATE UserInfo SET {column}=? WHERE userId="{userId}";', (data,))
         return data
 
     def setLogConfig(self, comId, mode, value):
@@ -246,19 +253,26 @@ class Database:
         self.cursor.execute(f'SELECT * FROM Yincana WHERE userId="{userId}" AND ndcId={ndcId}')
         resp = self.cursor.fetchall()
         if resp == []:
-            self.cursor.execute(f'INSERT INTO Yincana VALUES ("{userId}", {ndcId}, 0);')
-            self.cursor.execute(f'SELECT * FROM Yincana WHERE userId="{userId}" AND ndcId={ndcId}')
-            resp = self.cursor.fetchall()
+            #self.cursor.execute(f'INSERT INTO Yincana VALUES ("{userId}", {ndcId}, 0);')
+            #self.cursor.execute(f'SELECT * FROM Yincana WHERE userId="{userId}" AND ndcId={ndcId}')
+            #resp = self.cursor.fetchall()
+            yincana = objects.Yincana.blank(userId, ndcId)
+            return yincana
 
-        yincana = objects.Yincana(*resp[0])
+        yincana = objects.Yincana.from_db(*resp[0])
         return yincana
-
 
     def setYincanaData(self, userId, ndcId, level=0):
         yincana         = self.getYincanaData(userId, ndcId)
         yincana.level  += level
-        self.cursor.execute(f'UPDATE Yincana SET level={yincana.level} WHERE userId="{userId}" AND ndcId={ndcId};')
+        if yincana.isBlank: self.cursor.execute(f'INSERT INTO Yincana VALUES ("{userId}", {ndcId}, 1, NOW());')
+        else:               self.cursor.execute(f'UPDATE Yincana SET level={yincana.level} WHERE userId="{userId}" AND ndcId={ndcId};')
         return yincana
+
+    def getYincanaDataCommunity(self, ndcId):
+        self.cursor.execute(f'SELECT * FROM Yincana WHERE ndcId={ndcId}')
+        resp = self.cursor.fetchall()
+        return tuple(map(lambda data: objects.Yincana.from_db(*data), resp))
 
     def checkYincanaExist(self, objectType, objectId, ndcId):
         self.cursor.execute(f'SELECT * FROM YincanaCheck WHERE objectType={objectType} AND objectId="{objectId}" AND ndcId={ndcId}')
@@ -269,9 +283,111 @@ class Database:
         resp = self.checkYincanaExist(objectType, objectId, ndcId)
         self.cursor.execute(f'INSERT INTO YincanaCheck VALUES ({objectType}, "{objectId}", {ndcId}, NOW());')
 
+    
+    def getNatiPetData(self, ndcId):
+        self.cursor.execute("SELECT * FROM NatiPet WHERE ndcId=?;", (ndcId, ))
+        resp = self.cursor.fetchall()
+        if resp == []: return None
+
+        if self.redis.hexists(self.r_messageCom, f"?{ndcId}"):
+            pet = objects.NatiPet(*resp[0])
+
+            messages = self.redis.hget(self.r_messageCom, f"?{ndcId}")
+            messages = int.from_bytes(messages, 'big')
+            pet.care += messages // 10
+            if pet.care < 0    : pet.care = 0
+
+            timedelta = datetime.datetime.now() - pet.lastInteraction
+            secs      = timedelta.seconds // 10
+            if secs > pet.care:
+                secs = secs - pet.care
+                pet.care = 0
+                pet.health = (pet.health - (secs * 2))
+                if pet.health < 0    : pet.health = 0
+            else:
+                pet.care = pet.care - secs
+
+            self.cursor.execute("UPDATE NatiPet SET lastInteraction=NOW(), health=?, care=? WHERE ndcId=?;", (pet.health, pet.care, ndcId, ))
+            self.redis.hset(self.r_messageCom, f"?{ndcId}", (0).to_bytes(4, 'big'))
+            self.cursor.execute("SELECT * FROM NatiPet WHERE ndcId=?;", (ndcId, ))
+            resp = self.cursor.fetchall()
+
+        return objects.NatiPet(*resp[0])
+
+
+    def initNatiPet(self, ndcId):
+        pet = self.getNatiPetData(ndcId)
+        if pet: return pet
+        self.cursor.execute("INSERT INTO NatiPet VALUES (?, NOW(), NOW(), 0, 0, 10000, 10000, 10000, 10000, 10000, 10000, 10000, 0)", (ndcId,))
+        pet = self.getNatiPetData(ndcId)
+        return pet
+
+    def updateNatiPet(self, ndcId, column, amount):
+        pet = self.getNatiPetData(ndcId)
+        if pet is None: return None
+    
+        if column == "health":
+            amount = pet.health + amount
+            if amount > pet.maxHealth: amount = pet.maxHealth
+
+        elif column == "happiness": amount = pet.happiness + amount
+        elif column == "energy":    amount = pet.energy    + amount
+        elif column == "care":      amount = pet.care      + amount
+        elif column == "hunger":    amount = pet.hunger    + amount
+        elif column == "thirst":    amount = pet.thirst    + amount
+        else                   :    return None
         
+        if amount < 0                           : amount = 0
 
+        self.cursor.execute(f"UPDATE NatiPet SET {column}=?, lastInteraction=NOW(), WHERE ndcId=?", (amount, ndcId, ))
+        pet = self.getNatiPetData(ndcId)
+        return pet
 
+    def updateMultipleNatiPet(self, ndcId, data):
+        pet = self.getNatiPetData(ndcId)
+        query = f"UPDATE NatiPet SET "
+        for i,(key, value) in enumerate(data.items()):
+            if      key == "health":
+                if (pet.health + value) > pet.maxHealth: value = pet.maxHealth
+                else:                                    value += pet.health
+                if value < 0: value = 0
+                query += f"health={value}, "
 
+            elif    key == "exp":
+                value += pet.exp
+                query += f"exp={value}, "
+
+            elif    key == "happiness":
+                value += pet.happiness
+                if value < 0: value = 0
+                query += f"happiness={value}, "
+
+            elif    key == "energy":
+                value += pet.energy
+                if value < 0: value = 0
+                query += f"energy={value}, "
+
+            elif    key == "care":
+                value += pet.care
+                if value < 0: value = 0
+                query += f"care={value}, "
+
+            elif    key == "hunger":
+                value += pet.hunger
+                if value < 0: value = 0
+                query += f"hungry={value}, "
+
+            elif    key == "thirst":
+                value += pet.thirst
+                if value < 0: value = 0
+                query += f"thirst={value}, "
+
+            elif    key == "effects":
+                if pet.effects != 0: query += f"effects={pet.effects}"
+                else:   query += f"effects={value}"
+
+        self.cursor.execute(f"{query} WHERE ndcId=?", (ndcId,) )
+        pet = self.getNatiPetData(ndcId)
+        return pet
 
 db = Database()

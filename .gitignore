@@ -22,3 +22,8 @@ git_token.txt
 *.json
 *.txt
 data/*
+main.py
+data/*
+database/*
+media/pfp*
+media/cutes*

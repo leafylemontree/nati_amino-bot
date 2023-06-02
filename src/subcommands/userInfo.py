@@ -12,7 +12,6 @@ async def get_user_checkins(ctx, userId):
 @utils.userId
 async def userInfo(ctx, uid, content):
         user = await ctx.client.get_user_info(uid)
-
         # print(user)
         role = "Curador" if user.role == 101 else "Líder" if user.role == 102 else "Ninguno"
 
@@ -31,38 +30,32 @@ async def userInfo(ctx, uid, content):
                 marry = resp.nickname
             except:
                 marry = 'No está en esta comunidad, unu.'
+
+        yincana = db.getYincanaData(ctx.msg.author.uid, ctx.msg.ndcId)
+
         msg = f"""[cu]Información de perfil:
        
-Nick: {user.nickname}
-Alias: {usr_db.alias}
-Estado: {activo}
-Nivel: {user.level}
-Seguidores: {user.membersCount}
-Siguiendo a: {user.joinedCount}
-Chek-in: {checkInDays} {dia[a]}
-Rol: {role}
+Nick: {user.nickname}   Alias: {usr_db.alias}
+Estado: {activo}        Nivel: {user.level}
+Seguidores: {user.membersCount}  Siguiendo a: {user.joinedCount}
+Chek-in: {checkInDays} {dia[a]}  Rol: {role}
 uid: {user.uid}
-Comunidad: {user.aminoId}
-Reputación: {user.reputation}
-Blogs: {user.blogsCount}
-Comentarios: {user.commentsCount}
+Comunidad: {user.aminoId} Reputación: {user.reputation}
+Blogs: {user.blogsCount}  Comentarios: {user.commentsCount}
 Unido en: {user.createdTime}
 Última modificación: {user.modifiedTime}
 Casado con: {'nadie' if marry is None else marry}
 
-[u]Ha recibido: 
-    - {usr_db.hugs_r} abrazos. 
-    - {usr_db.kiss_r} besos. 
-    - {usr_db.pats_r} caricias.
-    - {usr_db.doxx_r} doxxeos. 
+[u]Ha recibido:
+[c]{usr_db.hugs_r} abrazos. {usr_db.kiss_r} besos. {usr_db.pats_r} caricias. {usr_db.doxx_r} doxxeos.
 
 [u]Ha dado:
-    - {usr_db.hugs_g} abrazos.
-    - {usr_db.kiss_g} besos.
-    - {usr_db.pats_g} caricias.
-    - {usr_db.doxx_g} doxeadas.
+[c]{usr_db.hugs_g} abrazos. {usr_db.kiss_g} besos. {usr_db.pats_g} caricias. {usr_db.doxx_g} doxeadas. {usr_db.kiwi} furias del kiwi.
 
-Este usuario ha hecho {usr_db.kiwi} furias del kiwi.
+[u]Yincana:
+    - Nivel: {yincana.level}
+    - Puntos: {usr_db.LApoints}
+
 {usr_db.win}/{usr_db.draw}/{usr_db.lose}. Total: {usr_db.points} puntos.
 """
 

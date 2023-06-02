@@ -6,12 +6,14 @@ import edamino
 
 rank_card   = cairo.ImageSurface.create_from_png("media/templates/rank_card.png")
 
-async def triggerLevelUp(ctx, level, communityChallenge):
+async def triggerLevelUp(ctx, level, communityChallenge, userId=None):
     level     = level + 1 
     prevLevel = (level - 1) if level >= 1                           else None
     nextLevel = (level + 1) if level <= communityChallenge.levels    else None
-    nickname  = ctx.msg.author.nickname
-    profile   = await utils.getImageBytes(ctx, ctx.msg.author.icon)
+    if userId is None: userId = ctx.msg.author.uid
+    user      = await ctx.client.get_user_info(userId)
+    nickname  = user.nickname
+    profile   = await utils.getImageBytes(ctx, user.icon)
 
     file      = io.BytesIO()
     image     = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1024, 512)
@@ -57,7 +59,7 @@ async def triggerLevelUp(ctx, level, communityChallenge):
     image.write_to_png(file)
     file.seek(0)
     linkSnippet = edamino.api.LinkSnippet(
-                link=f'ndc://x{ctx.msg.ndcId}/user-profile/{ctx.msg.author.uid}',
+                link=f'ndc://x{ctx.msg.ndcId}/user-profile/{user.uid}',
                 media_upload_value=file.read(),
             )
     

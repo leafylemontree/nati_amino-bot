@@ -24,6 +24,28 @@ def isStaff(func):
         return r
     return check
 
+def isCoHost(func):
+    async def check(*args, **kwargs):
+        ctx = None
+        for arg in args:
+            if isinstance(arg, Context): ctx = arg
+        if ctx is None: return
+        
+        chat = await ctx.client.get_chat_info(ctx.msg.threadId)
+
+
+        if   ctx.msg.author.role in [100, 101, 102]         : pass
+        elif ctx.msg.author.uid == leafId                   : pass
+        elif ctx.msg.author.uid in chat.extensions.cohost   : pass
+        elif ctx.msg.author.uid in chat.author.uid          : pass
+        else:
+                await ctx.send(noMessage)
+                return
+
+        r = await func(*args, **kwargs)
+        return r
+    return check
+
 def userId(func):
     async def check(*args, **kwargs):
         ctx = args[0]
@@ -33,6 +55,12 @@ def userId(func):
             uid = ctx.msg.extensions.mentionedArray[0].uid
             msg = msg.split("\u200e")[0]
         elif ctx.msg.extensions.replyMessage:             uid = ctx.msg.extensions.replyMessage.author.uid
+        elif ctx.msg.content.find("pps.com/p/") != -1:
+            userLink = ctx.msg.content.split("pps.com/p/")[1]
+            userLink = userLink.split(" ")[0]
+            link = await ctx.client.get_info_link(f"http://aminoapps.com/p/{userLink}")
+            if link.linkInfo.objectType != 0: pass
+            uid = link.linkInfo.objectId
         await func(*args, uid, msg, **kwargs)
         return
     return check
@@ -199,13 +227,22 @@ class AW:
         self.fcargs     = fcargs
         self.kill       = instantKill
         self.accessed   = False
+        self.deleteNext = False
+
+    def kill_next(self):
+        self.userId     = None
+        self.ndcId      = None
+        self.threadId   = None
+        self.message    = None
+        self.deleteNext = True
+
 
 class Waiting:
     aw = []
     cn = []
 
     def add(self, userId, ndcId, threadId, message, func, content, fcargs, instantKill):
-        self.aw.append(
+        self.aw.insert(0,
                 AW(userId, ndcId, threadId, message, func, content, fcargs, instantKill)
             )
         return
@@ -222,6 +259,15 @@ class Waiting:
     def delete(self, index):
         self.aw.pop(index)
         return
+
+    def look_and_delete(self, userId, ndcId, threadId):
+        index = self.retrieve(userId, ndcId, threadId)
+        if index != -1:
+            del self.aw[index]
+            #self.aw.pop(index)
+            return True
+        print('Not found')
+        return False
     
     def retrieve(self, userId, ndcId, threadId):
         for index, ins in enumerate(self.aw):

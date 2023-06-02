@@ -13,7 +13,7 @@ import traceback
 async def get_my_communities(ctx, start=0, size=25):
         data = {"timestamp": int(time.time() * 1000)}
         response = await ctx.client.request(
-            'GET', f'https://service.narvii.com/api/v1/g/s/community/joined?v=1&start={start}&size={size}', json=data, full_url=True)
+            'GET', f'https://service.aminoapps.com/api/v1/g/s/community/joined?v=1&start={start}&size={size}', json=data, full_url=True)
         return tuple(
             map(lambda community: edamino.objects.Community(**community),
                 response['communityList']))
@@ -136,7 +136,6 @@ async def show_online(ctx, ndcId):
 
     data['t'] = 306
     await ctx.ws.send_json(data)
-    await asyncio.sleep(5)
     data['t'] = 304
     await ctx.ws.send_json(data)
     return
@@ -149,6 +148,10 @@ async def beActive(ctx):
     loop = asyncio.get_event_loop()
     ctx.ws = await ctx.client.ws_connect()
     logging.info(f"{objects.ba.instance} Restarting websocket")
+
+
+    for i,com in enumerate(comList):
+        await show_online(ctx, com)
 
     await asyncio.sleep(180)
     for i,com in enumerate(comList):
@@ -203,21 +206,20 @@ async def giveWelcome(ctx):
             try:
                 if db.redis.hexists('usersWelcome', f'?{com}&{user.uid}'): continue
                 await asyncio.sleep(5)
-    
+
+                db.redis.hset('usersWelcome', f'?{com}&{user.uid}', int(time.time() * 1000))
                 bio_warn  = await findContent(user.content, comId=com)
                 nick_warn = await findNickname(user.nickname)
                 if log.threadId and (bio_warn or nick_warn):
                     await userNicknameLog(ctx, user, com, [bio_warn, nick_warn]) 
                     await banUser(ctx, user.uid, com, [bio_warn, nick_warn])
 
-
+                if log.userWelcome == 0 : continue
+                if welcomeMsg is None   : continue
                 comments = await get_wall_comments(ctx, user_id=user.uid, sorting='oldest', start=0, size=100)
                 if ctx.client.uid in tuple(map(lambda comment: comment.author.uid, comments)):
                     db.redis.hset('usersWelcome', f'?{com}&{user.uid}', int(time.time() * 1000))
                     continue
-
-                if log.userWelcome == 0 : continue
-                if welcomeMsg is None   : continue
 
                 await ctx.client.comment_profile(uid=user.uid, message=welcomeMsg)
                 await asyncio.sleep(3)
@@ -227,9 +229,26 @@ async def giveWelcome(ctx):
                 logging.error(f"Errored $.{objects.ba.instance} giveWelcome - {com} - {user.uid}: {e}")
                 pass
             
-            db.redis.hset('usersWelcome', f'?{com}&{user.uid}', int(time.time() * 1000))
 
     return
+
+
+@utils.runSubTask(pollingTime=44200)
+async def communityCheckIn(ctx):
+    #await asyncio.sleep(120)
+    coms = await get_my_communities(ctx, start=0, size=100)
+    comList = list(map(lambda com: com.ndcId, coms))
+
+    for com in comList:
+        ctx.client.set_ndc(com)
+        data = {'timezone': -1 * time.timezone // 1000, 'timestamp': int(time.time() * 1000)}
+        try:
+            await ctx.client.request('POST', 'check-in', json=data)
+            logging.info(f"$.{objects.ba.instance} check-in - {com}")
+        except Exception as e:
+            logging.error(str(e))
+            traceback.print_exc()
+        await asyncio.sleep(300)
 
 
 
@@ -244,7 +263,13 @@ async def applyRole(ctx):
         ctx.client.set_ndc(com)
         notices = await get_notices(ctx, start=0, size=100)
         for notice in notices:
-           pass 
+            data = {'timestamp': int(time.time() * 1000)}
+            request = await ctx.client.request("POST", f"notice/{notice.noticeId}/accept", json=data)
+            break
+
+        await asyncio.sleep(1200)
+
+
 
 
 

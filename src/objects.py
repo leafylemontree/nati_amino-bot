@@ -10,6 +10,7 @@ import ujson as json
 import os
 import datetime
 import random
+import uuid
 
 m_error = {
         "error_2400" : "Error 2400: No ha ingresado los parámetros suficientes para el comando 'math'.",
@@ -268,18 +269,17 @@ class Stats:
     strange     = -1
 
     def __init__(self):
-        with open("data/botstats.json", "r") as fp:
-            a = json.load(fp)
         self.time      = time.time()
-        self.reset     = a['reset'] + 1
-        self.users     = a['users'] 
-        self.messages  = a['messages'] 
-        self.sus_names = a['sus_name'] 
-        self.spam_msg  = a['spam_msg'] 
-        self.strange   = a['strange'] 
+        self.reset     = 0
+        self.users     = 0
+        self.messages  = 0
+        self.sus_names = 0
+        self.spam_msg  = 0
+        self.strange   = 0 
         return
 
     def write(self):
+        return
         a = {
 	        "users"    : self.users,
 	        "reset"    : self.reset,
@@ -495,7 +495,7 @@ class NoticeAttachedObjectInfo(BaseModel):
     objectId:                   Optional[str]
     title:                      Optional[str]
     content:                    Optional[str]
-    extensions:                 Optional[int]
+    extensions:                 Optional[Any]
     link:                       Optional[str]
     mediaList:                  Optional[Any]
 
@@ -592,7 +592,7 @@ class UserInfo:
     draw:                       int
     lose:                       int
     points:                     int
-    unused4:                    int
+    LApoints:                   int
     unused5:                    int
     unused6:                    int
     unused7:                    int
@@ -749,35 +749,56 @@ class InvAPrs: #Inventory API Preset
     rarity      : int
     description : str
 
+    # effects
+    itemtype    : int # 0: food, 1: single use object, 2: key-object
+
+    health      : int
+    happiness   : int
+    energy      : int
+    care        : int
+    hunger      : int
+    thirst      : int
+    effects     : int
+
+    # Effects
+    #0  : None
+    #1  : Boozed
+    #2  : Sleepy
+    #3  : Tired
+
+    #-1 : clear
+    #-2 : leftovers
+
 class InventoryAPI:
     data = {
-        0  : InvAPrs("Botella de agua",     -1, True, 300,  50, 0, "Quita la sed."),
-        1  : InvAPrs("Botella de cerveza",  -1, True, 1200, 10, 1, "Quita la sed, pero, ¿a qué costo?"),
-        2  : InvAPrs("Botella de leche",    -1, True, 500,  20, 1, "Quita todos los efectos de estado."),
-        3  : InvAPrs("Pastelito",           -1, True, 800,  15, 0, "Mucha azúcar hace a Nati doler la pancita."),
-        4  : InvAPrs("Hamburguesa",         -1, True, 800,  15, 1, "Quita el hambre. Puede hacer a Nati perezosa."),
-        5  : InvAPrs("Manzana",             -1, True, 300,  20, 0, "Quita el hambre y da energía a Nati."),
-        6  : InvAPrs("Trozo de pizza",      -1, True, 1000, 10, 1, "Quita el hambre. Hace a Nati perezosa."),
-        7  : InvAPrs("Sobras",              -1, True, 100,  7.5,1, "¿Quién sabe lo que hay aquí? Es un misterio"),
-        8  : InvAPrs("Sopa de gato",        -1, True, 1500, 5,  2, "Ñom ñom ñom, delicious!"),
-        9  : InvAPrs("Ensalada",            -1, True, 600,  5,  2, "Quita el hambre y da mucha energía a Nati."),
-        10 : InvAPrs("Peine",                1, False,2000, 5,  1, "¡La melena alineada como nunca!"),
-        11 : InvAPrs("Espejo",               1, False,2500, 5,  1, "Cuidado, si eres muy feo se rompe."),
-        12 : InvAPrs("Correa",               1, False,2500, 5,  2, "Saca a pasear a tu Nati, solo no la acerques a los perros."),
-        13 : InvAPrs("Silla",               -1, True, 2000, 15, 3, "Corrije a tu Nati antes que sea tarde."),
-        14 : InvAPrs("Frasco de vidrio",    -1, True, 2500, 13, 2, "Química o alquimia, sea lo que sea, dale uno de estos y saldrán cosas."),
-        15 : InvAPrs("Reloj mecánico",      -1, True, 4000, 3.8,2, "Nati se calma al oir su tic tac."),
-        16 : InvAPrs("Mantita",             -1, True, 2200, 7.5,1, "El frío está fuerte. Cubre a tu Nati con ella."),
-        17 : InvAPrs("Tenedor",              1, False,700,  5,  2, "No acercar a los enchufes."),
-        18 : InvAPrs("Plato",               -1, True, 1000, 5,  2, "¿A que no te apetece arrojarlo como frisbee?"),
-        19 : InvAPrs("Corneta",             -1, True, 1500, 2,  3, "Nati ruidosa ha ingresado al chat."),
-        20 : InvAPrs("Cuchillo",             1, False,700,  5,  2, "NO acercar a Nati o se enoja."),
-        21 : InvAPrs("Bate",                 1, False,3000, 3,  2, "Las reglas están hechas para romperse."),
-        22 : InvAPrs("Martillo",             1, False,3500, 3,  3, "A este punto, ¿la corriges o la mandas al lobby?"),
-        23 : InvAPrs("Serrucho",             1, False,4500, 3,  3, "Dale a Nati una sierra y te hará una choza... con una persona dentro."),
-        24 : InvAPrs("Atornillador",         1, False,2500, 3,  3, "Nati puede reparar cosas con esto."),
-        25 : InvAPrs("Llave Inglesa",        1, False,3500, 3,  3, "Nati puede reparar cosas con esto."),
-        26 : InvAPrs("Tu vieja",            -1, True, 10000,0.5,4, "El objeto más masivo del universo.")
+    #   id          name                  limit stack val. wei.rarity  description                                                            type  health happin. energy   care    hunger  thirst  effect
+        0  : InvAPrs("Botella de agua",     -1, True, 300,  50, 0, "Quita la sed.",                                                             0,  750,    0,      0,      0,      0,      2000,   0),
+        1  : InvAPrs("Botella de cerveza",  -1, True, 1200, 10, 1, "Quita la sed, pero, ¿a qué costo?",                                         0,  -1000,  750,    -1000,  500,    -500,   1250,   1),
+        2  : InvAPrs("Botella de leche",    -1, True, 500,  20, 1, "Quita todos los efectos de estado.",                                        0,  250,    250,    250,    0,      250,    1500,   -1),
+        3  : InvAPrs("Pastelito",           -1, True, 800,  15, 0, "Mucha azúcar hace a Nati doler la pancita.",                                0,  -500,   750,    1000,   750,    1000,   -250,   3),
+        4  : InvAPrs("Hamburguesa",         -1, True, 800,  15, 1, "Quita el hambre. Puede hacer a Nati perezosa.",                             0,  -1250,  1000,   1500,   125,    1250,   -750,   3),
+        5  : InvAPrs("Manzana",             -1, True, 300,  20, 0, "Quita el hambre y da energía a Nati.",                                      0,  500,    250,    750,    0,      1000,   200,    0),
+        6  : InvAPrs("Trozo de pizza",      -1, True, 1000, 10, 1, "Quita el hambre. Hace a Nati perezosa.",                                    0,  -1000,  750,    -1500,  400,    1000,   -1000,  3),
+        7  : InvAPrs("Sobras",              -1, True, 100,  7.5,1, "¿Quién sabe lo que hay aquí? Es un misterio",                               0,  0,      0,      0,      0,      0,      0,      -2),
+        8  : InvAPrs("Sopa de gato",        -1, True, 1500, 5,  2, "Ñom ñom ñom, delicious!",                                                   0,  500,    -500,   0,      -500,   1500,   750,    0),
+        9  : InvAPrs("Ensalada",            -1, True, 600,  5,  2, "Quita el hambre y da mucha energía a Nati.",                                0,  1000,   -300,   2500,   0,      750,    250,    0),
+        10 : InvAPrs("Peine",                1, False,2000, 5,  1, "¡La melena alineada como nunca!",                                           1,  0,      500,    0,      250,    0,      0,      0),
+        11 : InvAPrs("Espejo",               1, False,2500, 5,  1, "Cuidado, si eres muy feo se rompe.",                                        1,  0,      -750,   0,      250,    0,      0,      0),
+        12 : InvAPrs("Correa",               1, False,2500, 5,  2, "Saca a pasear a tu Nati, solo no la acerques a los perros.",                1,  -500,   500,    0,      750,    0,      0,      0),
+        13 : InvAPrs("Silla",               -1, True, 2000, 15, 3, "Corrije a tu Nati antes que sea tarde.",                                    1,  -1250,  -1000,  1000,   -500,   0,      0,      0),
+        14 : InvAPrs("Frasco de vidrio",    -1, True, 2500, 13, 2, "Química o alquimia, sea lo que sea, dale uno de estos y saldrán cosas.",    1,  0,      750,    0,      0,      0,      0,      0),
+        15 : InvAPrs("Reloj mecánico",      -1, True, 4000, 3.8,2, "Nati se calma al oir su tic tac.",                                          1,  500,    750,    -750,   750,    0,      0,      -1),
+        16 : InvAPrs("Mantita",             -1, True, 2200, 7.5,1, "El frío está fuerte. Cubre a tu Nati con ella.",                            1,  100,    250,    -1500,  500,    0,      0,      2),
+        17 : InvAPrs("Tenedor",              1, False,700,  5,  2, "No acercar a los enchufes.",                                                1,  0,      0,      0,      0,      0,      0,      0),
+        18 : InvAPrs("Plato",               -1, True, 1000, 5,  2, "¿A que no te apetece arrojarlo como frisbee?",                              1,  0,      0,      0,      0,      0,      0,      0),
+        19 : InvAPrs("Corneta",             -1, True, 1500, 2,  3, "Nati ruidosa ha ingresado al chat.",                                        1,  0,      250,    0,      0,      0,      0,      0),
+        20 : InvAPrs("Cuchillo",             1, False,700,  5,  2, "NO acercar a Nati o se enoja.",                                             1,  -1500,  1750,   0,      0,      0,      0,      0),
+        21 : InvAPrs("Bate",                 1, False,3000, 3,  2, "Las reglas están hechas para romperse.",                                    2,  0,      750,    750,    0,      0,      0,      0),
+        22 : InvAPrs("Martillo",             1, False,3500, 3,  3, "A este punto, ¿la corriges o la mandas al lobby?",                          2,  0,      0,      0,      0,      0,      0,      0),
+        23 : InvAPrs("Serrucho",             1, False,4500, 3,  3, "Dale a Nati una sierra y te hará una choza... con una persona dentro.",     2,  -1250,  2000,   0,      0,      0,      0,      0),
+        24 : InvAPrs("Atornillador",         1, False,2500, 3,  3, "Nati puede reparar cosas con esto.",                                        2,  -750,   1250,   0,      0,      0,      0,      0),
+        25 : InvAPrs("Llave Inglesa",        1, False,3500, 3,  3, "Nati puede reparar cosas con esto.",                                        2,  -1000,  1500,   0,      0,      0,      0,      0),
+        26 : InvAPrs("Tu vieja",            -1, True, 10000,0.5,4, "El objeto más masivo del universo.",                                        0,  999999, 10000,  10000,  10000,  10000,  10000,  -1)
     }
 
     def __init__(self):
@@ -815,8 +836,107 @@ class Yincana:
     userId:             str
     ndcId:              int
     level:              int
+    timestamp:          datetime.datetime
+    isBlank:            bool
 
+    @classmethod
+    def from_db(Self, userId, ndcId, level, timestamp):
+        self = Self(userId, ndcId, level, timestamp, False)
+        return self
+
+    @classmethod
+    def blank(Self, userId, ndcId):
+        self = Self(userId, ndcId, 0, datetime.datetime.now(), True)
+        return self
 
 
 logging.basicConfig(level=logging.INFO, fmt=f"%(asctime)s %(levelname)s : ins={ba.instance} - %(message)s")
 alreadyChecked = []
+
+
+class AdHeaders:
+    def __init__(self, userId):
+        self.data = {
+            "reward": {
+                "ad_unit_id": "t00_tapjoy_android_master_checkinwallet_rewardedvideo_322",
+                "credentials_type": "publisher",
+                "custom_json": {
+                    "hashed_user_id": userId
+                },
+                "demand_type": "sdk_bidding",
+                "event_id": str(uuid.uuid4()),
+                "network": "tapjoy",
+                "placement_tag": "default",
+                "reward_name": "Amino Coin",
+                "reward_valid": True,
+                "reward_value": 2,
+                "shared_id": "4d7cc3d9-8c8a-4036-965c-60c091e90e7b",
+                "version_id": "1569147951493",
+                "waterfall_id": "4d7cc3d9-8c8a-4036-965c-60c091e90e7b"
+            },
+            "app": {
+                "bundle_id": "com.narvii.amino.master",
+                "current_orientation": "portrait",
+                "release_version": "3.4.33585",
+                "user_agent": "Dalvik\/2.1.0 (Linux; U; Android 10; G8231 Build\/41.2.A.0.219; com.narvii.amino.master\/3.4.33567)"
+            },
+            "device_user": {
+                "country": "US",
+                "device": {
+                    "architecture": "aarch64",
+                    "carrier": {
+                        "country_code": 255,
+                        "name": "Vodafone",
+                        "network_code": 0
+                    },
+                    "is_phone": True,
+                    "model": "GT-S5360",
+                    "model_type": "Samsung",
+                    "operating_system": "android",
+                    "operating_system_version": "29",
+                    "screen_size": {
+                        "height": 2300,
+                        "resolution": 2.625,
+                        "width": 1080
+                    }
+                },
+                "do_not_track": False,
+                "idfa": "0c26b7c3-4801-4815-a155-50e0e6c27eeb",
+                "ip_address": "",
+                "locale": "ru",
+                "timezone": {
+                    "location": "Asia\/Seoul",
+                    "offset": "GMT+02:00"
+                },
+                "volume_enabled": True
+            },
+            "session_id": "7fe1956a-6184-4b59-8682-04ff31e24bc0",
+            "date_created": 1633283996
+        }
+        self.headers = {
+            "cookies": "__cfduid=d0c98f07df2594b5f4aad802942cae1f01619569096",
+            "authorization": "Basic NWJiNTM0OWUxYzlkNDQwMDA2NzUwNjgwOmM0ZDJmYmIxLTVlYjItNDM5MC05MDk3LTkxZjlmMjQ5NDI4OA==",
+            "X-Tapdaq-SDK-Version": "android-sdk_7.1.1",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 10; Redmi Note 9 Pro Build/QQ3A.200805.001; com.narvii.amino.master/3.4.33585)"
+        }
+
+
+@dataclass
+class NatiPet:
+    ndcId:              int
+    createdTime:        datetime.datetime
+    lastInteraction:    datatime.datetime
+    exp:                int
+    level:              int
+
+    health:             int
+    maxHealth:          int
+    happiness:          int
+    energy:             int
+    care:               int
+    hunger:             int
+    thirst:             int
+
+    effects:            int
+

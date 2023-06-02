@@ -92,7 +92,6 @@ Mensaje:
                 if i in ["1", "2", "3"]: objects.botStats.register(3)
                 if i in ["101", "102", "103", "104"]: objects.botStats.register(4)
                 if i in ["200"]: objects.botStats.register(5)
-                print(f"{i} - {objects.AntiSpam.msg_desc[i]}")
 
     embed = Embed(title="Perfil del usuario", object_type=0, object_id=ctx.msg.author.uid, content=ctx.msg.author.nickname )
 
@@ -158,6 +157,8 @@ async def chatAnalyzeLog(ctx, message, warnings, auto=None):
 
     title = "Análisis de chat manual"
     if auto: title = "Análisis de chat automático"
+
+    if await register_user(message.ndcId, message.author.uid) : return
 
     embed = Embed(title="Perfil del usuario", object_type=0, object_id=message.author.uid, content=message.author.nickname)
     base_msg=f"""

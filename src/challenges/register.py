@@ -54,18 +54,18 @@ class ChallengeAPI:
             return label
 
 class ChallengeRequirement:
-    type:   int
-    args:   int
-    start:  datetime.datetime
-    end:    datetime.datetime
-    silent: bool
+    type:       int
+    args:       int
+    start:      datetime.datetime
+    end:        datetime.datetime
+    silent:     bool
 
     def __init__(self, ctype, args, silent, start=None, end=None) :
-        self.type   = ctype
-        self.args   = args
-        self.start  = start
-        self.end    = end
-        self.silent = False
+        self.type       = ctype
+        self.args       = args
+        self.start      = start
+        self.end        = end
+        self.silent     = False
 
 class CommunityChallenges:
     def __init__(self, ndcId, challenges):
@@ -159,7 +159,7 @@ class CommunityChallenges:
                 else:                                   return i
 
             elif    c.type == ChallengeAPI.profileChange:
-                if d['profileChangeTime'] >= c.args:    checks.append(True)
+                if d['profileChangeTime'] > c.start:    checks.append(True)
                 else:                                   return i
 
             elif    c.type == ChallengeAPI.nickname:
@@ -223,42 +223,33 @@ class CommunityChallenges:
             elif      c.type == ChallengeAPI.quizUpload:
                 for quiz in d['quiz']: db.cursor.execute('INSERT INTO YincanaCheck VALUES (?, ?, ?, NOW());', (1, quiz, ndcId))
 
-            elif      c.type == ChallengeAPI.like:
-                for objectType,objectId in zip(d['likes'], d['objectType']): db.cursor.execute('INSERT INTO YincanaCheck VALUES (?, ?, ?, NOW());', (objectType, objectId, ndcId))
 
-            elif      c.type == ChallengeAPI.likeAndComment:
-                for objectType,objectId in zip(d['likes'], d['objectType']): db.cursor.execute('INSERT INTO YincanaCheck VALUES (?, ?, ?, NOW());', (objectType, objectId, ndcId))
-
-
-date = datetime.datetime(2023, 5, 1)
+date = datetime.datetime(2023, 5, 15)
 
 
 challenges = {
     9999 : CommunityChallenges(9999, [
                 [
-                    ChallengeRequirement(ChallengeAPI.blogUpload,       1, True, start=date)
+                    ChallengeRequirement(ChallengeAPI.likeAndComment,   3, True, start=date)
                 ],
                 [
-                    ChallengeRequirement(ChallengeAPI.level,           12, True),
+                    ChallengeRequirement(ChallengeAPI.profileChange,    1, False, start=date)
                 ],
                 [
-                    ChallengeRequirement(ChallengeAPI.likeAndComment,   3, True)
+                    ChallengeRequirement(ChallengeAPI.blogUpload,   1, True, start=date)
                 ],
                 [
-                    ChallengeRequirement(ChallengeAPI.profileChange,    0, False, start=date)
+                    ChallengeRequirement(ChallengeAPI.level,            9, True, start=date),
+                    ChallengeRequirement(ChallengeAPI.weeklyMinutes,  200, True, start=date)
                 ],
                 [
-                    ChallengeRequirement(ChallengeAPI.level,            9, True),
-                    ChallengeRequirement(ChallengeAPI.weeklyMinutes,  200, True)
-                ],
-                [
-                    ChallengeRequirement(ChallengeAPI.level,           10, True),
+                    ChallengeRequirement(ChallengeAPI.level,           10, True, start=date),
                     ChallengeRequirement(ChallengeAPI.postFeatured,     1, True, start=date)
                 ],
         ]),
     111610163: CommunityChallenges(111610163, [
                 [
-                    ChallengeRequirement(ChallengeAPI.level,           3, False)
+                    ChallengeRequirement(ChallengeAPI.likeAndComment,   3, True, start=date)
                 ],
                 [
                     ChallengeRequirement(ChallengeAPI.level,           4, False)

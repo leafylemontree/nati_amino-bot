@@ -4,7 +4,7 @@ from src import utils
 
 
 
-@utils.isStaff
+@utils.isCoHost
 async def everyone(ctx):
         user = await ctx.get_user_info()
         if ((user.role == 0) & (user.uid != "17261eb7-7fcd-4af2-9539-dc69c5bf2c76")): return bot_o.Reply("Usted no está autorizado para ejercer este comando", False)
@@ -12,17 +12,17 @@ async def everyone(ctx):
         userCount = thread.membersCount
 
         uidList = []
-        for i in range(userCount % 100):
+        for i in range(userCount // 100 + 1):
             users = await ctx.client.get_chat_users(
                                                 ctx.msg.threadId,
-                                                i * 25,
+                                                i * 100,
                                                 100
                                                 )
             for j in users:
                 uidList.append(j.uid)
 
 
-        await ctx.client.send_message(  message="Mencionando usuarios...",
+        await ctx.client.send_message(  message=f"Mencionando {len(uidList)} usuarios...",
                                     chat_id=ctx.msg.threadId,
                                     message_type=0,
                                     ref_id=None,
@@ -30,8 +30,7 @@ async def everyone(ctx):
                                     embed=None,
                                     link_snippets_list=None,
                                     reply=None )
-
-        return objects.Reply(f"{len(uidList)} usuarios mencionados.", False)
+        return
 
 async def staff(ctx):
 

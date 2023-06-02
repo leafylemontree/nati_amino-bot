@@ -15,12 +15,11 @@ async def back(ctx, aw):
 async def buy2(ctx, aw):
     msg = ctx.msg.content.upper().split(" ")
 
-    if len(msg) < 3:
-        await ctx.send("Debe ingresarlo de la siguiente manera: -item (posición) (cantidad)")
-        return False
-
-
     if msg[0].find("-ITEM") != -1:
+        if len(msg) < 3:
+            await ctx.send("Debe ingresarlo de la siguiente manera: -item (posición) (cantidad)")
+            return False
+
         inventory = await db.getUserInventory(ctx.msg.author.uid)
         inventoryIndex  = None
         inventoryAmount = None
@@ -50,7 +49,7 @@ async def buy2(ctx, aw):
         db.modifyRecord(43, ctx.msg.author, points)
     
         await ctx.send(f"Ha cambiado {inventoryAmount}x {props.name} por {points} puntos.\n\nPuede seguir comprando, o cerrar la tienda con -salir.")
-    elif msg[0].find("-SALIR") != -1:
+    elif msg[0].find("-S") != -1:
         await ctx.send("Vuelva pronto, u.u.")
         return True
     else:

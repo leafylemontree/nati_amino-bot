@@ -1,5 +1,9 @@
 from src import objects
 import datetime
+from src.database import db
+from src.utils.formatter import get_community_info
+
+newLine = '\n'
 
 async def get_blog_likes(ctx, blogId=None, wikiId=None, start=0, size=100):
     response = None
@@ -37,3 +41,50 @@ Creado hace: {timeDelta.days // 365} años, {timeDelta.days // 30} meses, {timeD
 
 Usted {'' if ctx.msg.author.uid in likes.votedValueMap else 'no '}le ha dado like {'al blog' if objectType == 1 else 'la wiki'}.""")
     return
+
+async def getYincanaRanking(ctx):
+    userYincana = db.getYincanaDataCommunity(ctx.msg.ndcId)
+    community   = await get_community_info(ctx, ctx.msg.ndcId)
+
+    splitData = {}
+
+    for data in userYincana:
+        if data.level not in splitData.keys():   splitData[data.level] = []
+        splitData[data.level].append(data)
+
+    filteredData = {}
+    for key,array in splitData.items():
+        if key not in filteredData.keys():   filteredData[key] = []
+
+        sortedArray = sorted(array, key=lambda item: item.timestamp)
+        filteredData[key] = sortedArray
+
+    keys = [key for key in filteredData.keys()]
+
+    msg = ''
+    i   = 0
+    for key in keys:
+        array  = [f'{i + j + 1}. {(await db.getUserNickname(ctx, ctx.msg.ndcId, userId=yincana.userId))[:16]} - {yincana.level + 1}\n' for j,yincana in enumerate(filteredData[key])] 
+        msg   += '\n'.join(array)
+        i += len(filteredData[key])
+
+    print(filteredData)
+    await ctx.send(f"""
+[cb]Ranking
+[c]——————«•»——————
+[C]Comunidad: {community.name}
+[c]Usuarios jugando: {len(userYincana)}
+
+{msg}""")
+
+
+async def giveHelpYincana(ctx):
+    link = 'http://aminoapps.com/p/r2ap3z'
+    await ctx.send(f"""La yincana es un sistema de recompensas que va por nivel. Cada nivel posee premios cada vez más altos, pero a su vez serán más complicados.
+
+Comandos:
+--ver-yincana: Muestra el reto actual dependiendo de tu nivel
+--entregar-yincana: Para registrar si se cumplen los requisitos. Puede pedir información adicional.
+--ranking-yincana: Muestra el ranking a nivel comunidad.
+
+{('link del blog: ' + link) if ctx.msg.ndcId == 9999 else ''}""")

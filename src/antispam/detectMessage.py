@@ -3,6 +3,7 @@ from .n_logging import sendLog
 from src        import objects
 from src.database import db
 import re
+import traceback
 
 async def findNickname(nick):
         warnings = []
@@ -35,6 +36,13 @@ async def findContent(content, comId=None):
         if len(content) > 3200                         : warnings.append("151") 
         if len(content) > 32000                        : warnings.append("152") 
         
+        #try:
+            #pz = re.search(r"((PRO[JY])*.*?[zZ](PRO[JY])*(?![a-zA-Z0-9ñÑ]))", content, re.IGNORECASE)
+            #if pz and "106" not in warnings: warnings.append("106")
+        #except Exception as e:
+            #print(e)
+            #traceback.print_exc()
+
         normalSpam = list(map(lambda w: str(w), range(101, 109)))
         if not any(map(lambda w: True if w in normalSpam else False, warnings)):
             if   content.find("AMINOAPPS")    != -1: pass

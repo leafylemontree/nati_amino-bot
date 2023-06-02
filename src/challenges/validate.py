@@ -9,6 +9,7 @@ from .test                      import get_blog_likes
 from src                        import objects
 import traceback
 from .images                    import triggerLevelUp
+from .rewards                   import giveRewards
 
 checkFurther = [
         ChallengeAPI.blogUpload,
@@ -47,6 +48,7 @@ async def furtherRegister(ctx, ins):
             if db.checkYincanaExist(1, objectId, ctx.msg.ndcId): continue
             ins.data['data'][index]['blog'].append(objectId)
             blog = await ctx.client.get_blog_info(objectId)
+            if len(blog.content) < 2000:                        continue
             createdTime = datetime.datetime.strptime(str(blog.createdTime), '%Y-%m-%dT%H:%M:%SZ')
             if leastCreatedTime > createdTime: leastCreatedTime = createdTime
         ins.data['data'][index]['leastCreatedTime'] = leastCreatedTime
@@ -184,10 +186,8 @@ async def furtherRegister(ctx, ins):
             likes = []
 
             if objectType == 1:
-                if db.checkYincanaExist(1, objectId, ctx.msg.ndcId):    continue
                 likes = await get_blog_likes(ctx, blogId=objectId)
             elif objectType == 2:
-                if db.checkYincanaExist(2, objectId, ctx.msg.ndcId):    continue
                 likes = await get_blog_likes(ctx, wikiId=objectId)
 
             if likes.votedValueMap == ():                               continue
@@ -230,6 +230,9 @@ async def furtherRegister(ctx, ins):
             #await ctx.send(f"Felicidades, {ctx.msg.author.nickname}, has superado el nivel {ins.data['yincana'].level + 1} de los retos con éxito.")
             ins.data['community'].dbUpdate(ins.data['challenge'], ins.data['data'], ctx.msg.ndcId)
             await triggerLevelUp(ctx, ins.data['yincana'].level + 1, ins.data['community'] )
+            level = ins.data['yincana'].level
+            utils.waiting.look_and_delete(ctx.msg.author.uid, ctx.client.ndc_id, ctx.msg.threadId)
+            await giveRewards(ctx, level)
         else       :
             await ctx.send(f"""
 Que mal, no cumple con los requisitos del nivel {ins.data['yincana'].level + 1}. Intente otra vez
@@ -309,16 +312,16 @@ async def validate(ctx):
             data.append({ 'bans' :      await get_user_moderation(ctx, ctx.msg.author.uid, 'BAN') })
 
         elif    c.type == ChallengeAPI.profileChange:
-            user    = await ctx.get_user_data()
-            modifiedTime = datetime.strptime(str(user.modifiedTime), '%Y-%m-%dT%H:%M:%SZ')
-            data.append({ 'profileCreatedTime' : modifiedTime })
+            user    = await ctx.get_user_info()
+            modifiedTime = datetime.datetime.strptime(str(user.modifiedTime), '%Y-%m-%dT%H:%M:%SZ')
+            data.append({ 'profileChangeTime' : modifiedTime })
 
         elif    c.type == ChallengeAPI.nickname:
             data.append({ 'nickname' : ctx.msg.author.nickname })
 
         elif    c.type == ChallengeAPI.profileDays:
-            user        = await ctx.get_user_data()
-            createdTime = datetime.strptime(str(user.createdTime), '%Y-%m-%dT%H:%M:%SZ')
+            user        = await ctx.get_user_info()
+            createdTime = datetime.datetime.strptime(str(user.createdTime), '%Y-%m-%dT%H:%M:%SZ')
             days        = (datetime.datetime.now() - createdTime).days
             data.append({ 'profileCreatedTime' : days })
 
@@ -340,6 +343,8 @@ aminoapps...""")
         if response:
             db.setYincanaData(ctx.msg.author.uid, ctx.msg.ndcId, level=1)
             await triggerLevelUp(ctx, yincana.level + 1, communityChallenge)
+            utils.waiting.look_and_delete(ctx.msg.author.uid, ctx.client.ndc_id, ctx.msg.threadId)
+            await giveRewards(ctx, yincana.level)
         else       :    await ctx.send(f"Que mal, no cumple con los requisitos del nivel {yincana.level + 1}.")
         return -1
 
@@ -365,3 +370,27 @@ Estos son tus retos
 [c]Retos nivel {yincana.level + 1}:
 {s}""")
     return
+
+
+@utils.isStaff
+async def advanceLevel(ctx):
+    
+    if ctx.msg.content.find("pps.com/p/") == -1: return await ctx.send("Debe ingresar el link de un usuario")
+
+    userLink = ctx.msg.content.split("pps.com/p/")[1]
+    userLink = userLink.split(" ")[0]
+    link = await ctx.client.get_info_link(f"http://aminoapps.com/p/{userLink}")
+    if link.linkInfo.objectType != 0: await ctx.send("Solo funciona con usuarios")
+    userId = link.linkInfo.objectId
+    
+    communityChallenge =    None
+    try:                    communityChallenge = challenges[ctx.msg.ndcId]
+    except Exception:
+        await ctx.send('Esta comunidad no tiene retos.')
+        return -1
+
+    yincana             =   db.getYincanaData(userId, ctx.msg.ndcId)
+    db.setYincanaData(userId, ctx.msg.ndcId, level=1)
+    await triggerLevelUp(ctx, yincana.level + 1, communityChallenge, userId=userId)
+    await giveRewards(ctx, yincana.level, userId=userId)
+
