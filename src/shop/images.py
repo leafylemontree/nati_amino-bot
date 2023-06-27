@@ -10,6 +10,7 @@ from src          import objects
 
 base    = cairo.ImageSurface.create_from_png("media/templates/card_wallet_base.png")
 base2   = cairo.ImageSurface.create_from_png("media/templates/inventory_new.png")
+base3   = cairo.ImageSurface.create_from_png("media/templates/multiitem.png")
 
 async def walletCard(ctx):
     
@@ -157,3 +158,82 @@ async def inventoryNewItemCard(ctx, objectId, amount):
             )
     
     return linkSnippet
+
+
+async def multiitem(ctx, data):
+    imgIO   = io.BytesIO()
+    image   = cairo.ImageSurface(cairo.FORMAT_RGB24, 1536, 1728)
+    ct      = cairo.Context(image)
+    
+    ct.save()
+    ct.set_source_surface(base3)
+    ct.paint()
+    ct.restore()
+
+
+    def drawItem(ct, x, y, item, amount):
+        itemProps = objects.inventoryAPI.properties(item)
+        if   itemProps.rarity == 1: ct.set_source_rgb(0.13, 0.54, 0.10)
+        elif itemProps.rarity == 2: ct.set_source_rgb(0.18, 0.42, 0.90)
+        elif itemProps.rarity == 3: ct.set_source_rgb(0.58, 0.18, 0.90)
+        elif itemProps.rarity == 4: ct.set_source_rgb(0.90, 0.50, 0.18)
+        else                      : ct.set_source_rgb(0.71, 0.71, 0.71)
+
+        ct.rectangle(x, y, 320, 320)
+        ct.fill()
+        ct.stroke()
+        
+        itemImg = cairo.ImageSurface.create_from_png(f"media/templates/items/item_{str(item).zfill(3)}.png")
+        ct.save()
+        ct.translate(x + 16, y + 16)
+        ct.set_source_surface(itemImg)
+        ct.paint()
+        ct.restore()
+        ct.stroke()
+
+        ct.set_source_rgb(1, 1, 1)
+        ct.move_to(x + 160, y + 240)
+        putText(ct,
+                text="x",
+                size=56,
+                width=64,
+                height=128,
+                font="Heavitas")
+        ct.stroke()
+        ct.move_to(x + 224, y + 224)
+        putText(ct,
+                text=str(amount),
+                size=72,
+                width=128,
+                height=128,
+                font="Heavitas")
+        ct.stroke()
+        ct.move_to(x, y + 336)
+        ct.set_source_rgb(0.90, 0.72, 0.24)
+        putText(ct,
+                text=itemProps.name,
+                size=30,
+                width=320,
+                height=96,
+                align="CENTER",
+                font="Heavitas")
+        ct.stroke()
+
+    l = len(data)
+    for i,(item,amount) in enumerate(data.items()):
+        n, m = divmod(i, 4)
+        w    = 3 if (l - n * 4) > 4 else (l - n * 4 - 1)
+        x    = 12 * 64 - (((w % 4) + 1) * (10 * 16) + (w % 4) * 16) + m * ((20 * 16) + 32)
+        y    = 368 + n * 7 * 64
+        drawItem(ct, x, y, item, amount)
+    
+    ct.stroke()
+    out = io.BytesIO()
+    image.write_to_png(imgIO)
+    imgIO.seek(0)
+    img = imgIO.read()
+
+    from src.imageSend import send_image
+    await send_image(ctx, image=img)
+
+

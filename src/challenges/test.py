@@ -88,3 +88,26 @@ Comandos:
 --ranking-yincana: Muestra el ranking a nivel comunidad.
 
 {('link del blog: ' + link) if ctx.msg.ndcId == 9999 else ''}""")
+
+async def giveAllChallenges(ctx):
+    from src.challenges.register import challenges
+
+    communityChallenge = None
+    try: communityChallenge = challenges[ctx.msg.ndcId]
+    except Exception:       return await ctx.send('Esta comunidad no tiene retos.')
+
+    msg = f"[c]Estos son los retos de esta comunidada (Id: {ctx.msg.ndcId}):\n\n"
+    for i,challenge in enumerate(communityChallenge.challenges):
+        msg += f"[cu]Nivel: {i+1}\n[c]{communityChallenge.levelRepr(i)}\n".replace("\n", "\n[c]")
+
+        if len(msg) > 1800:
+            await ctx.send(msg)
+            msg = ""
+
+    if len(msg) > 0: await ctx.send(msg)
+
+
+
+async def get_community_stickers(ctx):
+    response = await ctx.client.request("GET", "sticker-collection?type=community-shared")
+    return tuple(map(lambda stickerCollection: objects.StickerCollection(**stickerCollection), response['stickerCollectionList']))

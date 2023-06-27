@@ -25,7 +25,6 @@ async def wordle(ctx, msg):
                 return objects.Reply("""
 [cb]Normas del Wordle:
 [c]Se le será dado un espacio de cinco letras, el cual oculta una palabra de cinco letras. Su misión es encontrarla antes de los cinco intentos, si no, habrá perdido.
-
 [c]¿Cómo jugar?
 [c]Ponga el comando --wordle -iniciar, y Nati les dará un tablero de juego, que es único para cada jugador.
 

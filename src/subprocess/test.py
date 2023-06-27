@@ -6,7 +6,7 @@ import asyncio
 from src.database import db
 from src import objects
 import random
-from src.antispam import get_wall_comments, findNickname, findContent, userNicknameLog, wallLogAuto, banUser
+from src.antispam import get_wall_comments, findNickname, findContent, userNicknameLog, wallLogAuto, banUser, imageDetect
 import logging
 import traceback
 
@@ -186,7 +186,7 @@ async def beActive(ctx):
 
 @utils.runSubTask(pollingTime=2400)
 async def giveWelcome(ctx):
-    await asyncio.sleep(120)
+    await asyncio.sleep(300)
     coms = await get_my_communities(ctx, start=0, size=100)
     comList = list(map(lambda com: com.ndcId, coms))
     
@@ -210,9 +210,10 @@ async def giveWelcome(ctx):
                 db.redis.hset('usersWelcome', f'?{com}&{user.uid}', int(time.time() * 1000))
                 bio_warn  = await findContent(user.content, comId=com)
                 nick_warn = await findNickname(user.nickname)
-                if log.threadId and (bio_warn or nick_warn):
-                    await userNicknameLog(ctx, user, com, [bio_warn, nick_warn]) 
-                    await banUser(ctx, user.uid, com, [bio_warn, nick_warn])
+                img_warn  = await imageDetect(user.icon)
+                if log.threadId and (bio_warn or nick_warn or img_warn):
+                    await userNicknameLog(ctx, user, com, [bio_warn, nick_warn, img_warn]) 
+                    await banUser(ctx, user.uid, com, [bio_warn, nick_warn, img_warn])
 
                 if log.userWelcome == 0 : continue
                 if welcomeMsg is None   : continue
@@ -235,7 +236,7 @@ async def giveWelcome(ctx):
 
 @utils.runSubTask(pollingTime=44200)
 async def communityCheckIn(ctx):
-    #await asyncio.sleep(120)
+    await asyncio.sleep(1200)
     coms = await get_my_communities(ctx, start=0, size=100)
     comList = list(map(lambda com: com.ndcId, coms))
 
@@ -246,8 +247,9 @@ async def communityCheckIn(ctx):
             await ctx.client.request('POST', 'check-in', json=data)
             logging.info(f"$.{objects.ba.instance} check-in - {com}")
         except Exception as e:
-            logging.error(str(e))
-            traceback.print_exc()
+            pass
+            #logging.error(str(e))
+            #traceback.print_exc()
         await asyncio.sleep(300)
 
 
@@ -255,7 +257,7 @@ async def communityCheckIn(ctx):
 @utils.runSubTask(pollingTime=7200)
 async def applyRole(ctx):
     from src.admin.role import get_notices
-    await asyncio.sleep(120)
+    await asyncio.sleep(1200000)
     coms = await get_my_communities(ctx, start=0, size=100)
     comList = list(map(lambda com: com.ndcId, coms))
 

@@ -5,11 +5,13 @@ from src.admin.leaderboard      import get_leaderboard_info
 import datetime
 from src.antispam               import get_wall_comments
 from src.admin                  import moderation_history, get_user_moderation
-from .test                      import get_blog_likes
+from .test                      import get_blog_likes, get_community_stickers
 from src                        import objects
 import traceback
 from .images                    import triggerLevelUp
 from .rewards                   import giveRewards
+import math
+import asyncio
 
 checkFurther = [
         ChallengeAPI.blogUpload,
@@ -21,7 +23,9 @@ checkFurther = [
         ChallengeAPI.postFeatured,
         ChallengeAPI.quizUpload,
         ChallengeAPI.like,
-        ChallengeAPI.likeAndComment
+        ChallengeAPI.likeAndComment,
+        ChallengeAPI.imagePost,
+        ChallengeAPI.beInChat,
 ]
 
 newLine = '\n'
@@ -33,6 +37,7 @@ async def get_comments(ctx, blogId=None, wikiId=None, sorting='newest', start=0,
     return tuple(map(lambda comment: objects.CommentList(**comment), response['commentList']))
 
 async def furtherRegister(ctx, ins):
+    print(ins.data['needsUserInput'])
     print(ins.data)
     index = ins.data['needsUserInput'][0]
     c     = ins.data['challenge'][index]
@@ -44,11 +49,12 @@ async def furtherRegister(ctx, ins):
         ins.data['data'][index]['blog']             = []
         leastCreatedTime                            = datetime.datetime.now()
         for objectId,objectType in objects:
-            if objectType != 1:                                  continue
-            if db.checkYincanaExist(1, objectId, ctx.msg.ndcId): continue
+            if objectType != 1:                                     continue
+            if db.checkYincanaExist(1, objectId, ctx.msg.ndcId):    continue
             ins.data['data'][index]['blog'].append(objectId)
             blog = await ctx.client.get_blog_info(objectId)
-            if len(blog.content) < 2000:                        continue
+            if len(blog.content) < 2000:                            continue
+            if blog.author.uid != ctx.msg.author.uid:               continue
             createdTime = datetime.datetime.strptime(str(blog.createdTime), '%Y-%m-%dT%H:%M:%SZ')
             if leastCreatedTime > createdTime: leastCreatedTime = createdTime
         ins.data['data'][index]['leastCreatedTime'] = leastCreatedTime
@@ -214,6 +220,32 @@ async def furtherRegister(ctx, ins):
         ins.data['data'][index]['leastCreatedTime'] = leastCreatedTime
 
 
+    elif    c.type == ChallengeAPI.imagePost:
+        ins.data['data'][index]['imagePost']        = []
+        leastCreatedTime                            = datetime.datetime.now()
+        for objectId,objectType in objects:
+            if objectType != 1:                                  continue
+            if db.checkYincanaExist(1, objectId, ctx.msg.ndcId): continue
+            ins.data['data'][index]['imagePost'].append(objectType)
+            blog = await ctx.client.get_blog_info(objectId)
+            createdTime = datetime.datetime.strptime(str(blog.createdTime), '%Y-%m-%dT%H:%M:%SZ')
+            if leastCreatedTime > createdTime: leastCreatedTime = createdTime
+        ins.data['data'][index]['leastCreatedTime'] = leastCreatedTime
+
+    elif    c.type == ChallengeAPI.beInChat:
+        ins.data['data'][index]['isInChat']         = []
+        for i,(objectId,objectType) in enumerate(objects):
+            if objectType != 12:                                    continue
+            chat = await ctx.client.get_chat_info(objectId)
+            threadId = chat.threadId
+            for i in range(10):
+                users = await ctx.client.get_chat_info(threadId, start=i*100, size=100)
+                for user in users:
+                    if user.uid != ctx.msg.author.uid:              continue
+                    ins.data['data'][index]['isInChat'].append(threadId)
+                    break
+                if len(ins.data['data'][index]['isInChat']) >= (i+1): break 
+                await asyncio.sleep(3)
 
     ins.data['needsUserInput'].pop(0)
 
@@ -243,13 +275,13 @@ Ha fallado en: {ChallengeAPI.getLabel(ins.data['challenge'][response])}""")
     else:
         await ctx.send(f"""
 Nati necesita que ingreses información adicional para la siguiente tarea:
-{ChallengeAPI.getLabel(ins.data['challenge'][needsUserInput[0]])}
+{ChallengeAPI.getLabel(ins.data['challenge'][ins.data['needsUserInput'][0]])}
 
 Ingresa solo los enclaces de los blogs en una linea diferente cada uno. Ejemplo:
 aminoapps...
 aminoapps...
 aminoapps...""")
-        return True
+        return False
 
     return False
 
@@ -283,8 +315,8 @@ async def validate(ctx):
             data.append({ 'level' : ctx.msg.author.level })
         
         elif    c.type == ChallengeAPI.follow:
-            user    = await ctx.get_user_data()
-            data.append({ 'follow' : user.membersCount })
+            user    = await ctx.get_user_info()
+            data.append({ 'follow' : user.joinedCount })
 
         elif    c.type == ChallengeAPI.dailyMinutes:
             users = await get_leaderboard_info(ctx, rankingType=1)
@@ -325,28 +357,73 @@ async def validate(ctx):
             days        = (datetime.datetime.now() - createdTime).days
             data.append({ 'profileCreatedTime' : days })
 
+        elif    c.type == ChallengeAPI.checkIn:
+            from src.subcommands.userInfo import get_user_checkins
+            days = await get_user_checkins(ctx, ctx.msg.author.uid)
+            data.append({ 'checkIn' : days })
+
+        elif    c.type == ChallengeAPI.followStaff:
+            following   = []
+            staffFollow = []
+            user        = await ctx.get_user_info()
+            for i in range(0, math.ceil(user.joinedCount / 100)):
+                await asyncio.sleep(3)
+                u = await ctx.client.get_user_following(user_id=user.uid, start=i*100, size=100)
+                following.extend(u)
+            for u in following:
+                if u.role == 0:     continue
+                staffFollow.append(u.uid)
+            data.append({ 'follow' : staffFollow })
+
+        elif    c.type == ChallengeAPI.stickerPack:
+            packs = 0
+            stickerCollections = await get_community_stickers(ctx)
+            for stickerPack in stickerCollections: packs += 1
+            data.append({'stickerPack': packs})
+
+        elif    c.type == ChallengeAPI.nicknameStart:
+            data.append({ 'nickname' : ctx.msg.author.nickname })
+
+        elif    c.type == ChallengeAPI.likeFeatured:
+            from src.subprocess.test import get_recent_blogs 
+            from src.challenges.test import get_blog_likes
+            
+            likes = []
+            featured = await get_recent_blogs(ctx, start=0, size=100)
+            for blog in featured:
+                if   blog.refObjectType == 1: postLikes = await  get_blog_likes(ctx, blogId=blog.refObjectId)
+                elif blog.refObjectType == 2: postLikes = await  get_blog_likes(ctx, wikiId=blog.refObjectId)
+
+                for like in postLikes.votedValueMapV2:
+                    if like.uid != ctx.msg.author.uid: continue
+                    likes.append(featured.refObjectId)
+                    break
+
+                await asyncio.sleep(3)
+            data.append({ 'likes' : [] })
+
         elif c.type in checkFurther:
             data.append({})
             needsUserInput.append(i)
-            await ctx.send(f"""
-Nati necesita que ingreses información adicional para la siguiente tarea:
-{ChallengeAPI.getLabel(challenge[needsUserInput[0]])}
-{communityChallenge.levelRepr(yincana.level).split(newLine)[needsUserInput[0]]}
-
-Ingresa solo los enclaces de los blogs en una linea diferente cada uno. Ejemplo:
-aminoapps...
-aminoapps...
-aminoapps...""")
                 
     if needsUserInput == []:
         response = await communityChallenge.check(ctx, yincana.level, data)
-        if response:
+        if response is True:
             db.setYincanaData(ctx.msg.author.uid, ctx.msg.ndcId, level=1)
             await triggerLevelUp(ctx, yincana.level + 1, communityChallenge)
             utils.waiting.look_and_delete(ctx.msg.author.uid, ctx.client.ndc_id, ctx.msg.threadId)
             await giveRewards(ctx, yincana.level)
         else       :    await ctx.send(f"Que mal, no cumple con los requisitos del nivel {yincana.level + 1}.")
         return -1
+    else:
+        await ctx.send(f"""
+Nati necesita que ingreses información adicional para la siguiente tarea:
+{ChallengeAPI.getLabel(challenge[needsUserInput[0]])}
+
+Ingresa solo los enclaces de los blogs en una linea diferente cada uno. Ejemplo:
+aminoapps...
+aminoapps...
+aminoapps...""")
 
     return {
             'data'          : data,
@@ -372,16 +449,30 @@ Estos son tus retos
     return
 
 
+async def isValidUserLink(ctx, text=None):
+    if text is None: text = ctx.msg.content
+
+    if text.find("pps.com/p/") == -1: return None
+    userLink = text.split("pps.com/p/")[1]
+    userLink = userLink.split(" ")[0]
+    link = await ctx.client.get_info_link(f"http://aminoapps.com/p/{userLink}")
+    if link.linkInfo.objectType != 0: return False
+    return link.linkInfo.objectId
+
+def parseNumbers(text):
+    nums  = []
+    words = text.split(" ")
+    for word in words:
+        try:    nums.append(int(word))
+        except: pass
+    return nums
+
 @utils.isStaff
 async def advanceLevel(ctx):
     
-    if ctx.msg.content.find("pps.com/p/") == -1: return await ctx.send("Debe ingresar el link de un usuario")
-
-    userLink = ctx.msg.content.split("pps.com/p/")[1]
-    userLink = userLink.split(" ")[0]
-    link = await ctx.client.get_info_link(f"http://aminoapps.com/p/{userLink}")
-    if link.linkInfo.objectType != 0: await ctx.send("Solo funciona con usuarios")
-    userId = link.linkInfo.objectId
+    userId = await isValidUserLink(ctx, text=ctx.msg.content)
+    if   userId is None:  return await ctx.send("Debe ingresar el link de un usuario") 
+    elif userId is False: return await ctx.send("Solo funciona con usuarios") 
     
     communityChallenge =    None
     try:                    communityChallenge = challenges[ctx.msg.ndcId]
@@ -393,4 +484,46 @@ async def advanceLevel(ctx):
     db.setYincanaData(userId, ctx.msg.ndcId, level=1)
     await triggerLevelUp(ctx, yincana.level + 1, communityChallenge, userId=userId)
     await giveRewards(ctx, yincana.level, userId=userId)
+
+@utils.isStaff
+async def rewindLevel(ctx):
+    
+    userId = await isValidUserLink(ctx, text=ctx.msg.content)
+    if   userId is None:  return await ctx.send("Debe ingresar el link de un usuario") 
+    elif userId is False: return await ctx.send("Solo funciona con usuarios") 
+    
+    communityChallenge =    None
+    try:                    communityChallenge = challenges[ctx.msg.ndcId]
+    except Exception:
+        await ctx.send('Esta comunidad no tiene retos.')
+        return -1
+
+    yincana             =   db.getYincanaData(userId, ctx.msg.ndcId)
+    if yincana.level == 0: return await ctx.send("Ya está en el nivel mas bajo.")
+    db.setYincanaData(userId, ctx.msg.ndcId, level=-1)
+    return await ctx.send(f"Se ha retrocedido de nivel al {yincana.level}")
+
+@utils.isStaff
+async def setLevel(ctx):
+    
+    userId = await isValidUserLink(ctx, text=ctx.msg.content)
+    if   userId is None:  return await ctx.send("Debe ingresar el link de un usuario") 
+    elif userId is False: return await ctx.send("Solo funciona con usuarios") 
+    
+    communityChallenge =    None
+    try:                    communityChallenge = challenges[ctx.msg.ndcId]
+    except Exception:
+        await ctx.send('Esta comunidad no tiene retos.')
+        return -1
+
+    yincana             =   db.getYincanaData(userId, ctx.msg.ndcId)
+    nums                =   parseNumbers(ctx.msg.content)
+    if nums == []: return await ctx.send("Debe ingresar el nivel del usuario de esta forma: --nivel-yincana (link) (nivel)")
+    newLevel            =   nums[-1] - 1
+    if newLevel >= communityChallenge.levels: newLevel = communityChallenge.levels - 1
+    if newLevel < 0: newLevel = 0
+    difference          = newLevel - yincana.level
+
+    db.setYincanaData(userId, ctx.msg.ndcId, level=difference)
+    return await ctx.send(f"Se ha cambiado el nivel del usuario a nivel {newLevel + 1}")
 

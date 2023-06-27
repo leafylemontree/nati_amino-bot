@@ -27,48 +27,12 @@ def error(num):
 
 class Reply:
     def __init__(self, msg, reply=True):
-        self.msg = msg
-        self.reply = reply
-
-class Database_return:
-    alias   : str   = ""
-    hugs_r  : int   = 0
-    hugs_g  : int   = 0
-    kiss_r  : int   = 0
-    kiss_g  : int   = 0
-    pats_r  : int   = 0
-    pats_g  : int   = 0
-    doxx_r  : int   = 0
-    doxx_g  : int   = 0
-    kiwi    : int   = 0
-    win     : int   = 0
-    derr    : int   = 0
-    draw    : int   = 0
-    points  : int   = 0
-
-
-    def strToVal(self, msg):
-        msg = msg.split("__$")
-        self.alias   = msg[0]
-        self.hugs_r  = int(msg[1])
-        self.hugs_g  = int(msg[2])
-        self.kiss_r  = int(msg[3])
-        self.kiss_g  = int(msg[4])
-        self.pats_r  = int(msg[5])
-        self.pats_g  = int(msg[6])
-        self.doxx_r  = int(msg[7])
-        self.doxx_g  = int(msg[8])
-        self.kiwi    = int(msg[9])
-        self.derr    = int(msg[10])
-        self.win     = int(msg[11])
-        self.draw    = int(msg[12])
-        self.points  = int(msg[13])
-        return
+        self.msg    = msg
+        self.reply  = reply
 
 @dataclass
 class ThreadProperties:
     disabled = []
-
 
 @dataclass
 class Status:
@@ -327,7 +291,8 @@ class AntiSpam:
                     "𝕋ᴏ֟֯xɪɴᴀ!"
                     "FOXY",
                     "HEPHA",
-                    "SAY_"
+                    "SAY_",
+                    "KAI"
                     ]
 
     sexual_nicks = [
@@ -368,8 +333,9 @@ class AntiSpam:
                 "151": "Mensaje de gran longitud que cierra la app",
                 "152": "Biografía que cierra la app",
 
-                "200": "Mensaje fuera de lo común"
+                "200": "Mensaje fuera de lo común",
 
+                "300": "Usuario sin imagen. Cuenta creada de forma ilegal"
             }
 
 class Bot_attributes:
@@ -574,6 +540,103 @@ class PostLikes:
         self.votedCount         = len(self.votedValueMap)
 
 
+class OriginalCommunity(BaseModel):
+    status:                     Optional[int]
+    icon:                       Optional[str]
+    endpoint:                   Optional[str]
+    name:                       Optional[str]
+    ndcId:                      Optional[int]
+
+class StickerExtensions(BaseModel):
+    iconSourceStickerId:        Optional[str]
+    originalAuthor:             Optional[Author]
+    originalCommunity:          Optional[OriginalCommunity]
+
+class StickerRestriction(BaseModel):
+    discountStatus:             Optional[int]
+    ownedUid:                   Optional[Any]
+    ownerType:                  Optional[int]
+    restrictType:               Optional[int]
+    restrictValue:              Optional[int]
+    availableDuration:          Optional[Any]
+    discountValue:              Optional[Any]
+
+class StickerCollection(BaseModel):
+    status:                     Optional[int]
+    isActivated:                Optional[bool]
+    collectionType:             Optional[int]
+    uid:                        Optional[str]
+    modifiedTime:               Optional[Any]
+    isNew:                      Optional[bool]
+    bannerUrl:                  Optional[Any]
+    smallIcon:                  Optional[str]
+    stickersCount:              Optional[int]
+    ownershipStatus:            Optional[Any]
+    usedCount:                  Optional[int]
+    availableNdcIds:            Optional[List[int]]
+    icon:                       Optional[str]
+    name:                       Optional[str]
+    collectionId:               Optional[str]
+    description:                Optional[str]
+    author:                     Optional[Author]
+    extensions:                 Optional[StickerExtensions]
+    createdTime:                Optional[Any]
+    isGloballyAvailable:        Optional[bool]
+    restrictionInfo:            Optional[StickerRestriction]
+
+class ExtData(BaseModel):
+    subtitle:                   Optional[str]
+    objectDeeplinkUrl:          Optional[str]
+    description:                Optional[str]
+    icon:                       Optional[str]
+
+class CoinHistory(BaseModel):
+    uid:                        Optional[str]
+    extData:                    Optional[ExtData]
+    originCoins:                Optional[int]
+    bonusCoins:                 Optional[int]
+    totalCoins:                 Optional[int]
+    taxCoinsFloat:              Optional[float]
+    bonusCoinsFloat:            Optional[float]
+    totalCoinsFloat:            Optional[float]
+    isPositive:                 Optional[bool]
+    changedCoins:               Optional[int]
+    sourceType:                 Optional[int]
+    createdTime:                Optional[Any]
+    originalCoinsFloat:         Optional[float]
+    taxCoins:                   Optional[int]
+    changedCoinsFloat:          Optional[float]
+
+class Notification(BaseModel):
+    parentText:                 Optional[str]
+    objectId:                   Optional[str]
+    contextText:                Optional[str]
+    type:                       Optional[int]
+    parentId:                   Optional[str]
+    operator:                   Optional[Author]
+    createdTime:                Optional[Any]
+    parentType:                 Optional[int]
+    objectSubType:              Optional[int]
+    ndcId:                      Optional[int]
+    notificationId:             Optional[str]
+    objectText:                 Optional[str]
+    contextValue:               Optional[int]
+    contextNdcId:               Optional[int]
+    objectType:                 Optional[int]
+
+@dataclass
+class NotificationList:
+    notifications:              Tuple[Notification]
+    nextPageToken:              Optional[str]
+
+    def __init__(self, response):
+        self.notifications = tuple(map(lambda notif: Notification(**notif), response["notificationList"]))
+        self.nextPageToken = response["paging"]["nextPageToken"]
+        return
+
+class AdminUserProfile(UserProfile):
+    adminLogCountIn7Days:       Optional[int]
+    avgDailySpendTimeIn7Days:   Optional[int]
 
 @dataclass
 class UserInfo:
@@ -593,7 +656,7 @@ class UserInfo:
     lose:                       int
     points:                     int
     LApoints:                   int
-    unused5:                    int
+    ACBuffer:                   int
     unused6:                    int
     unused7:                    int
     unused8:                    int
@@ -656,6 +719,7 @@ class Report:
     globalLink:                 bool
     nonASCII:                   bool
     unidentifiedLink:           bool
+    imageIsNone:                bool
 
 
 @dataclass
@@ -700,7 +764,7 @@ class UserInventory:
         return Self(userId, 0, [])
     
     def add(self, objectId, amount, data=None):
-        if len(self.data) >= 10: return True
+        if len(self.data) >= 32: return True
         remove = None
         found  = False
 
@@ -738,6 +802,12 @@ class UserInventory:
                 "data"  :   [element.export() for element in self.data]
             }
         return data_dict
+    def exists(self, objectId):
+        amount = 0
+        for item in self.data:
+            if item.objectId != objectId: continue
+            amount = item.amount
+        return amount
 
 @dataclass
 class InvAPrs: #Inventory API Preset
@@ -760,6 +830,8 @@ class InvAPrs: #Inventory API Preset
     thirst      : int
     effects     : int
 
+    usable      : bool
+
     # Effects
     #0  : None
     #1  : Boozed
@@ -772,37 +844,49 @@ class InvAPrs: #Inventory API Preset
 class InventoryAPI:
     data = {
     #   id          name                  limit stack val. wei.rarity  description                                                            type  health happin. energy   care    hunger  thirst  effect
-        0  : InvAPrs("Botella de agua",     -1, True, 300,  50, 0, "Quita la sed.",                                                             0,  750,    0,      0,      0,      0,      2000,   0),
-        1  : InvAPrs("Botella de cerveza",  -1, True, 1200, 10, 1, "Quita la sed, pero, ¿a qué costo?",                                         0,  -1000,  750,    -1000,  500,    -500,   1250,   1),
-        2  : InvAPrs("Botella de leche",    -1, True, 500,  20, 1, "Quita todos los efectos de estado.",                                        0,  250,    250,    250,    0,      250,    1500,   -1),
-        3  : InvAPrs("Pastelito",           -1, True, 800,  15, 0, "Mucha azúcar hace a Nati doler la pancita.",                                0,  -500,   750,    1000,   750,    1000,   -250,   3),
-        4  : InvAPrs("Hamburguesa",         -1, True, 800,  15, 1, "Quita el hambre. Puede hacer a Nati perezosa.",                             0,  -1250,  1000,   1500,   125,    1250,   -750,   3),
-        5  : InvAPrs("Manzana",             -1, True, 300,  20, 0, "Quita el hambre y da energía a Nati.",                                      0,  500,    250,    750,    0,      1000,   200,    0),
-        6  : InvAPrs("Trozo de pizza",      -1, True, 1000, 10, 1, "Quita el hambre. Hace a Nati perezosa.",                                    0,  -1000,  750,    -1500,  400,    1000,   -1000,  3),
-        7  : InvAPrs("Sobras",              -1, True, 100,  7.5,1, "¿Quién sabe lo que hay aquí? Es un misterio",                               0,  0,      0,      0,      0,      0,      0,      -2),
-        8  : InvAPrs("Sopa de gato",        -1, True, 1500, 5,  2, "Ñom ñom ñom, delicious!",                                                   0,  500,    -500,   0,      -500,   1500,   750,    0),
-        9  : InvAPrs("Ensalada",            -1, True, 600,  5,  2, "Quita el hambre y da mucha energía a Nati.",                                0,  1000,   -300,   2500,   0,      750,    250,    0),
-        10 : InvAPrs("Peine",                1, False,2000, 5,  1, "¡La melena alineada como nunca!",                                           1,  0,      500,    0,      250,    0,      0,      0),
-        11 : InvAPrs("Espejo",               1, False,2500, 5,  1, "Cuidado, si eres muy feo se rompe.",                                        1,  0,      -750,   0,      250,    0,      0,      0),
-        12 : InvAPrs("Correa",               1, False,2500, 5,  2, "Saca a pasear a tu Nati, solo no la acerques a los perros.",                1,  -500,   500,    0,      750,    0,      0,      0),
-        13 : InvAPrs("Silla",               -1, True, 2000, 15, 3, "Corrije a tu Nati antes que sea tarde.",                                    1,  -1250,  -1000,  1000,   -500,   0,      0,      0),
-        14 : InvAPrs("Frasco de vidrio",    -1, True, 2500, 13, 2, "Química o alquimia, sea lo que sea, dale uno de estos y saldrán cosas.",    1,  0,      750,    0,      0,      0,      0,      0),
-        15 : InvAPrs("Reloj mecánico",      -1, True, 4000, 3.8,2, "Nati se calma al oir su tic tac.",                                          1,  500,    750,    -750,   750,    0,      0,      -1),
-        16 : InvAPrs("Mantita",             -1, True, 2200, 7.5,1, "El frío está fuerte. Cubre a tu Nati con ella.",                            1,  100,    250,    -1500,  500,    0,      0,      2),
-        17 : InvAPrs("Tenedor",              1, False,700,  5,  2, "No acercar a los enchufes.",                                                1,  0,      0,      0,      0,      0,      0,      0),
-        18 : InvAPrs("Plato",               -1, True, 1000, 5,  2, "¿A que no te apetece arrojarlo como frisbee?",                              1,  0,      0,      0,      0,      0,      0,      0),
-        19 : InvAPrs("Corneta",             -1, True, 1500, 2,  3, "Nati ruidosa ha ingresado al chat.",                                        1,  0,      250,    0,      0,      0,      0,      0),
-        20 : InvAPrs("Cuchillo",             1, False,700,  5,  2, "NO acercar a Nati o se enoja.",                                             1,  -1500,  1750,   0,      0,      0,      0,      0),
-        21 : InvAPrs("Bate",                 1, False,3000, 3,  2, "Las reglas están hechas para romperse.",                                    2,  0,      750,    750,    0,      0,      0,      0),
-        22 : InvAPrs("Martillo",             1, False,3500, 3,  3, "A este punto, ¿la corriges o la mandas al lobby?",                          2,  0,      0,      0,      0,      0,      0,      0),
-        23 : InvAPrs("Serrucho",             1, False,4500, 3,  3, "Dale a Nati una sierra y te hará una choza... con una persona dentro.",     2,  -1250,  2000,   0,      0,      0,      0,      0),
-        24 : InvAPrs("Atornillador",         1, False,2500, 3,  3, "Nati puede reparar cosas con esto.",                                        2,  -750,   1250,   0,      0,      0,      0,      0),
-        25 : InvAPrs("Llave Inglesa",        1, False,3500, 3,  3, "Nati puede reparar cosas con esto.",                                        2,  -1000,  1500,   0,      0,      0,      0,      0),
-        26 : InvAPrs("Tu vieja",            -1, True, 10000,0.5,4, "El objeto más masivo del universo.",                                        0,  999999, 10000,  10000,  10000,  10000,  10000,  -1)
+        0  : InvAPrs("Botella de agua",     -1, True, 300,  50, 0, "Quita la sed.",                                                             0,  750,    0,      0,      0,      0,      2000,   0,      True),
+        1  : InvAPrs("Botella de cerveza",  -1, True, 1200, 10, 1, "Quita la sed, pero, ¿a qué costo?",                                         0,  -1000,  750,    -1000,  500,    -500,   1250,   1,      True),
+        2  : InvAPrs("Botella de leche",    -1, True, 500,  20, 1, "Quita todos los efectos de estado.",                                        0,  250,    250,    250,    0,      250,    1500,   -1,     True),
+        3  : InvAPrs("Pastelito",           -1, True, 800,  15, 0, "Mucha azúcar hace a Nati doler la pancita.",                                0,  -500,   750,    1000,   750,    1000,   -250,   3,      True),
+        4  : InvAPrs("Hamburguesa",         -1, True, 800,  15, 1, "Quita el hambre. Puede hacer a Nati perezosa.",                             0,  -1250,  1000,   1500,   125,    1250,   -750,   3,      True),
+        5  : InvAPrs("Manzana",             -1, True, 300,  20, 0, "Quita el hambre y da energía a Nati.",                                      0,  500,    250,    750,    0,      1000,   200,    0,      True),
+        6  : InvAPrs("Trozo de pizza",      -1, True, 1000, 10, 1, "Quita el hambre. Hace a Nati perezosa.",                                    0,  -1000,  750,    -1500,  400,    1000,   -1000,  3,      True),
+        7  : InvAPrs("Sobras",              -1, True, 100,  7.5,1, "¿Quién sabe lo que hay aquí? Es un misterio",                               0,  0,      0,      0,      0,      0,      0,      -2,     True),
+        8  : InvAPrs("Sopa de gato",        -1, True, 1500, 5,  2, "Ñom ñom ñom, delicious!",                                                   0,  500,    -500,   0,      -500,   1500,   750,    0,      True),
+        9  : InvAPrs("Ensalada",            -1, True, 600,  5,  2, "Quita el hambre y da mucha energía a Nati.",                                0,  1000,   -300,   2500,   0,      750,    250,    0,      True),
+        10 : InvAPrs("Peine",                1, False,2000, 5,  1, "¡La melena alineada como nunca!",                                           1,  0,      500,    0,      250,    0,      0,      0,      True),
+        11 : InvAPrs("Espejo",               1, False,2500, 5,  1, "Cuidado, si eres muy feo se rompe.",                                        1,  0,      -750,   0,      250,    0,      0,      0,      True),
+        12 : InvAPrs("Correa",               1, False,2500, 5,  2, "Saca a pasear a tu Nati, solo no la acerques a los perros.",                1,  -500,   500,    0,      750,    0,      0,      0,      True),
+        13 : InvAPrs("Silla",               -1, True, 2000, 15, 3, "Corrije a tu Nati antes que sea tarde.",                                    1,  -1250,  -1000,  1000,   -500,   0,      0,      0,      True),
+        14 : InvAPrs("Frasco de vidrio",    -1, True, 2500, 13, 2, "Química o alquimia, sea lo que sea, dale uno de estos y saldrán cosas.",    1,  0,      750,    0,      0,      0,      0,      0,      True),
+        15 : InvAPrs("Reloj mecánico",      -1, True, 4000, 3.8,2, "Nati se calma al oir su tic tac.",                                          1,  500,    750,    -750,   750,    0,      0,      -1,     False),
+        16 : InvAPrs("Mantita",             -1, True, 2200, 7.5,1, "El frío está fuerte. Cubre a tu Nati con ella.",                            1,  100,    250,    -1500,  500,    0,      0,      2,      True),
+        17 : InvAPrs("Tenedor",              1, False,700,  5,  2, "No acercar a los enchufes.",                                                1,  0,      0,      0,      0,      0,      0,      0,      True),
+        18 : InvAPrs("Plato",               -1, True, 1000, 5,  2, "¿A que no te apetece arrojarlo como frisbee?",                              1,  0,      0,      0,      0,      0,      0,      0,      True),
+        19 : InvAPrs("Corneta",             -1, True, 1500, 2,  3, "Nati ruidosa ha ingresado al chat.",                                        1,  0,      250,    0,      0,      0,      0,      0,      True),
+        20 : InvAPrs("Cuchillo",             1, False,700,  5,  2, "NO acercar a Nati o se enoja.",                                             1,  -1500,  1750,   0,      0,      0,      0,      0,      True),
+        21 : InvAPrs("Bate",                 1, False,3000, 3,  2, "Las reglas están hechas para romperse.",                                    2,  0,      750,    750,    0,      0,      0,      0,      True),
+        22 : InvAPrs("Martillo",             1, False,3500, 3,  3, "A este punto, ¿la corriges o la mandas al lobby?",                          2,  0,      0,      0,      0,      0,      0,      0,      True),
+        23 : InvAPrs("Serrucho",             1, False,4500, 3,  3, "Dale a Nati una sierra y te hará una choza... con una persona dentro.",     2,  -1250,  2000,   0,      0,      0,      0,      0,      True),
+        24 : InvAPrs("Atornillador",         1, False,2500, 3,  3, "Nati puede reparar cosas con esto.",                                        2,  -750,   1250,   0,      0,      0,      0,      0,      True),
+        25 : InvAPrs("Llave Inglesa",        1, False,3500, 3,  3, "Nati puede reparar cosas con esto.",                                        2,  -1000,  1500,   0,      0,      0,      0,      0,      True),
+        26 : InvAPrs("Tu vieja",            -1, True, 10000,0.5,4, "El objeto más masivo del universo.",                                        0,  999999, 10000,  10000,  10000,  10000,  10000,  -1,     True),
+        27 : InvAPrs("Ticket de destacado", -1, True,   0,  0,  0, "Canjea este item por una publicación destacada con el staff.",              0, -999999, -9999,  -9999,  -9999,  -9999,  -9999,  -1,     False),
+        28 : InvAPrs("Ticket de chat"     , -1, True,   0,  0,  0, "Canjea este item por un chat destacado con el staff.",                      0, -999999, -9999,  -9999,  -9999,  -9999,  -9999,  -1,     False),
+        29 : InvAPrs("Ticket de notificación",-1, True, 0,  0,  0, "Canjea este item por una notifiación con el staff.",                        0, -999999, -9999,  -9999,  -9999,  -9999,  -9999,  -1,     False),
+        30 : InvAPrs("Ticket de título", -1,    True,   0,  0,  0, "Canjea este item por un título personalizado con el staff.",                0, -999999, -9999,  -9999,  -9999,  -9999,  -9999,  -1,     False),
+        31 : InvAPrs("Caja normal",         -1, True,   0,  0,  1, "Algo desconocido aguarda dentro de esta caja.",                             0, -999999, -9999,  -9999,  -9999,  -9999,  -9999, 301,     False),
+        32 : InvAPrs("Caja rara",           -1, True,   0,  0,  2, "Un gran misterio oculta la madera, puede ser valioso.",                     0, -999999, -9999,  -9999,  -9999,  -9999,  -9999, 302,     False),
+        33 : InvAPrs("Caja mágica",         -1, True,   0,  0,  3, "Riqueza inimaginable aguarda dentro del metal.",                            0, -999999, -9999,  -9999,  -9999,  -9999,  -9999, 303,     False),
     }
 
     def __init__(self):
-        self.totalWeight = self.getWeight()
+        self.totalWeight    = self.getWeight()
+        self.commonWeight   = self.getTypedWeight(0)
+        self.casualWeight   = self.getTypedWeight(1)
+        self.rareWeight     = self.getTypedWeight(2)
+        self.strangeWeight  = self.getTypedWeight(3)
+        self.legendaryWeight= self.getTypedWeight(4)
         return
 
     def getWeight(self):
@@ -825,6 +909,31 @@ class InventoryAPI:
             accumulator += element.weight
             if r < accumulator: return key
         
+        return None
+
+    def getTypedWeight(self, rarity):
+        weight = 0
+        for key,element in self.data.items():
+            if element.rarity != rarity: continue
+            if element.weight == 0     : continue
+            weight += element.weight
+        return weight
+
+    def getItemByRarity(self, rarity):
+        r = random.random()
+        if   rarity == 0: r = r * self.commonWeight
+        elif rarity == 1: r = r * self.casualWeight
+        elif rarity == 2: r = r * self.rareWeight
+        elif rarity == 3: r = r * self.strangeWeight
+        elif rarity == 4: r = r * self.legendaryWeight
+        accumulator = 0
+
+        for key,element in self.data.items():
+            if element.rarity != rarity: continue
+            if element.weight == 0     : continue
+            print(element.name, element.rarity, r, accumulator)
+            accumulator += element.weight
+            if r < accumulator: return key
         return None
 
 
@@ -940,3 +1049,18 @@ class NatiPet:
 
     effects:            int
 
+
+@dataclass
+class Rewards:
+    userId:             str
+    ndcId:              int
+    type:               int
+    itemId:             int
+    amount:             int
+    rewardId:           str
+
+@dataclass
+class UserEXP:
+    ndcId:              int
+    userId:             str
+    exp:                int

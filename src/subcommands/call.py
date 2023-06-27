@@ -6,9 +6,7 @@ from src import utils
 
 @utils.isCoHost
 async def everyone(ctx):
-        user = await ctx.get_user_info()
-        if ((user.role == 0) & (user.uid != "17261eb7-7fcd-4af2-9539-dc69c5bf2c76")): return bot_o.Reply("Usted no está autorizado para ejercer este comando", False)
-        thread = await ctx.get_chat_info()
+        thread  = await ctx.get_chat_info()
         userCount = thread.membersCount
 
         uidList = []

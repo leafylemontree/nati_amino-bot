@@ -3,6 +3,7 @@ from src import utils
 from edamino.api import Embed
 from src.database import db
 import time
+from src.antispam.register import getLevel
 
 async def get_user_checkins(ctx, userId):
     timezone = time.timezone
@@ -22,6 +23,8 @@ async def userInfo(ctx, uid, content):
         activo = "No activo" if user.onlineStatus == 0 else "Conectado"
 
 
+        userExp = db.getUserExp(ctx.msg.ndcId, uid)
+
         usr_db = db.getUserData(user)
         marry = None
         if usr_db.marry != 'none':
@@ -31,17 +34,17 @@ async def userInfo(ctx, uid, content):
             except:
                 marry = 'No está en esta comunidad, unu.'
 
-        yincana = db.getYincanaData(ctx.msg.author.uid, ctx.msg.ndcId)
+        yincana = db.getYincanaData(uid, ctx.msg.ndcId)
 
         msg = f"""[cu]Información de perfil:
        
 Nick: {user.nickname}   Alias: {usr_db.alias}
 Estado: {activo}        Nivel: {user.level}
-Seguidores: {user.membersCount}  Siguiendo a: {user.joinedCount}
-Chek-in: {checkInDays} {dia[a]}  Rol: {role}
+Seguidores: {user.membersCount}       Siguiendo a: {user.joinedCount}
+Chek-in: {checkInDays} {dia[a]}       Rol: {role}
 uid: {user.uid}
-Comunidad: {user.aminoId} Reputación: {user.reputation}
-Blogs: {user.blogsCount}  Comentarios: {user.commentsCount}
+Comunidad: {user.aminoId}    Reputación: {user.reputation}
+Blogs: {user.blogsCount}     Comentarios: {user.commentsCount}
 Unido en: {user.createdTime}
 Última modificación: {user.modifiedTime}
 Casado con: {'nadie' if marry is None else marry}
@@ -52,9 +55,11 @@ Casado con: {'nadie' if marry is None else marry}
 [u]Ha dado:
 [c]{usr_db.hugs_g} abrazos. {usr_db.kiss_g} besos. {usr_db.pats_g} caricias. {usr_db.doxx_g} doxeadas. {usr_db.kiwi} furias del kiwi.
 
-[u]Yincana:
-    - Nivel: {yincana.level}
-    - Puntos: {usr_db.LApoints}
+[uc]Yincana:
+[c]Nivel: {yincana.level}  Puntos: {usr_db.LApoints}
+
+[uc]Experiencia:
+[c]{userExp} -  Nivel: {getLevel(userExp) + 1}
 
 {usr_db.win}/{usr_db.draw}/{usr_db.lose}. Total: {usr_db.points} puntos.
 """

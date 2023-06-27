@@ -94,24 +94,41 @@ async def message(ctx: Context):
             elif com.find("--SOYTUNEKITA") == 0:                                        await subcommands.ayudaPsicologica(ctx)
             elif com.find("--ADVERTENCIA") == 0:                                        await antispam.warningInfo(ctx)
 
+            elif com.find("--STICKERS") == 0:                                           await subcommands.getStickerPacksInfo(ctx)
+            elif com.find("--MONEDERO-HISTORIAL") == 0:                                 await shop.get_wallet_history(ctx, start=0, size=100)
+            elif com.find("--NOTIFICACIONES") == 0:                                     await shop.get_notifications(ctx, start=0, size=100)
+            elif com.find("--MIS-ULTIMAS-DONACIONES") == 0:                             await shop.myLastDonations(ctx)
+
 
             elif com.find("--INVENTARIO") == 0:                                         await shop.inventory(ctx)
-            elif com.find("--AÑADIRITEM") == 0:                                         await shop.add_item(ctx, 'ADD', use_text=True)
-            elif com.find("--QUITARITEM") == 0:                                         await shop.add_item(ctx, 'DEL', use_text=True)
-            elif com.find("--RANDOMITEM") == 0:                                         await shop.giveRandomItem(ctx)
+            #elif com.find("--AÑADIRITEM") == 0:                                         await shop.add_item(ctx, 'ADD', use_text=True)
+            #elif com.find("--QUITARITEM") == 0:                                         await shop.add_item(ctx, 'DEL', use_text=True)
+            #elif com.find("--RANDOMITEM") == 0:                                         await shop.giveRandomItem(ctx)
             elif com.find("--VACIARINVENTARIO") == 0:                                   await shop.clearInventory(ctx)
-        
+
+            elif com.find("--TEST-DONATION") == 0:                                      await shop.testDonation(ctx)
+            elif com.find("--RECLAMAR-RECOMPENSA") == 0:                                await challenges.claimRewards(ctx)
+            elif com.find("--PROBAR-CAJAS") == 0:                                       await pet.testBox(ctx)
+            elif com.find("--EXP") == 0:                                                await images.expCardCreate(ctx, message=False)
 
             elif com.find("--VER-YINCANA") == 0:                                        await challenges.getChallenges(ctx)
             elif com.find("--ENTREGAR-YINCANA") == 0:                                   await challenges.validate(ctx)
             elif com.find("--RANKING-YINCANA") == 0:                                    await challenges.getYincanaRanking(ctx)
             elif com.find("--AVANZAR-YINCANA") == 0:                                    await challenges.advanceLevel(ctx)
+            elif com.find("--RETROCEDER-YINCANA") == 0:                                 await challenges.rewindLevel(ctx)
+            elif com.find("--NIVEL-YINCANA") == 0:                                      await challenges.setLevel(ctx)
             elif com.find("--YINCANA") == 0:                                            await challenges.giveHelpYincana(ctx)
+            elif com.find("--RETOS-YINCANA") == 0:                                      await challenges.giveAllChallenges(ctx)
 
             elif com.find("--MASCOTA") == 0:                                            await pet.info(ctx)
-            elif com.find("--NUEVA-MASCOTA") == 0:                                            await pet.initPet(ctx)
-            elif com.find("--DAR-ITEM") == 0:                                            await pet.giveItem(ctx)
+            elif com.find("--NUEVA-MASCOTA") == 0:                                      await pet.initPet(ctx)
+            elif com.find("--DAR-ITEM") == 0:                                           await pet.giveItem(ctx)
+            elif com.find("--USAR-ITEM") == 0:                                          await pet.useItem(ctx)
 
+            elif com.find("--TABLA-EXPERIENCIA") == 0:                                  await challenges.getCommunityRank(ctx)
+            elif com.find("--MODERACIONES") == 0:                                       await admin.moderations(ctx, mtype="NATI")
+            elif com.find("--VALORES-PROPIOS") == 0:                                    await subcommands.imageEigenvalues(ctx)
+            elif com.find("--LINK-INFO") == 0:                                          await subcommands.sendLinkInfo(ctx)
             elif com.find("--HISTORIAL") == 0:                                          await admin.get_history(ctx)
             elif com.find("--VERLIKES")  == 0:                                          await challenges.get_likes_from_link(ctx)
             elif com.find("--FORMAT") == 0:                                             await subcommands.fmt(ctx)
@@ -181,7 +198,7 @@ async def message(ctx: Context):
             elif ((msg.find("--say") < 5) & (msg.find("--say") != -1)) :                reply.msg = msg[6:]
             elif ((com.find("KIWILATIGO") != -1) | (com.find("KIWILÁTIGO") != -1)):     reply     = subcommands.kiwilatigo(ctx)
             elif com.find("--NORMAS") == 0  :                                           reply.msg = text['normas']
-            elif com.find("--SOPORTE") == 0  :                                          reply.msg = "support.aminoapps.com/hc/es-419/requests/new?from_aminoapp=1"
+            elif com.find("--SOPORTE") == 0  :                                          await subcommands.aminoSupportForm(ctx)
             elif com.find("--CENTRO") == 0  :                                           reply.msg = "support.aminoapps.com/hc/es-419?from_aminoapp=1"
             elif com.find("--AYUDA") == 0  :                                            reply.msg = "https://leafylemontree.github.io/lider-amino/resume.html"
             elif msg.find("--Mensaje Oculto") == 0 :                                    reply.msg = text['msg_oculto']
@@ -207,8 +224,10 @@ async def message(ctx: Context):
             elif com.find("--PAPULINCE") == 0:                                          await subcommands.papulince(ctx)
             elif com.find("Y LOS RESULTADOS?") != -1:                                   reply.msg = "Y los blogs?"
             elif com.find("--XKCD") != -1:                                              await subcommands.web_tools.xfcd(ctx)
+            elif com.find("--PALETA") == 0:                                             await subcommands.imagePalette(ctx)
         
-        if   ((reply.msg is not None) & (reply.reply is True))           : await ctx.reply(reply.msg)
+        if     reply is None                                             : return None
+        elif ((reply.msg is not None) & (reply.reply is True))           : await ctx.reply(reply.msg)
         elif ((reply.msg is not None) & (reply.reply is False))          : await ctx.send(reply.msg)
 
         return None;

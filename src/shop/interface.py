@@ -14,7 +14,7 @@ async def inventory(ctx):
 [c]Usuario: {ctx.msg.author.nickname}
 [c]Alias: {user.alias}
 [c]Puntos: {user.points}
-[c]Inventario: {inventory.length}/10
+[c]Inventario: {inventory.length}/32
 
 [c]Objetos:
 """    
@@ -23,8 +23,9 @@ async def inventory(ctx):
     await ctx.send(msg[:1999])
     return
 
-async def add_item(ctx, mode='ADD', verbose=True, objectId=None, amount=None, use_text=False):
+async def add_item(ctx, mode='ADD', verbose=True, objectId=None, amount=None, use_text=False, userId=None, saveItem=True):
     msg         = ctx.msg.content.split(" ")
+    if not userId: userId = ctx.msg.author.uid
 
     if use_text:
         if len(msg) < 3: return await ctx.send("Debe añadir la id del objeto y la cantidad")
@@ -35,7 +36,7 @@ async def add_item(ctx, mode='ADD', verbose=True, objectId=None, amount=None, us
         try                 :    amount = int(msg[2])
         except ValueError   :    return await ctx.send("La cantidad es inválida")
 
-    inventory = await db.getUserInventory(ctx.msg.author.uid)
+    inventory = await db.getUserInventory(userId)
 
     if   mode == 'ADD':
         
@@ -44,7 +45,10 @@ async def add_item(ctx, mode='ADD', verbose=True, objectId=None, amount=None, us
             if element.objectId == objectId: index = i
         objectProps = objects.inventoryAPI.properties(inventory.data[index].objectId) if index is not None else None
 
-        if index is not None and objectProps.limit < (inventory.data[index].amount + amount) and objectProps.limit != -1: return await ctx.send(f"¡Se ha alcanzado el máximo de {objectProps.name} en el invetario de {ctx.msg.author.nickname}!")
+        if index is not None and objectProps.limit < (inventory.data[index].amount + amount) and objectProps.limit != -1:
+            if saveItem and amount > 0: db.setUserReward(userId, ctx.msg.ndcId, dtype=2, itemId=objectId, amount=amount)
+            await ctx.send(f"¡Se ha alcanzado el máximo de {objectProps.name} en el invetario de {ctx.msg.author.nickname}!\nEl objeto ha sido guardado hasta que pueda ser reclamado.\n\nPara reclamarlo, use el comando --reclamar-recompensa")
+            return False
 
         response = inventory.add(objectId, amount)
 
@@ -52,7 +56,10 @@ async def add_item(ctx, mode='ADD', verbose=True, objectId=None, amount=None, us
             
             linkSnippet = await inventoryNewItemCard(ctx, objectId, amount)
 
-            if response: return await ctx.send(f"¡Se ha alcanzado el máximo de items en el inventario de {ctx.msg.author.nickname}!")
+            if response:
+                if saveItem and amount > 0: db.setUserReward(userId, ctx.msg.ndcId, dtype=2, itemId=objectId, amount=amount)
+                await ctx.send(f"¡Se ha alcanzado el máximo de items en el inventario de {ctx.msg.author.nickname}!\nEl objeto ha sido guardado hasta que pueda ser reclamado.\n\nPara reclamarlo, use el comando --reclamar-recompensa")
+                return False
 
             c_type = 'Añadido'
             if amount < 0: c_type = 'Quitado'
@@ -66,7 +73,7 @@ async def add_item(ctx, mode='ADD', verbose=True, objectId=None, amount=None, us
         if verbose: await ctx.send(f"[c]Removido {objects.inventoryAPI.name(objectId)} del inventario de {ctx.msg.author.nickname}")
 
     await db.setUserInventory(inventory)
-    return
+    return True
 
 
 async def giveRandomItem(ctx):

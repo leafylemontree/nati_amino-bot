@@ -10,3 +10,5 @@ from .botstats2 import botstats2
 from .news      import getNews
 from .animals   import animals
 from .craiyon   import craiyon
+from .palette   import paletteCard
+from .expCard   import expCardCreate

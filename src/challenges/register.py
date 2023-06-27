@@ -1,6 +1,8 @@
 import datetime
 from src.database import db
 
+date = datetime.datetime(2023, 6, 7)
+
 class ChallengeAPI:
     none            = 0
     reputation      = 1
@@ -25,7 +27,14 @@ class ChallengeAPI:
     profileDays     = 20
     like            = 21
     likeAndComment  = 22
-    
+    followStaff     = 23
+    checkIn         = 24
+    stickerPack     = 25
+    imagePost       = 26
+    beInChat        = 27
+    nicknameStart   = 28
+    likeFeatured    = 29
+
     def getLabel(c):
             label = ''
             if   c.type == ChallengeAPI.none            : label = f"Reto no fijado."
@@ -46,11 +55,18 @@ class ChallengeAPI:
             elif c.type == ChallengeAPI.profileChange   : label = f"Cambia tu perfil de la comunidad."
             elif c.type == ChallengeAPI.nickname        : label = f"Ten el nick \"{c.args}\" en tu perfil de la comunidad."
             elif c.type == ChallengeAPI.chatMessage     : label = f"Deja este mensaje en un chat: \"{c.args}\"."
-            elif c.type == ChallengeAPI.postFeatured    : label = f"Ten al menos {c.args} blogs destados."
+            elif c.type == ChallengeAPI.postFeatured    : label = f"Ten al menos {c.args} blogs destacados."
             elif c.type == ChallengeAPI.quizUpload      : label = f"Sube al menos {c.args} quizzes."
             elif c.type == ChallengeAPI.profileDays     : label = f"Ten al menos {c.args} días en la comunidad."
-            elif c.type == ChallengeAPI.like            : label = f"Dale link a {c.args} publicaciones."
-            elif c.type == ChallengeAPI.likeAndComment  : label = f"Dale link y deja un comentario en {c.args} publicaciones."
+            elif c.type == ChallengeAPI.like            : label = f"Dale like a {c.args} publicaciones."
+            elif c.type == ChallengeAPI.likeAndComment  : label = f"Dale like y deja un comentario en {c.args} publicaciones."
+            elif c.type == ChallengeAPI.followStaff     : label = f"Sigue a {c.args} miembros del staff actuales."
+            elif c.type == ChallengeAPI.checkIn         : label = f"Ten al menos {c.args} días de check-in."
+            elif c.type == ChallengeAPI.stickerPack     : label = f"Crea {c.args} pack de stickers y que sea aprobado."
+            elif c.type == ChallengeAPI.imagePost       : label = f"Crea {c.args} publicacion de imagen en la comunidad."
+            elif c.type == ChallengeAPI.beInChat        : label = f"Está en {c.args} chat donde esté Nati también."
+            elif c.type == ChallengeAPI.beInChat        : label = f"Ten un nick que comience por \"{c.args}\"."
+            elif c.type == ChallengeAPI.likeFeatured    : label = f"Dale like a {c.args} publicaciones que estén en destacados."
             return label
 
 class ChallengeRequirement:
@@ -60,7 +76,7 @@ class ChallengeRequirement:
     end:        datetime.datetime
     silent:     bool
 
-    def __init__(self, ctype, args, silent, start=None, end=None) :
+    def __init__(self, ctype, args, silent, start=date, end=None) :
         self.type       = ctype
         self.args       = args
         self.start      = start
@@ -83,7 +99,7 @@ class CommunityChallenges:
         challenge = self.getLevelChallenge(level)
 
         if challenge is None: return "No hay retos para este nivel"
-        msg = " "
+        msg = ""
         for c in challenge:
             label = ChallengeAPI.getLabel(c)
             msg += f' - {label}\n'
@@ -163,8 +179,10 @@ class CommunityChallenges:
                 else:                                   return i
 
             elif    c.type == ChallengeAPI.nickname:
-                if d['nickname'].find(c.args) != -1:    checks.append(True)
-                else:                                   return i
+                name = d['nickname'].upper()
+                args = c.args.upper()
+                if name.find(args) == -1:               return i
+                checks.append(True)
 
             elif    c.type == ChallengeAPI.chatMessage:
                 if d['chatMessage'].find(c.args) != -1: checks.append(True)
@@ -194,6 +212,38 @@ class CommunityChallenges:
                 if d['leastCreatedTime'] < c.start:     return i
                 checks.append(True)
 
+            elif    c.type == ChallengeAPI.followStaff:
+                if len(d['follow']) < c.args:           return i
+                checks.append(True)
+
+            elif    c.type == ChallengeAPI.checkIn:
+                if d['checkIn'] < c.args:               return i
+                checks.append(True)
+
+            elif    c.type == ChallengeAPI.stickerPack:
+                if d['stickerPack'] < c.args:           return i
+                checks.append(True)
+
+            elif    c.type == ChallengeAPI.imagePost:
+                if len(d['imagePost'])   < c.args:      return i
+                if d['leastCreatedTime'] < c.start:     return i
+                checks.append(True)
+
+            elif    c.type == ChallengeAPI.beInChat:
+                if len(d['isInChat']) < c.args:             return i
+                checks.append(True)
+            
+            elif    c.type == ChallengeAPI.nicknameStart:
+                name = d['nickname'].upper()
+                args = c.args.upper()
+                if name.find(args) != 0:               return i
+                checks.append(True)
+
+            elif    c.type == ChallengeAPI.likeFeatured:
+                if len(d['likes']) < c.args:            return i
+                checks.append(True)
+
+        print(len(checks), len(challenge), checks, challenge, sep='\n')
         if len(checks) < len(challenge):    return False
         return True
 
@@ -224,7 +274,6 @@ class CommunityChallenges:
                 for quiz in d['quiz']: db.cursor.execute('INSERT INTO YincanaCheck VALUES (?, ?, ?, NOW());', (1, quiz, ndcId))
 
 
-date = datetime.datetime(2023, 5, 15)
 
 
 challenges = {
@@ -246,8 +295,135 @@ challenges = {
                     ChallengeRequirement(ChallengeAPI.level,           10, True, start=date),
                     ChallengeRequirement(ChallengeAPI.postFeatured,     1, True, start=date)
                 ],
+                [
+                    ChallengeRequirement(ChallengeAPI.quizUpload,        1, True, start=date),
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.weeklyMinutes,   400, True, start=date),
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.level,            12, True, start=date),
+                    ChallengeRequirement(ChallengeAPI.stickerPack,       1, True, start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.checkIn,          30, True, start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.postFeatured,       3, True, start=date),
+                    ChallengeRequirement(ChallengeAPI.level,             13, True, start=date)
+                ],
         ]),
+    41001082: CommunityChallenges(41001082, [
+                [
+                    ChallengeRequirement(ChallengeAPI.followStaff,   3, True)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.profileChange, 1,             True, start=date),
+                    ChallengeRequirement(ChallengeAPI.nickname,      "Arácnido",    True, start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.like,         3, True, start=date),
+                    ChallengeRequirement(ChallengeAPI.wallComment,  2, True, start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.postComment,   3, True, start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.like,   10, True, start=date),
+                    ChallengeRequirement(ChallengeAPI.postComment,   5, True, start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.chatMessage,   "Hola!", True)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.quizUpload,   1, True)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.chatMembers,   20, True)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.postFeatured,   1, True, start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.level,   10, True)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.profileDays,   30, True)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.dailyMinutes,   100, True)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.weeklyMinutes,   600, True)
+                ]
+
+        ]),
+    144321393: CommunityChallenges(144321393, [
+                [
+                    ChallengeRequirement(ChallengeAPI.followStaff,      2,  False,  start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.imagePost,        1,  True,  start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.likeFeatured,     5,  False,  start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.postComment,      2,  True,  start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.beInChat,         1,  True,  start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.chatMessage,      "Les deseo un hermoso  día",  True,  start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.nicknameStart,    "R",  False,  start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.wallComment,       5,  True,  start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.quizUpload,        1,  True,  start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.postFeatured,      1,  True,  start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.profileDays,       30,  False,  start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.weeklyMinutes,     100,  False,  start=date)
+                ],
+                [
+                    ChallengeRequirement(ChallengeAPI.weeklyMinutes,     500,  False,  start=date)
+                ]
+            ]),
     111610163: CommunityChallenges(111610163, [
+                [   
+                    ChallengeRequirement(ChallengeAPI.reputation,       4000, True)],[
+                    ChallengeRequirement(ChallengeAPI.level,            11, True)],[
+                    ChallengeRequirement(ChallengeAPI.blogUpload,       1, True, start=date)],[
+                    ChallengeRequirement(ChallengeAPI.postComment,      1, True, start=date)],[
+                    ChallengeRequirement(ChallengeAPI.wallComment,      1, True, start=date)],[
+                    ChallengeRequirement(ChallengeAPI.follow,           10, True)],[
+                    ChallengeRequirement(ChallengeAPI.chatMembers,      17, True)],[
+                    ChallengeRequirement(ChallengeAPI.dailyMinutes,     50, True)],[
+                    ChallengeRequirement(ChallengeAPI.weeklyMinutes,    500, True)],[
+                    ChallengeRequirement(ChallengeAPI.moderation,       1, True)],[
+                    ChallengeRequirement(ChallengeAPI.warnings,         1, True)],[
+                    ChallengeRequirement(ChallengeAPI.strikes,          1, True)],[
+                    ChallengeRequirement(ChallengeAPI.bans,             1, True)],[
+                    ChallengeRequirement(ChallengeAPI.profileChange,    1, True, start=date)],[
+                    ChallengeRequirement(ChallengeAPI.nickname,         "test", True, start=date)],[
+                    ChallengeRequirement(ChallengeAPI.chatMessage,      "Alv", True, start=date)],[
+                    ChallengeRequirement(ChallengeAPI.postFeatured,     1, True, start=date)],[
+                    ChallengeRequirement(ChallengeAPI.quizUpload,       1, True, start=date)],[
+                    ChallengeRequirement(ChallengeAPI.profileDays,      80, True, start=date)],[
+                    ChallengeRequirement(ChallengeAPI.like,             1, True, start=date)],[
+                    ChallengeRequirement(ChallengeAPI.likeAndComment,   1, True, start=date)],[
+                    ChallengeRequirement(ChallengeAPI.followStaff,      1, True, start=date)],[
+                    ChallengeRequirement(ChallengeAPI.checkIn,          83, True, start=date)],
                 [
                     ChallengeRequirement(ChallengeAPI.likeAndComment,   3, True, start=date)
                 ],

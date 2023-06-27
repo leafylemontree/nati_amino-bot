@@ -66,6 +66,12 @@ async def msgType(mtype, content=None, author=None):
             else                               : warnings.append("200")
         return warnings
 
+async def imageDetect(icon):
+    warnings = []
+    if icon is None:  warnings.append("300")
+
+    return warnings
+
 async def detectAll(ctx):
         if ctx.msg.author is None: return False
         if ctx.msg.author.uid in AS.whitelist: return
@@ -83,12 +89,14 @@ async def detectAll(ctx):
         nick_warnings = await findNickname(nick)
         msg_warnings  = await findContent(content, comId)
         type_warnings = await msgType(ctx.msg.type, ctx.msg.content, ctx.msg.author)
+        image_warnings= await imageDetect(ctx.msg.author.icon)
 
         if chat is not None and "4" in nick_warnings: nick_warnings.remove("4")
 
         warnings.extend(nick_warnings)
         warnings.extend(msg_warnings)
         warnings.extend(type_warnings)
+        warnings.extend(image_warnings)
         
         if warnings: return await sendLog(ctx, warnings)
         return False

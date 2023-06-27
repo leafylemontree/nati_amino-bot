@@ -29,16 +29,23 @@ def isCoHost(func):
         ctx = None
         for arg in args:
             if isinstance(arg, Context): ctx = arg
-        if ctx is None: return
+        if ctx is None:
+            print("No context found")
+            return
         
         chat = await ctx.client.get_chat_info(ctx.msg.threadId)
 
+        coHosts = chat.extensions.coHost 
+        host    = chat.author.uid
+        userId  = ctx.msg.author.uid
+        role    = ctx.msg.author.role
 
-        if   ctx.msg.author.role in [100, 101, 102]         : pass
-        elif ctx.msg.author.uid == leafId                   : pass
-        elif ctx.msg.author.uid in chat.extensions.cohost   : pass
-        elif ctx.msg.author.uid in chat.author.uid          : pass
+        if   role in [100, 101, 102]                    : pass
+        elif userId == leafId                           : pass
+        elif coHosts is not None and userId in coHosts  : pass
+        elif userId == host                             : pass
         else:
+                print("Failed")
                 await ctx.send(noMessage)
                 return
 

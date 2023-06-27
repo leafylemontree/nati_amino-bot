@@ -263,3 +263,38 @@ async def ayudaPsicologica(ctx):
 
 [ci]-ESCUCHAR: Seguir en línea. Un psicólogo se pondrá en contacto con usted por medio de Nati.
 [ci]-SALIR: Termina la sesión.""")
+
+
+async def sendLinkInfo(ctx):
+    words = ctx.msg.content.split(" ")
+    if len(words) < 2: return await ctx.send("Debe colocar un link tras el comando.")
+    
+    link = words[1]
+    linkInfo    = await ctx.client.get_info_link(link=link)
+    objectId    = linkInfo.linkInfo.objectId
+    objectType  = linkInfo.linkInfo.objectType
+    ndcId       = linkInfo.linkInfo.ndcId
+    
+    ctx.client.set_ndc(ndcId)
+    o = None
+    if   objectType == 0:   o = await ctx.client.get_user_info(objectId)
+    elif objectType == 1:   o = await ctx.client.get_blog_info(objectId)
+    elif objectType == 2:   o = await ctx.client.get_wiki_info(objectId)
+    ctx.client.set_ndc(ctx.msg.ndcId)
+
+    print(o)
+    await ctx.send(str(o)[:2000])
+
+
+async def getStickerPacksInfo(ctx):
+    from src.challenges.test import get_community_stickers
+    stickerCollections = await get_community_stickers(ctx)
+
+    own = 0
+    stickers = ""
+    for stickerPack in stickerCollections:
+        if stickerPack.extensions.originalAuthor.uid == ctx.msg.author.uid:
+            own += 1
+            stickers += f"\n[c]ndc://x{ctx.msg.ndcId}/sticker-collection/{stickerPack.collectionId}"
+
+    await ctx.send(f"[c]Usted es autor de {own} pack de stickers en esta comunidad.\n{stickers}"[:2000])

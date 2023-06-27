@@ -233,6 +233,9 @@ async def userNicknameLog(ctx, user, ndcId, warnings):
     
     def FContent(fcontent):
         return '\n'.join(list(map(lambda warning: f'  {warning} - {objects.AntiSpam.msg_desc[str(warning)]}', fcontent)))
+
+    def FImage(fimage):
+        return '\n'.join(list(map(lambda warning: f'  {warning} - {objects.AntiSpam.msg_desc[str(warning)]}', fimage)))
     
     if log.ban:
         try:    
@@ -249,6 +252,7 @@ ndc://x{ndcId}/user-profile/{user.uid}
 Advertencias:
 {FNick(warnings[0])}
 {FContent(warnings[1])}
+{FImage(warnings[2])}
 ------------------
 Contenido:
 {str(user.content)[:500]}
@@ -274,6 +278,9 @@ async def wallLogAuto(ctx, comment, warnings, user):
     def FContent(fcontent):
         return '\n'.join(list(map(lambda warning: f'  {warning} - {objects.AntiSpam.msg_desc[str(warning)]}', fcontent)))
 
+    def FImage(fimage):
+        return '\n'.join(list(map(lambda warning: f'  {warning} - {objects.AntiSpam.msg_desc[str(warning)]}', fimage)))
+
     if log.ban:
         try:    
             await banUser(ctx, comment.author.uid, ctx.msg.ndcId, str(warnings))
@@ -290,6 +297,7 @@ Comentó en el muro de {user.nickname}
 Advertencias:
 {FNick(warnings[0])}
 {FContent(warnings[1])}
+{FImage(warnings[2])}
 ------------------
 Contenido:
 {str(comment.content)[:500]}

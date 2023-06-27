@@ -2,10 +2,12 @@ from src import utils
 from src import database
 import asyncio
 from . import helpers
+from src.shop.donations import lootboxes
 from src.database import db
 from src import objects
+from src.challenges.rewards import donateAC
 
-VERSION = "0.5.99"
+VERSION = "0.5.99.5"
 
 async def back(ctx, aw):
     await ctx.send("Vuelva pronto u.u")
@@ -13,6 +15,9 @@ async def back(ctx, aw):
 
 
 async def buy2(ctx, aw):
+    aw.data += 1
+    if aw.data > 3: return True
+
     msg = ctx.msg.content.upper().split(" ")
 
     if msg[0].find("-ITEM") != -1:
@@ -83,7 +88,7 @@ async def buy(ctx, aw):
 
 . . . . . .˚ೃ(‧₊ Nati {VERSION}˚.ꦿ)⨾ੈ . . . . . .
 ︶︶︶︶︶︶︶︶︶︶︶︶︶︶︶""")
-    return False
+    return 0
 
 async def sell2(ctx, aw):
     postId   = None
@@ -96,6 +101,10 @@ async def sell2(ctx, aw):
         await ctx.send("No se encontraron blogs para donar :c")
         return True
     user = database.db.getUserData(ctx.msg.author)
+
+    if user.points < 0:
+        await ctx.send("No se pueden cambiar puntos a AC cuando tiene una cantidad negativa de puntos.")
+        return True
 
     text = ctx.msg.content
     amount = None
@@ -112,49 +121,17 @@ async def sell2(ctx, aw):
     if amount > (user.points // 100):
         await ctx.send(f"Ha ingresado una cantidad mayor a los puntos que tiene, se le cambiará a {user.points // 100} AC.")
         amount = user.points // 100
-    
 
-    donation = helpers.getDonationList(amount)
-    hasDonated = False
- 
-    if not hasDonated:
-        for blog in blogs:
-            for i in donation:
-                if hasDonated: break
-                try:
-                    await asyncio.sleep(3)
-                    await ctx.client.send_coins(coins=i, blog_id=blog.blogId)
-                    hasDonated = True
-                    postName    = blog.title
-                    postType    = 'blog'
-                    break
-                except Exception as e :
-                    pass 
-
-    if not hasDonated:
-        for wiki in wikis:
-            for i in donation:
-                if hasDonated: break
-                try:
-                    await asyncio.sleep(3)
-                    await ctx.client.send_coins(coins=i, object_id=wiki.itemId)
-                    hasDonated  = True
-                    postName    = wiki.label
-                    postType    = 'wiki'
-                except Exception as e :
-                    pass
-            break
-    
-    if not hasDonated:
-        await ctx.send(f"Ha ocurrido un error donando. Asegure tener un blog o wiki donde donar.\nError: {e}")
-        return False
-    
-    database.db.modifyRecord(43, ctx.msg.author, amount * -100)
-    await ctx.send(f"""
+    r = await donateAC(ctx, ctx.msg.author.uid, amount)
+    if r is not None:
+        database.db.modifyRecord(43, ctx.msg.author, amount * -100)
+        await ctx.send(f"""
 Ha cambiado exitosamente {amount * 100} por {amount} AC
 Han sido donados a {helpers.postFormatString(postType, postName)}
 
 La tienda ha sido cerrada por su seguridad""")
+    elif r is False:
+        await ctx.send("Ha ocurrido un error donando. Puede intentar recuperar la recompensa poniendo --reclamar-recompensas")
     return True
 
 @utils.waitForMessage(message='*', callback=sell2, instantKill=True)
@@ -214,6 +191,7 @@ async def account(ctx, aw):
 
 @utils.waitForMessage(message="-COMPRAR",   callback=buy)
 @utils.waitForMessage(message="-VENDER",    callback=sell)
+@utils.waitForMessage(message="-CAJAS",     callback=lootboxes)
 @utils.waitForMessage(message="-PIRAMIDE",  callback=pyramid)
 @utils.waitForMessage(message="-BANCA",     callback=account)
 @utils.waitForMessage(message="-SALIR",     callback=back)
@@ -240,6 +218,7 @@ async def shop(ctx):
 
 ░⃟⃟﹫◌*̥₊❀ -comprar
 ░⃟⃟﹫◌*̥₊❀ -vender
+░⃟⃟﹫◌*̥₊❀ -cajas
 ░⃟⃟﹫◌*̥₊❀ -pirámide
 ░⃟⃟﹫◌*̥₊❀ -banca
 ░⃟⃟﹫◌*̥₊❀ -salir

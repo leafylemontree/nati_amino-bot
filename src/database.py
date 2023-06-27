@@ -6,6 +6,7 @@ import  aiofile
 import  os
 import  threading
 import  datetime
+import  uuid
 
 class Database:
     base   = None
@@ -18,6 +19,8 @@ class Database:
     r_chatWelMsg    = 'ChatWelcome'
     r_userNickname  = "UserNickname"
     r_messageCom    = "MessagesSentCounter"
+    r_userMsgCounter= "UserMessageCounter"
+    r_userExp       = "UserEXP"
 
     def __init__(self):
         self.redis = redis.Redis()
@@ -65,6 +68,8 @@ class Database:
         elif mode == 43: column = "unused3"
         elif mode == 44: column = "unused4"
         elif mode == 50: column = "marry"
+        elif mode == 60: column = "unused5"
+        elif mode == 70: column = "unused6"
 
         if not userId: userId = user.uid
 
@@ -76,7 +81,7 @@ class Database:
         else:
             data = data[0]
 
-        if mode in [31, 50] and value != 1:   data = f'"{value}"'.replace(";", "").replace("DROP", "").replace("drop", "")
+        if mode in [31, 50] and value != 1:   data = f'{value}'.replace(";", "").replace("DROP", "").replace("drop", "")
         else:                           data = data + value
         
         self.cursor.execute(f'UPDATE UserInfo SET {column}=? WHERE userId="{userId}";', (data,))
@@ -160,7 +165,8 @@ class Database:
         w151 = 1 if "151" in warnings else 0
         w152 = 1 if "152" in warnings else 0
         w200 = 1 if "200" in warnings else 0
-        self.cursor.execute(f'INSERT INTO Reports VALUES ("{userId}", {comId}, "{threadId}", NOW(), {w001}, {w002}, {w003}, {w101}, {w102}, {w103}, {w104}, {w111}, {w151}, {w152}, {w200}, {w105}, {w106}, {w107}, {w108}, {w004}, {w109});')
+        w300 = 1 if "300" in warnings else 0
+        self.cursor.execute(f'INSERT INTO Reports VALUES ("{userId}", {comId}, "{threadId}", NOW(), {w001}, {w002}, {w003}, {w101}, {w102}, {w103}, {w104}, {w111}, {w151}, {w152}, {w200}, {w105}, {w106}, {w107}, {w108}, {w004}, {w109}, {w300});')
         return
 
     def r_addBlog(self, ndcId, blogId):
@@ -285,9 +291,15 @@ class Database:
 
     
     def getNatiPetData(self, ndcId):
+        from src.pet import helpers as petHelpers
+
         self.cursor.execute("SELECT * FROM NatiPet WHERE ndcId=?;", (ndcId, ))
         resp = self.cursor.fetchall()
         if resp == []: return None
+        pet = objects.NatiPet(*resp[0])
+
+        pet.level       = petHelpers.getLevelFromEXP(pet.exp)
+        pet.maxHealth   = pet.maxHealth + (pet.level * 500)
 
         if self.redis.hexists(self.r_messageCom, f"?{ndcId}"):
             pet = objects.NatiPet(*resp[0])
@@ -389,5 +401,67 @@ class Database:
         self.cursor.execute(f"{query} WHERE ndcId=?", (ndcId,) )
         pet = self.getNatiPetData(ndcId)
         return pet
+
+    def getUserRewards(self, userId, ndcId):
+        self.cursor.execute("SELECT * FROM Rewards WHERE userId=? AND ndcId=?;", (userId, ndcId,))
+        resp = self.cursor.fetchall()
+        return tuple(map(lambda reward: objects.Rewards(*reward), resp)) 
+
+    def removeUserRewards(self, rewards):
+        if isinstance(rewards, str): rewards = (rewards, )
+        query = "DELETE FROM Rewards WHERE " + " OR ".join(f'rewardId=?' for r in rewards) + ";"
+        self.cursor.execute(query, rewards)
+        return
+
+    def setUserReward(self, userId, ndcId, dtype=0, itemId=0, amount=0):
+        rewardId = uuid.uuid4()
+        self.cursor.execute("INSERT INTO Rewards VALUES (?, ?, ?, ?, ?, ?)", (userId, ndcId, dtype, itemId, amount, str(rewardId), ))
+        return
+
+    def getLastDonation(self, userId, ndcId):
+        self.cursor.execute("SELECT * FROM ACDonations WHERE userId=? AND ndcId=?", (userId, ndcId,))
+        resp = self.cursor.fetchall()
+        if resp == []: return None
+        return resp[0][1]
+
+    def setLastDonation(self, userId, notificationId, amount, ndcId):
+        if notificationId is None: return None
+        oldNotificationId = self.getLastDonation(userId, ndcId)
+        if oldNotificationId is None:
+            self.cursor.execute("INSERT INTO ACDonations VALUES (?, ?, ?)", (userId, notificationId, ndcId))
+        else:
+            self.cursor.execute("UPDATE ACDonations SET notificationId=? WHERE userId=? AND ndcId=?", (notificationId, userId, ndcId,))
+
+        data = self.modifyRecord(60, None, amount, userId=userId)
+        return data
+
+    def getUserExp(self, ndcId, userId):
+        self.cursor.execute("SELECT * FROM UserEXP WHERE userId=? AND ndcId=?", (userId, ndcId,))
+        resp = self.cursor.fetchall()
+        
+        delta = 0
+        label = f"?{ndcId}&{userId}"
+        if self.redis.hexists(self.r_userMsgCounter, label):
+            raw   = self.redis.hget(self.r_userMsgCounter, label)
+            delta = int.from_bytes(raw, 'big')
+        
+        counter = 0
+        if resp != []:
+            counter = resp[0][2] + delta
+            self.cursor.execute("UPDATE UserEXP SET exp=? WHERE userId=? AND ndcId=?", (counter, userId, ndcId, ))
+        else:
+            counter = delta
+            self.cursor.execute("INSERT INTO UserEXP VALUES (?, ?, ?)", (ndcId, userId, counter,))
+        
+        self.redis.hset(self.r_userMsgCounter, label, (0).to_bytes(4, 'big'))
+        self.redis.hset(self.r_userExp, label, (counter).to_bytes(4, 'big'))
+        return counter
+
+    def getExpRank(self, ndcId):
+        self.cursor.execute("SELECT * FROM UserEXP WHERE ndcId=?", (ndcId, ))
+        resp = self.cursor.fetchall()
+        userExp = list(map(lambda x: objects.UserEXP(*x), resp))
+        for user in userExp:    user.exp = self.getUserExp(ndcId, user.userId)
+        return userExp
 
 db = Database()

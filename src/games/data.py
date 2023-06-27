@@ -4,7 +4,7 @@ from src import utils
 from typing import List, Any
 from edamino import Context, Client
 from .functions import Functions
-from .presetGames import Hangman, Auth, Wordle, Trivia
+from .presetGames import Hangman, Auth, Wordle, Trivia, Escoba
 from asyncio import sleep
 from src import database
 
@@ -73,6 +73,7 @@ Jugadores:
         if   msg[0].upper() == "AHORCADO": data = Hangman
         elif msg[0].upper() == "WORDLE"  : data = Wordle
         elif msg[0].upper() == "TRIVIA"  : data = Trivia
+        elif msg[0].upper() == "ESCOBA"  : data = Escoba
         else                             :
             print("No game")
             data = None
@@ -133,7 +134,7 @@ Jugadores:
         if self.instances[r].run:
             return await self.functions.send(self.ctx, ctx.msg.threadId, f"La sala {self.instances[r].roomId} ya está iniciada", self.instances[r].ndcId)
 
-        await self.functions.send(self.ctx, ctx.msg.threadId, f"El juego {self.instances[r].game} ha sido iniciado por {self.instances[r].auth.nickname}", self.instances[r].ndcId, ghost=True)
+        await self.functions.send(self.ctx, ctx.msg.threadId, f"El juego {self.instances[r].game} ha sido iniciado por {self.instances[r].auth.nickname}", self.instances[r].ndcId, ghost=False)
         self.instances[r].start()
         t = await self.instances[r].screen(ctx)
         if t: await self.functions.send(self.ctx, self.instances[r].threadId, t, self.instances[r].ndcId)
@@ -153,7 +154,7 @@ Jugadores:
             database.db.modifyRecord(43, await ctx.client.get_user_info(player[0]), 250)
             await self.functions.send(self.ctx, self.instances[r].threadId, f"¡{player[1]} es el ganador!", self.instances[r].ndcId)
             await sleep(1)
-            await self.functions.send(self.ctx, self.instances[r].threadId, f"La sala {self.instances[r].roomId} ha finalizado el juego", self.instances[r].ndcId, ghost=True)
+            await self.functions.send(self.ctx, self.instances[r].threadId, f"La sala {self.instances[r].roomId} ha finalizado el juego", self.instances[r].ndcId, ghost=False)
             self.instances[r].end()
         
         if await self.instances[r].lose(ctx):

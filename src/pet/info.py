@@ -5,18 +5,34 @@ from src.images.funcs import putText
 from src import objects
 from src.pet import helpers
 import edamino
+import random
+from src.shop.images import multiitem
 
 pet_card        = cairo.ImageSurface.create_from_png("media/templates/pet/stats_card.png")
 give_item_card  = cairo.ImageSurface.create_from_png("media/templates/pet/give_item_card.png")
 
+def maximizePet(pet):
+    if pet.health       > pet.maxHealth :   pet.health      = pet.maxHealth
+    if pet.happiness    > 10000         :   pet.happiness   = 10000
+    if pet.energy       > 10000         :   pet.energy      = 10000
+    if pet.care         > 10000         :   pet.care        = 10000
+    if pet.hunger       > 10000         :   pet.hunger      = 10000
+    if pet.thirst       > 10000         :   pet.thirst      = 10000
+
+    if pet.health       < 0             :   pet.health      = 0
+    if pet.happiness    < 0             :   pet.happiness   = 0
+    if pet.energy       < 0             :   pet.energy      = 0
+    if pet.care         < 0             :   pet.care        = 0
+    if pet.hunger       < 0             :   pet.hunger      = 0
+    if pet.thirst       < 0             :   pet.thirst      = 0
+    return
+
 async def info(ctx):
 
     pet = db.getNatiPetData(ctx.msg.ndcId)
-    if pet.happiness    > 10000     :   pet.happiness   = 10000
-    if pet.energy       > 10000     :   pet.energy      = 10000
-    if pet.care         > 10000     :   pet.care        = 10000
-    if pet.hunger       > 10000     :   pet.hunger      = 10000
-    if pet.thirst       > 10000     :   pet.thirst      = 10000
+    maximizePet(pet)
+
+    nati_sticker = helpers.getStickerValue(pet)
 
     imageFile      = io.BytesIO()
     image     = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1024, 1024)
@@ -28,7 +44,7 @@ async def info(ctx):
     ct.restore()
 
     scale = 1
-    nati = cairo.ImageSurface.create_from_png(f"media/templates/pet/nati_base.png")
+    nati = cairo.ImageSurface.create_from_png(f"media/templates/pet/stickers/nati_base_{nati_sticker}.png")
     ct.save()
     ct.translate(592, 96)
     ct.scale(scale, scale)
@@ -155,13 +171,14 @@ async def giveItem(ctx):
     inventory   = await db.getUserInventory(ctx.msg.author.uid)
     if(item > inventory.length) : return await ctx.send("No existe un item con esta posición en tu inventario.")
     itemId      = inventory.data[item].objectId
+    itemData = objects.inventoryAPI.properties(itemId)
+    if itemData.usable is False:    return await ctx.send(f"Lo siento, pero {itemData.name} no puede ser utilizado, :c.")
 
     inventory.add(itemId, -1)
     await db.setUserInventory(inventory)
 
-    itemData = objects.inventoryAPI.properties(itemId)
     data = {
-        "exp"       : 20,
+        "exp"       : helpers.getEXPGain(itemData),
         "health"    : itemData.health,
         "happiness" : itemData.happiness,
         "energy"    : itemData.energy,
@@ -249,7 +266,7 @@ async def giveItem(ctx):
     nextExp = helpers.getExpBaseFromLevel(level+1)
 
     ct.set_source_rgb(0.47, 0.21, 0.85)
-    writeDesc(ct, 672, pet.exp, 20, pet2.exp, x1=48, x2=976, minV=lowExp, maxV=nextExp, scale=1)
+    writeDesc(ct, 672, pet.exp, data['exp'], pet2.exp, x1=48, x2=976, minV=lowExp, maxV=nextExp, scale=1)
 
     ct.stroke()
     image.write_to_png(imageFile)
@@ -261,9 +278,166 @@ async def giveItem(ctx):
             )
 
     await ctx.client.send_message(message=f"[ci]¡Dado 1x {itemData.name} a Nati!", chat_id=ctx.msg.threadId ,link_snippets_list=[linkSnippet])
+
+    lv1 = helpers.getLevelFromEXP(pet.exp)
+    lv2 = helpers.getLevelFromEXP(pet2.exp)
+    if(lv2 > lv1):
+        await ctx.send(f"¡Felicidades! Nati ha sudo al nivel {lv2} u.u.")
+    return
+
+
+def parseNumbers(msg):
+    nums  = []
+    words = msg.split(" ")
+    for word in words:
+        try:    nums.append(int(word))
+        except ValueError: pass
+    return nums
+
+def lootGenerator(loot):
+    rarity = 0
+    lower  = 0
+    upper  = 0
+
+    items  = []
+    for key,value in loot.items():
+        if      key == "common"     : rarity = 0
+        elif    key == "casual"     : rarity = 1
+        elif    key == "rare"       : rarity = 2
+        elif    key == "strange"    : rarity = 3
+        elif    key == "legendary"  : rarity = 4
+        else                        : rarity = -1
+        print("Loot:", key, rarity, value)
+
+        lower  = value["min"]
+        upper  = value["max"]
+
+        amount = lower + round(random.random() * (upper - lower))
+        item   = None
+        for a in range(amount):
+            if rarity != -1 : item   = objects.inventoryAPI.getItemByRarity(rarity)
+            else            : item   = objects.inventoryAPI.getRandomItem()
+            if item is not None: items.append(item) 
+    return items
+
+async def updateInventoryLoot(ctx, inventory, items, LOOTBOX_ID, test=False):
+    data = {}
+    for item in items:
+        if item not in tuple(data.keys()): data[item]  = 1
+        else                             : data[item] += 1
+
+
+    for item,amount in data.items():
+        inventory.add(item, amount)
+
+    inventory.add(LOOTBOX_ID, -1)
+    if test is False:           await db.setUserInventory(inventory)
+    await multiitem(ctx, data)
+    return
+
+async def open_lootBox_small(ctx, inventory, test=False):
+    LOOTBOX_ID = 31
+    if test is False:
+        if inventory.exists(LOOTBOX_ID) < 1: return await ctx.send("NO posee esta caja, de alguna manera.")
+
+    loot = {
+        "casual": {
+                "min": 1,
+                "max": 2
+            },
+        "random": {
+                "min": 0,
+                "max": 2
+            }
+    }
+
+    items = lootGenerator(loot)
+    await updateInventoryLoot(ctx, inventory, items, LOOTBOX_ID, test=test)
+    return
+
+
+async def open_lootBox_medium(ctx, inventory, test=False):
+    LOOTBOX_ID = 32
+    if test is False:
+        if inventory.exists(LOOTBOX_ID) < 1: return await ctx.send("NO posee esta caja, de alguna manera.")
+
+    loot = {
+        "rare": {
+                "min": 1,
+                "max": 2
+            },
+        "casual": {
+                "min": 0,
+                "max": 2
+            },
+        "random": {
+                "min": 0,
+                "max": 2
+            }
+    }
+
+    items = lootGenerator(loot)
+    await updateInventoryLoot(ctx, inventory, items, LOOTBOX_ID, test=test)
+    return
+
+async def open_lootBox_large(ctx, inventory, test=False):
+    LOOTBOX_ID = 33
+    if test is False:
+        if inventory.exists(LOOTBOX_ID) < 1: return await ctx.send("NO posee esta caja, de alguna manera.")
+
+    loot = {
+        "strange": {
+                "min": 1,
+                "max": 2
+            },
+        "rare": {
+                "min": 0,
+                "max": 2
+            },
+        "casual": {
+                "min": 0,
+                "max": 3 
+            },
+        "random": {
+                "min": 0,
+                "max": 2
+            }
+    }
+
+    items = lootGenerator(loot)
+    await updateInventoryLoot(ctx, inventory, items, LOOTBOX_ID, test=test)
+    return
+
+async def useItem(ctx):
+    nums = parseNumbers(ctx.msg.content)
+    if len(nums) == 0:    return await ctx.send("Debe ingresar el item que quiere utilizar. Consulte el inventario con --inventario e ingrese el número de la posición que sale a la izquierda.")
+    item = nums[0] - 1
+    if item < 0: return await ctx.send("Han ingresado una posición inválida.")
+
+    pet = db.getNatiPetData(ctx.msg.ndcId)
+    inventory   = await db.getUserInventory(ctx.msg.author.uid)
+
+    if(item > inventory.length) : return await ctx.send("No existe un item con esta posición en tu inventario.")
+    itemId      = inventory.data[item].objectId
+    itemData = objects.inventoryAPI.properties(itemId)
+
+    if   itemData.effects == 0   :   await giveItem(ctx)
+    elif itemData.effects == 1   :   pass
+    elif itemData.effects == 301 :   await open_lootBox_small(ctx, inventory)
+    elif itemData.effects == 302 :   await open_lootBox_medium(ctx, inventory)
+    elif itemData.effects == 303 :   await open_lootBox_large(ctx, inventory)
+
     return
 
 
 
+async def testBox(ctx):
+    nums    = parseNumbers(ctx.msg.content)
+    num     = 1
+    if nums != []: num = nums[0]
+    inventory   = await db.getUserInventory(ctx.msg.author.uid)
 
-
+    if   num == 1:    await open_lootBox_small(ctx, inventory, test=True)
+    elif num == 2:    await open_lootBox_medium(ctx, inventory, test=True)
+    elif num == 3:    await open_lootBox_large(ctx, inventory, test=True)
+    return

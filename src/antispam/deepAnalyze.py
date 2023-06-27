@@ -3,7 +3,7 @@ import asyncio
 import threading
 
 from src.antispam.data import AS
-from src.antispam.detectMessage import findNickname, findContent
+from src.antispam.detectMessage import findNickname, findContent, imageDetect
 from edamino.api import Embed
 from src import objects
 from .n_logging import banUser
@@ -91,11 +91,12 @@ Si tiene el modo estricto activo, el bot expulsará a quien haya detectado como 
         for index,user in enumerate(users):
             s1 = await findNickname(user.nickname)
             s2 = await findContent(user.content, comId)
+            s3 = await imageDetect(user.icon)
             if "4" in s1: s1.remove("4")
             if "108" in s1: s2.remove("108")
             if "151" in s1: s2.remove("151")
 
-            if s1 or s2:
+            if s1 or s2 or s3:
                 print("\t", index, user.uid, user.nickname, s1, s2)
                 embed = Embed(title="Perfil del usuario", object_type=0, object_id=user.uid, content=user.nickname )
                 msg = f"""
@@ -111,6 +112,8 @@ Nick:"""
                 for w in s1: msg += f"\n\t{w}: {objects.AntiSpam.msg_desc[w]}"
                 msg += "\n\nBiografía:"
                 for w in s2: msg += f"\n\t{w}: {objects.AntiSpam.msg_desc[w]}"
+                msg += "\n\nImagen:"
+                for w in s3: msg += f"\n\t{w}: {objects.AntiSpam.msg_desc[w]}"
                 await self.ctx.client.send_message(message=msg,
                                     chat_id=threadId,
                                     message_type=0,

@@ -10,7 +10,6 @@ class Auth:
     nickname    : str
     uid         : str
 
-@dataclass
 class BaseInstance:
     roomId  :   int
     threadId:   str
@@ -20,9 +19,21 @@ class BaseInstance:
     auth    :   Auth
     run     =   False
 
+    def __init__(self, roomId, threadId, ndcId, players, game, auth):
+        self.roomId = roomId
+        self.threadId = threadId
+        self.ndcId = ndcId
+        self.players = players.copy()
+        self.game = game
+        self.auth = auth
+        self.run  = False
+        self.on_create()
+        return
+
     def start(self):
         self.run         = True
         self.auth.isOpen = False
+        self.on_start()
 
     def playerList(self):
         players = []
@@ -36,6 +47,7 @@ class BaseInstance:
     def indexPlayer(self, uid):
         for index, player in enumerate(self.players):
             if player[0] == uid:    return index
+        return None
 
     async def screen(self):
         return
@@ -44,4 +56,8 @@ class BaseInstance:
     async def win(self, ctx):
         return
     async def lose(self, ctx):
+        return
+    def on_create(self):
+        return
+    def on_start(self):
         return
