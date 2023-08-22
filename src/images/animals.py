@@ -66,6 +66,7 @@ async def animalImg(ctx, aw):
 
 @utils.waitForMessage(message="-DATO", callback=data)
 @utils.waitForMessage(message="-IMAGEN", callback=animalImg)
+@utils.userTracker("animales")
 async def animals(ctx):
     await ctx.send("""
 Comando de animalitos (de prueba)

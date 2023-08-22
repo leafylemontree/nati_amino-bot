@@ -2,7 +2,13 @@ from aiofile import async_open, AIOFile
 from src import utils
 from src import objects
 import cairo
+import math
+import random
 
+w = 512
+h = 512
+
+@utils.userTracker("lineart")
 async def lineart(ctx):
         msg = ctx.msg.content.split(" ")
         if len(msg) < 6: return await ctx.send("Debe ingresar un polinomio de rango 5")

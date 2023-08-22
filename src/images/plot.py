@@ -3,6 +3,7 @@ import cairo
 from aiofile import AIOFile
 
 @utils.checkFor(m=1, M=24, notcount=1, copy=1)
+@utils.userTracker("graph")
 async def plot(ctx, msg):
     
     constants = []

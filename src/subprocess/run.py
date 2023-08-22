@@ -22,7 +22,7 @@ class Process:
         return
 
 def st_run(loop, ctx):
-    loop.create_task(utils.st.run())
+    loop.create_task(utils.st.run(ctx))
     return
 
 def socket_run(loop, ctx):
@@ -44,11 +44,11 @@ def run(loop, ctx):
 
     if Process.clock is False:
         Process.set(1, True)
-        try:
-            p2 = threading.Thread(target=clock, args=(loop,ctx))
-            p2.start()
-        except Exception:
-                Process.set(1, False)
+        #try:
+        #    p2 = threading.Thread(target=clock, args=(loop,ctx))
+        #    p2.start()
+        #except Exception:
+        #        Process.set(1, False)
         
     if Process.subTs is False:
         Process.set(2, True)

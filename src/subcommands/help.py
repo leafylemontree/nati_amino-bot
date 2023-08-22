@@ -67,6 +67,7 @@ async def listener(ctx, ins):
     return r
 
 @utils.waitForMessage(message="*", callback=listener)
+@utils.userTracker("help")
 async def _help(ctx, hType=None):
     com = ctx.msg.content.upper().split(" ")
     if len(com) > 1 and hType is None:

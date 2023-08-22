@@ -2,6 +2,7 @@ from multiprocessing import Pool
 from aiofile import AIOFile
 from .pyimgplt import Image, Objects 
 from random import random
+from src import utils
 
 def abstractImageProcessing(steps):
         img = Image("test", 512, 512)
@@ -45,6 +46,7 @@ def abstractImageProcessing(steps):
         except Exception:
             pass
 
+@utils.userTracker("abstract")
 async def abstractImage(ctx):
         steps = 64
 

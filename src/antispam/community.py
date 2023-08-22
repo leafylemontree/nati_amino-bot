@@ -4,6 +4,7 @@ from .n_logging import chatAnalyzeLog
 import aiofile
 import time
 from src.subcommands.join import join_chat
+from src import utils
 
 CMP1 = '\n'
 CMP2 = '\n\t\t'
@@ -29,6 +30,7 @@ async def chatReview(ctx, chat):
     return response
 
 
+@utils.userTracker("communityanalyze")
 async def communityanalyze(ctx):
     
     msg = ctx.msg.content.split(" ")

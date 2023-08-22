@@ -160,6 +160,24 @@ El bot enviará cada 15 minutos una petición para estar activo. Esto significa 
 
 --log -beInactive
 El bot permanecerá con estado inactivo (por defecto)
+
+--log -chat
+Cambia el mensaje de bienvenida en chats
+
+--log -welcome
+Permite que Nati de bienvenida en los muros de los usuarios.
+
+--log -revisar-biografía
+Activa el revisar la biografía al analizar usuarios
+
+--log -no-revisar-biografía
+Desactiva la revisión de biografías (por defecto)
+
+--log -llamadas
+Activa la función de llamadas en la comunidad
+
+--log -no-llamadas
+Desactiva las llamadas en la comunidad
     """
         
         if len(com) == 1: return await ctx.send(msg)
@@ -233,5 +251,21 @@ El bot permanecerá con estado inactivo (por defecto)
         elif com[1] == "-CHAT" :
             await chatWelcome(ctx, com)
             msg = chatWelcomeMsg_default
+            
+        elif com[1].find("-REVISAR-BIOGRA") == 0 :
+            db.setLogConfig(comId, 'biography', 1)
+            msg = "El bot revisará la biografía de los usuarios de esta comunidad"
+
+        elif com[1].find("-NO-REVISAR-BIOGRA") == 0 :
+            db.setLogConfig(comId, 'biography', 0)
+            msg = "El bot no revisará la biografía de los usuarios de esta comunidad"
+
+        elif com[1] == "-LLAMADAS" :
+            db.setLogConfig(comId, 'calls', 1)
+            msg = "Se activarán las llamadas en la comunidad"
+
+        elif com[1] == "-NO-LLAMADAS" :
+            db.setLogConfig(comId, 'calls', 0)
+            msg = "La función de llamadas está desactivada en esta comunidad"
 
         return await ctx.send(msg)

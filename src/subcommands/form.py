@@ -1,3 +1,5 @@
+from src import utils
+
 class Form:
     base                = "https://support.aminoapps.com/hc/es-419/requests/new?from_aminoapp=1"
     error               = "https://support.aminoapps.com/hc/es-419/requests/new?ticket_form_id=114093987134"
@@ -26,6 +28,7 @@ def multiFind(text, keys):
         if text.find(key) != -1:    return True
     return False
 
+@utils.userTracker("soporte")
 async def aminoSupportForm(ctx):
     
     msg = ""

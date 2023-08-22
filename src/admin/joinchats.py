@@ -4,6 +4,7 @@ from src import utils
 import traceback
 
 @utils.isStaff
+@utils.userTracker("joinpublichats")
 async def joinChats(ctx):
     text = ctx.msg.content.upper().split(" ")
     msg  = ctx.msg.content.upper()
@@ -48,6 +49,7 @@ Unido a: {success} chats
 
 
 @utils.isStaff
+@utils.userTracker("invitar")
 async def inviteEveryone(ctx):
         link = ctx.msg.content.split(" ")
         if len(link) == 1: return "Debe poner el link del chat al cual quiere que el bot se una"

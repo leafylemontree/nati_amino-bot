@@ -123,6 +123,7 @@ async def sell2(ctx, aw):
         amount = user.points // 100
 
     r = await donateAC(ctx, ctx.msg.author.uid, amount)
+    print("Donation response:", r, amount)
     if r is not None:
         database.db.modifyRecord(43, ctx.msg.author, amount * -100)
         await ctx.send(f"""
@@ -142,9 +143,6 @@ async def sell(ctx, aw):
 ﹏̈́﹏̈́﹏̈́﹏̈́﹏̈́﹏̈́﹏̈́﹏̈́﹏̈́﹏̈́﹏̈́﹏̈́﹏̈́ ༅˻˳˯ₑ❛░⃟ ⃟°˟̫· · · ·
 
 ❛꙰̥᪶༘᪵ꪾꯪ՚̸꙰⃢🌼⃟⃟༘ꪳ⨾ 𝐂𝐚𝐦𝐛𝐢𝐨 𝐝𝐞 𝐩𝐮𝐧𝐭𝐨𝐬 𝐚 𝐀𝐂
-❛꙰̥᪶༘᪵ꪾꯪ՚̸꙰⃢🌼⃟⃟༘ꪳ⨾ 1 AC = 100 puntos
-
-❛꙰̥᪶༘᪵ꪾꯪ՚̸꙰⃢🌼⃟⃟༘ꪳ⨾ 𝐂𝐚𝐦𝐛𝐢𝐨 𝐝𝐞 𝐩𝐮𝐧𝐭𝐨𝐬 𝐚 
 ❛꙰̥᪶༘᪵ꪾꯪ՚̸꙰⃢🌼⃟⃟༘ꪳ⨾ 1 AC = 100 puntos
 
 ᪥ 𝐔𝐬𝐭𝐞𝐝 𝐩𝐨𝐬𝐞𝐞: {user.points} puntos ᪥
@@ -195,6 +193,7 @@ async def account(ctx, aw):
 @utils.waitForMessage(message="-PIRAMIDE",  callback=pyramid)
 @utils.waitForMessage(message="-BANCA",     callback=account)
 @utils.waitForMessage(message="-SALIR",     callback=back)
+@utils.userTracker("tienda")
 async def shop(ctx):
     if ctx.msg.content.upper().find("-BANCA") != -1:
         return await account(ctx, None)

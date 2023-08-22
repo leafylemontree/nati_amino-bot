@@ -8,6 +8,7 @@ async def get_wall_comments(ctx, user_id=None, sorting="oldest", start=0, size=2
         return tuple(map(lambda comment : objects.CommentList(**comment), response['commentList'] ))
 
 @utils.userId
+@utils.userTracker("check")
 async def check_wall(ctx, uid, msg):
 
         user = await ctx.client.get_user_info(uid)

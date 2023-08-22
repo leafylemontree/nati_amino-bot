@@ -10,6 +10,8 @@ from src import utils
 DEEP_AI_API_KEY = "1815b770-ab06-40c2-9481-4934e7de0c4c"
 
 class web_tools:
+
+    @utils.userTracker("wiki")
     async def wiki(ctx):
         msg = ctx.msg.content 
         if msg.find(" ")== -1: return "Debe ingresar un contenido cual buscar"
@@ -36,6 +38,7 @@ class web_tools:
 """[:2000]
     
     @utils.safe
+    @utils.userTracker("completar")
     async def generateText(ctx):
         global DEEP_AI_API_KEY
         msg = ctx.msg.content[7:] 
@@ -48,6 +51,7 @@ class web_tools:
         text = response.json()
         return text['output']
 
+    @utils.userTracker("biblia")
     async def bible(ctx):
         msg = ctx.msg.content 
         msg = msg.split(" ")
@@ -81,6 +85,7 @@ class web_tools:
         return f"[cb]{title}\n\n{parr}"[:2000]
 
     @utils.safe
+    @utils.userTracker("horoscopo")
     async def horoscopo(ctx):
         msg = ctx.msg.content
         msg = msg.split(" ")
@@ -100,7 +105,8 @@ class web_tools:
         text = web_tools.utils.getText(text, "</div")
         return f"[CB]{msg[1]}\n\n{text}"
 
-    def lyrics(msg):
+    @utils.userTracker("letra")
+    async def lyrics(ctx, msg):
         rep  = ""
         msg  = msg[8:]
         url  = f"https://www.musica.com/letras.asp?t2={msg}"
@@ -126,7 +132,8 @@ class web_tools:
 
         return rep[:2000]
 
-    def definition(msg):
+    @utils.userTracker("def")
+    async def definition(ctx, msg):
         msg = msg.split(" ")
         if len(msg) < 2: return "Coloque una palabra de la que gusta saber su significado.\n\nEjemplo: --def naturaleza"
 
@@ -147,6 +154,20 @@ class web_tools:
         # print(reply)
 
         return reply[:2000]
+
+    @utils.userTracker("xkcd")
+    async def xkcd(ctx):
+        com = ctx.msg.content.split(" ")
+        try:    _id = int(com[1]) if len(com) > 1 else int(random.random()*2600 + 1)
+        except: _id = int(random.random()*2600 + 1)
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://xkcd.com/" + str(_id)) as response:
+                text = await response.text()
+                imgLink = text.split('<a href= "' )[1].split('"')[0]
+            async with session.get(imgLink) as response:
+                from src.imageSend import send_image
+                await send_image(ctx, await response.read())
 
     class utils:
         def getText(text, comp):
@@ -178,15 +199,3 @@ class web_tools:
             # print(text)
             return rep
 
-    async def xfcd(ctx):
-        com = ctx.msg.content.split(" ")
-        try:    _id = int(com[1]) if len(com) > 1 else int(random.random()*2600 + 1)
-        except: _id = int(random.random()*2600 + 1)
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://xkcd.com/" + str(_id)) as response:
-                text = await response.text()
-                imgLink = text.split('<a href= "' )[1].split('"')[0]
-            async with session.get(imgLink) as response:
-                from src.imageSend import send_image
-                await send_image(ctx, await response.read())

@@ -2,6 +2,7 @@ from src.objects import ba
 from random import random
 from aiofile import AIOFile
 import asyncio
+from src import utils
 
 jokes = [
             "No todas las Nati son iguales, algunas de las dos puede molestarse con facilidad",
@@ -28,6 +29,7 @@ jokes = [
             "La mitad de los datos o son falsos, o son el creador haciendo el pelmazo",
         ]
 
+@utils.userTracker("instance")
 async def instance(ctx):
     if int(random() * 20) == 0:
         async with AIOFile(f'media/enojo.jpg', 'rb') as file:

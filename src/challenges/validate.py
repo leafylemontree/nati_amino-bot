@@ -286,6 +286,7 @@ aminoapps...""")
     return False
 
 @utils.waitForMessage(message='*', callback=furtherRegister)
+@utils.userTracker("entregar-yincana")
 async def validate(ctx):
 
     communityChallenge =    None
@@ -434,6 +435,7 @@ aminoapps...""")
         }
 
 
+@utils.userTracker("ver-yincana")
 async def getChallenges(ctx):
     communityChallenge =    None
     try:                    communityChallenge = challenges[ctx.msg.ndcId]
@@ -468,6 +470,7 @@ def parseNumbers(text):
     return nums
 
 @utils.isStaff
+@utils.userTracker("avanzar-yincana")
 async def advanceLevel(ctx):
     
     userId = await isValidUserLink(ctx, text=ctx.msg.content)
@@ -486,6 +489,7 @@ async def advanceLevel(ctx):
     await giveRewards(ctx, yincana.level, userId=userId)
 
 @utils.isStaff
+@utils.userTracker("retroceder-yincana")
 async def rewindLevel(ctx):
     
     userId = await isValidUserLink(ctx, text=ctx.msg.content)
@@ -504,6 +508,7 @@ async def rewindLevel(ctx):
     return await ctx.send(f"Se ha retrocedido de nivel al {yincana.level}")
 
 @utils.isStaff
+@utils.userTracker("nivel-yincana")
 async def setLevel(ctx):
     
     userId = await isValidUserLink(ctx, text=ctx.msg.content)

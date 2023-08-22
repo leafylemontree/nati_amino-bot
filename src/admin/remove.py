@@ -4,6 +4,7 @@ from src import utils
 import asyncio
 
 @utils.isStaff
+@utils.userTracker("purga")
 async def remove(ctx):
     chat  = await ctx.client.get_chat_info(chat_id=ctx.msg.threadId)
 

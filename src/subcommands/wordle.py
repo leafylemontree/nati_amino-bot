@@ -3,6 +3,7 @@ from src.objects import status
 from src import objects
 from src.database import db
 
+@utils.userTracker("wordle")
 async def wordle(ctx, msg):
         global status
 

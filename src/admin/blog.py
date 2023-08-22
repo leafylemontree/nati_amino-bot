@@ -24,6 +24,7 @@ async def confirm(ctx, ins):
 
 
 @utils.isStaff
+@utils.userTracker("crearblog")
 @utils.waitForMessage(message="*", callback=confirm)
 async def createBlog(ctx):
     lines   = ctx.msg.content.split("\n")

@@ -8,6 +8,7 @@ async def get_notices(ctx, start=0, size=25):
 
 
 @utils.isStaff
+@utils.userTracker("aceptarrol")
 async def accept_role(ctx):
     notices = await get_notices(ctx, start=0, size=100)
     noticeType  = None

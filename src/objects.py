@@ -244,6 +244,7 @@ class Stats:
 
     def write(self):
         return
+
         a = {
 	        "users"    : self.users,
 	        "reset"    : self.reset,
@@ -339,9 +340,10 @@ class AntiSpam:
             }
 
 class Bot_attributes:
-    counter = 0
-    loop  = False 
-    instance = -1
+    counter     = 0
+    loop        = False 
+    instance    = -1
+    timestamp   = time.time()
 
     def kill(self, r):
         import os, sys, signal
@@ -638,6 +640,39 @@ class AdminUserProfile(UserProfile):
     adminLogCountIn7Days:       Optional[int]
     avgDailySpendTimeIn7Days:   Optional[int]
 
+
+class USER_FLAGS:
+    botDisable          =   0b00000001
+    yincanaDisable      =   0b00000010
+    expDisable          =   0b00000100
+    petDisable          =   0b00001000
+    interactionDisable  =   0b00010000
+    staffCommandsEnable =   0b00100000
+    moderationEnable    =   0b01000000
+    godMode             =   0b10000000
+
+
+class UserFlags:
+    botDisable:                 bool
+    yincanaDisable:             bool
+    expDisable:                 bool
+    petDisable:                 bool
+    interactionDisable:         bool
+    staffCommandsEnable:        bool
+    moderationEnable:           bool
+    godMode:                    bool
+
+    def __init__(self, bitarray):
+        self.botDisable             = bool(bitarray & 0b00000001)
+        self.yincanaDisable         = bool(bitarray & 0b00000010)
+        self.expDisable             = bool(bitarray & 0b00000100)
+        self.petDisable             = bool(bitarray & 0b00001000)
+        self.interactionDisable     = bool(bitarray & 0b00010000)
+        self.staffCommandsEnable    = bool(bitarray & 0b00100000)
+        self.moderationEnable       = bool(bitarray & 0b01000000)
+        self.godMode                = bool(bitarray & 0b10000000)
+        return
+
 @dataclass
 class UserInfo:
     userId:                     str
@@ -657,10 +692,15 @@ class UserInfo:
     points:                     int
     LApoints:                   int
     ACBuffer:                   int
-    unused6:                    int
+    userFlags:                  UserFlags
     unused7:                    int
     unused8:                    int
     marry:                      str
+
+    def parse_flags(self):
+        flags = UserFlags(self.userFlags)
+        return flags
+
 
 @dataclass
 class LogConfig:
@@ -676,6 +716,8 @@ class LogConfig:
     blogCheck:                  int
     active:                     int
     userWelcome:                int
+    calls:                      int
+    biography:                  int
 
 @dataclass
 class ChatConfig:
@@ -721,6 +763,12 @@ class Report:
     unidentifiedLink:           bool
     imageIsNone:                bool
 
+@dataclass
+class Note:
+    userId:                     str
+    noteId:                     str
+    timestamp:                  datetime.datetime
+    content:                    str
 
 @dataclass
 class SocketResponse:
@@ -1064,3 +1112,136 @@ class UserEXP:
     ndcId:              int
     userId:             str
     exp:                int
+
+AVAILABLE_TOPICS = [
+        "news",
+        "amino",
+        "nati",
+        "resumen",
+        "formadores",
+        "cambio",
+        "unidosporamino",
+        "edicion",
+        "confesiones"
+    ]
+
+@dataclass
+class RoleplayItem:
+    itemId:         int
+    ndcId:          int
+    name:           str
+    level:          int
+    price:          int
+    description:    str
+
+    def __init__(self, itemId, ndcId, name, level, price, description):
+        self.itemId         = itemId
+        self.ndcId          = ndcId
+        self.name           = name
+        self.level          = level
+        self.price          = price
+        self.description    = description
+        return
+
+    @classmethod
+    def error(Self):
+        self = Self(-1, 0, "Error", -1, -1, "Algo está mal con este item. No existe o ha habido un error.")
+        return self
+
+@dataclass
+class RoleplayInventory:
+    ndcId:          int
+    userId:         str
+    itemId:         int
+    quantity:       int
+
+@dataclass
+class RoleplayNote:
+    ndcId:          int
+    userId:         str
+    content:        str
+
+    def __init__(self, ndcId, userId, content):
+        self.ndcId      = ndcId
+        self.userId     = userId
+        self.content    = content
+        return
+
+    @classmethod
+    def blank(Self):
+        self = Self(0, None, None)
+        return self
+
+@dataclass
+class FunctionCounter:
+    value:      int
+    name:       str
+
+@dataclass
+class WeeklyFunctionCounter:
+    ndcId:      int
+    name:       str
+    value:      int
+
+@dataclass
+class PAResults:
+    ndcId:      int
+    userId:     str
+    value:      int
+
+@dataclass
+class PABlogs:
+    userId:     str
+    nickname:   str
+    link:       str
+
+@dataclass
+class MessageHistory:
+    ndcId:      int
+    threadId:   str
+    userId:     str
+    messageId:  str
+    instance:   int
+    timestamp:  datetime.datetime
+    content:    str
+
+@dataclass
+class ReportsResume:
+    week:       int
+    lastWeek:   int
+    typed:      dict
+    raw:        Report
+
+@dataclass
+class Confession:
+    ndcId:      int
+    userId:     str
+    timestamp:  datetime.datetime
+    content:    str
+
+class Applicant(BaseModel):
+    status:             Optional[int]
+    uid:                Optional[str]
+    isGlobal:           Optional[bool]
+    role:               Optional[int]
+    isStaff:            Optional[bool]
+    nickname:           Optional[str]
+    icon:               Optional[str]
+
+
+class CommunityMembershipRequest(BaseModel):
+    status:             Optional[int] 
+    requestId:          Optional[str]
+    modifiedTime:       Optional[datetime.datetime]
+    ndcId:              Optional[int]
+    createdTime:        Optional[datetime.datetime]
+    message:            Optional[str]
+    applicant:          Optional[Applicant]
+    uid:                Optional[str]
+
+@dataclass
+class SubscriptionRepository:
+    topic:              str
+    title:              str
+    url:                str
+    timestamp:          datetime.datetime

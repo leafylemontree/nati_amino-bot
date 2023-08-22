@@ -1,7 +1,9 @@
 from src.database import db
 from src          import objects
 from .images      import inventoryNewItemCard
+from src          import utils
 
+@utils.userTracker("inventario")
 async def inventory(ctx):
 
     inventory = await db.getUserInventory(ctx.msg.author.uid)
@@ -51,6 +53,7 @@ async def add_item(ctx, mode='ADD', verbose=True, objectId=None, amount=None, us
             return False
 
         response = inventory.add(objectId, amount)
+        nickname = await db.getUserNickname(ctx, ctx.msg.ndcId, userId=userId)
 
         if verbose:
             
@@ -64,7 +67,7 @@ async def add_item(ctx, mode='ADD', verbose=True, objectId=None, amount=None, us
             c_type = 'Añadido'
             if amount < 0: c_type = 'Quitado'
             await ctx.client.send_message(
-                    message=f"[ci]{c_type} {amount} {objects.inventoryAPI.name(objectId)} al\ninventario de {ctx.msg.author.nickname}",
+                    message=f"[ci]{c_type} {amount} {objects.inventoryAPI.name(objectId)} al\ninventario de {nickname}",
                     chat_id=ctx.msg.threadId,
                     link_snippets_list=[linkSnippet])
 
@@ -76,11 +79,13 @@ async def add_item(ctx, mode='ADD', verbose=True, objectId=None, amount=None, us
     return True
 
 
+@utils.userTracker("randomitem")
 async def giveRandomItem(ctx):
     objectId = objects.inventoryAPI.getRandomItem()
     await add_item(ctx, objectId=objectId, amount=1)
     return
 
+@utils.userTracker("vaciarinventario")
 async def clearInventory(ctx):
     inventory = await db.getUserInventory(ctx.msg.author.uid)
     inventory.clear()

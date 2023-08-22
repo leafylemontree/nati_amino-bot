@@ -5,7 +5,9 @@ from src.database import db
 from src import objects
 from src.subcommands._math.rate import rt
 import math
+from src import utils
 
+@utils.userTracker("chatanalyze")
 async def chatAnalyze(ctx):
     m = 0
     userList = []

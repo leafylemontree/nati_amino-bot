@@ -28,8 +28,9 @@ def registerDonations(userNotifs, userId, ndcId):
     notificationId = None
 
     for notif in userNotifs:
-        if notif.amount is None: continue
+        if notif.amount is None                      : continue
         if notif.notificationId == lastNotificationId: break
+        if notif.amount <= 0                         : continue
         amount += notif.amount
         if notificationId is None: notificationId = notif.notificationId
 
@@ -55,10 +56,10 @@ async def parseLastDonations(ctx):
             break
         
     data = registerDonations(userNotifs, ctx.msg.author.uid, ctx.msg.ndcId)
-    print(data)
     return userNotifs
 
 
+@utils.userTracker("mis-ultimas-donaciones")
 async def myLastDonations(ctx):
     userNotifs = await parseLastDonations(ctx)
     msg = f"Estas son las últimas transaccines hechas por {ctx.msg.author.nickname}:\n\n"

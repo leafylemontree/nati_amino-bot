@@ -65,6 +65,9 @@ class Database:
         elif mode == 14: column = "recvDoxx"
         elif mode == 24: column = "givenDoxx"
         elif mode == 31: column = "alias"
+        elif mode == 40: column = "unused0"
+        elif mode == 41: column = "unused1"
+        elif mode == 42: column = "unused2"
         elif mode == 43: column = "unused3"
         elif mode == 44: column = "unused4"
         elif mode == 50: column = "marry"
@@ -82,7 +85,9 @@ class Database:
             data = data[0]
 
         if mode in [31, 50] and value != 1:   data = f'{value}'.replace(";", "").replace("DROP", "").replace("drop", "")
-        else:                           data = data + value
+        else:
+            if mode == 43:  data = data + value if (data + value) >= -5000 else -5000
+            else         :  data = data + value
         
         self.cursor.execute(f'UPDATE UserInfo SET {column}=? WHERE userId="{userId}";', (data,))
         return data
@@ -90,7 +95,7 @@ class Database:
     def setLogConfig(self, comId, mode, value):
         self.cursor.execute(f'SELECT * FROM Log WHERE comId="{comId}";')
         data = self.cursor.fetchall()
-        if data == []: self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 0, 0);')
+        if data == []: self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);')
         self.cursor.execute(f'UPDATE Log SET {mode}=? WHERE comId={comId};', (value,))
 
         self.cursor.execute(f'SELECT * FROM Log WHERE comId="{comId}";')
@@ -107,7 +112,7 @@ class Database:
         self.cursor.execute(f'SELECT * FROM Log WHERE comId="{comId}";')
         resp = self.cursor.fetchall()
         if not resp:
-            self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 1, 0, 0, 0);')
+            self.cursor.execute(f'INSERT INTO Log VALUES ({comId}, "", 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0);')
             self.cursor.execute(f'SELECT * FROM Log WHERE comId={comId};')
             resp = self.cursor.fetchall()
         
@@ -217,9 +222,15 @@ class Database:
 
         if ctx is None and user is None: return None
 
-        if not user and userId is not None:  user = await ctx.client.get_user_info(userId)
-        self.redis.hset(self.r_userNickname, f'?{ndcId}&{user.uid}', f'{user.nickname}')
-        return user.nickname
+        if not user and userId is not None:
+            try:
+                user = await ctx.client.get_user_info(userId)
+                self.redis.hset(self.r_userNickname, f'?{ndcId}&{user.uid}', f'{user.nickname}')
+                await asyncio.sleep(3)
+                return user.nickname
+            except Exception:
+                return f"ndc://g/user-profile/{userId}"
+        return None
 
     def dumpAllChats(self):
         self.cursor.execute('SELECT * FROM Chat')
@@ -435,7 +446,7 @@ class Database:
         data = self.modifyRecord(60, None, amount, userId=userId)
         return data
 
-    def getUserExp(self, ndcId, userId):
+    def getUserExp(self, ndcId, userId, isGlobal=False):
         self.cursor.execute("SELECT * FROM UserEXP WHERE userId=? AND ndcId=?", (userId, ndcId,))
         resp = self.cursor.fetchall()
         
@@ -455,13 +466,306 @@ class Database:
         
         self.redis.hset(self.r_userMsgCounter, label, (0).to_bytes(4, 'big'))
         self.redis.hset(self.r_userExp, label, (counter).to_bytes(4, 'big'))
+
+        if isGlobal:
+            self.cursor.execute("SELECT userId, SUM(exp) FROM UserEXP WHERE userId=? GROUP BY userId", (userId, ))
+            resp = self.cursor.fetchall()
+            counter = int(resp[0][1])
         return counter
 
     def getExpRank(self, ndcId):
-        self.cursor.execute("SELECT * FROM UserEXP WHERE ndcId=?", (ndcId, ))
+        expLowFilter = 100
+        self.cursor.execute("SELECT * FROM UserEXP WHERE ndcId=? AND exp>? GROUP BY exp DESC LIMIT 20", (ndcId, expLowFilter))
         resp = self.cursor.fetchall()
         userExp = list(map(lambda x: objects.UserEXP(*x), resp))
         for user in userExp:    user.exp = self.getUserExp(ndcId, user.userId)
         return userExp
+
+    def getAllUsersExperience(self):
+        self.cursor.execute("SELECT userId, SUM(exp) AS exp FROM UserEXP WHERE exp > 1000 GROUP BY userId ORDER BY exp")
+        resp    = self.cursor.fetchall()
+        return resp
+
+    def functionAnalytics(self, name, ndcId):
+        self.cursor.execute("SELECT * FROM FunctionAnalytics WHERE name = ?", (name,))
+        resp = self.cursor.fetchall()
+        if resp == []   :  self.cursor.execute("INSERT INTO FunctionAnalytics VALUES (1, ?)", (name,))
+        else            :  self.cursor.execute("UPDATE FunctionAnalytics SET value = ? WHERE name = ?", (resp[0][0] + 1, name))
+
+        self.cursor.execute("SELECT * FROM WeeklyFuncAnalytics WHERE name=? AND ndcId=?", (name, ndcId))
+        resp = self.cursor.fetchall()
+        if resp == []   :  self.cursor.execute("INSERT INTO WeeklyFuncAnalytics VALUES (?, ?, 1)", (ndcId, name,))
+        else            :  self.cursor.execute("UPDATE WeeklyFuncAnalytics SET value=? WHERE name=? AND ndcId=?", (resp[0][2] + 1, name, ndcId))
+        return
+
+    def setUserGlobalFlag(self, userId, flag, value):
+        userInfo    = self.getUserData(None, userId=userId)
+        userFlags   = userInfo.userFlags
+        print(userFlags, flag, value)
+        if value is True :      userFlags = userFlags | flag
+        else             :      userFlags = userFlags & (0xFF ^ flag)
+        self.cursor.execute("UPDATE UserInfo SET unused6=? WHERE userId=?", (userFlags, userId,))
+        return
+
+    def setNote(self, userId, content):
+        noteId = str(uuid.uuid4())
+        self.cursor.execute("INSERT INTO Notes VALUES (?, ?, NOW(), ?)", (userId, noteId, content))
+        return noteId
+
+    def removeNote(self, userId, noteId):
+        self.cursor.execute("DELETE FROM Notes WHERE userId=? AND noteId=?", (userId, noteId))
+        return
+
+    def retrieveNote(self, userId, noteId):
+        self.cursor.execute("SELECT * FROM Notes WHERE userId=? AND noteId=?", (userId, noteId))
+        resp = self.cursor.fetchall()
+        if resp == []:  return None
+        return objects.Note(*resp[0])
+
+    def getAllNotes(self, userId):
+        self.cursor.execute("SELECT * FROM Notes WHERE userId=?", (userId,))
+        resp = self.cursor.fetchall()
+        return list(map(lambda x: objects.Note(*x), resp))
+
+    def subscribeTopic(self, ndcId, topic):
+        topic = topic.lower()
+        if topic not in objects.AVAILABLE_TOPICS: return False
+        
+        self.cursor.execute("SELECT * FROM subscription WHERE ndcId=? AND topic=?", (ndcId, topic))
+        resp = self.cursor.fetchall()
+        if resp != []: return True
+        self.cursor.execute("INSERT INTO subscription VALUES (?, ?)", (ndcId, topic))
+        return True
+
+    def unsubscribeTopic(self, ndcId, topic):
+        topic = topic.lower()
+        if topic not in objects.AVAILABLE_TOPICS: return False
+        self.cursor.execute("DELETE FROM subscription WHERE ndcId=? AND topic=?", (ndcId, topic))
+        return True
+
+    def sugestTopic(self, ndcId, content):
+        self.cursor.execute("INSERT INTO topicsSugests VALUES (?, ?)", (ndcId, content))
+        return
+
+    def getCommunityTopic(self, ndcId, topic):
+        topic = topic.lower()
+        self.cursor.execute("SELECT * FROM subscription WHERE ndcId=? AND topic=?", (ndcId, topic))
+        resp = self.cursor.fetchall()
+        if resp == []: return False
+        else         : return True
+
+    def getAllCommunityTopics(self, ndcId):
+        self.cursor.execute("SELECT * FROM subscription WHERE ndcId=?", (ndcId, ))
+        resp = self.cursor.fetchall()
+        return tuple(map(lambda x: x[1], resp))
+
+    def newRoleplayItem(self, ndcId, name, level, price, description):
+        self.cursor.execute("INSERT INTO RoleplayItems VALUES (0, ?, ?, ?, ?, ?)", (ndcId, name, level, price, description))
+        return
+
+    def delRoleplayItem(self, ndcId, itemId):
+        self.cursor.execute("DELETE FROM RoleplayItems WHERE ndcId=? AND itemId=?", (ndcId, itemId))
+        return
+
+    def editRoleplayItem(self, ndcId, itemId, column, value):
+        if column not in ["name", "level", "price", "description"]: return None
+        if column     in [        "level", "price"]               : value = int(value)
+        self.cursor.execute(f"UPDATE RoleplayItems SET {column}=? WHERE ndcId=? AND itemId=?", (value, ndcId, itemId))
+        return True
+
+    def getRoleplayItems(self, ndcId):
+        self.cursor.execute("SELECT * FROM RoleplayItems WHERE ndcId=?", (ndcId, ))
+        resp = self.cursor.fetchall()
+        return tuple(map(lambda x: objects.RoleplayItem(*x), resp))
+
+    def getRoleplayItem(self, ndcId, itemId):
+        self.cursor.execute("SELECT * FROM RoleplayItems WHERE ndcId=? and itemId=?", (ndcId, itemId))
+        resp = self.cursor.fetchall()
+        if resp == []: return objects.RoleplayItem.error()
+        return objects.RoleplayItem(*resp[0])
+
+    def getRoleplayInventory(self, ndcId, userId):
+        self.cursor.execute("SELECT * FROM RoleplayInventory WHERE ndcId=? AND userId=?", (ndcId, userId))
+        resp = self.cursor.fetchall()
+        return list(map(lambda x: objects.RoleplayInventory(*x), resp))
+
+    def addRoleplayItem(self, ndcId, userId, itemId, quantity):
+        roleplayInventory = self.getRoleplayInventory(ndcId, userId)
+        item = list(filter(lambda e: e.itemId == itemId and e.ndcId == ndcId, roleplayInventory))
+        if item == []:
+            self.cursor.execute("INSERT INTO RoleplayInventory VALUES (?, ?, ?, ?)", (ndcId, userId, itemId, quantity))
+        else:
+            self.cursor.execute("UPDATE RoleplayInventory SET quantity=? WHERE ndcId=? AND userId=? AND itemId=?", (item[0].quantity + quantity, ndcId, userId, itemId))
+        return
+
+    def removeRoleplayItem(self, ndcId, userId, itemId, quantity):
+        roleplayInventory = self.getRoleplayInventory(ndcId, userId)
+        item = list(filter(lambda e: e.itemId == itemId and e.ndcId == ndcId, roleplayInventory))
+        if item == []:  return None
+        if (item[0].quantity - quantity) < 1:
+            self.cursor.execute("DELETE FROM RoleplayInventory WHERE ndcId=? AND userId=? AND itemId=?", (ndcId, userId, itemId))
+        else:
+            self.cursor.execute("UPDATE RoleplayInventory SET quantity=? WHERE ndcId=? AND userId=? AND itemId=?", (item[0].quantity - quantity, ndcId, userId, itemId))
+        return
+
+    def getRoleplayNote(self, ndcId, userId):
+        self.cursor.execute("SELECT * FROM RoleplayNotes WHERE ndcId=? and userId=?", (ndcId, userId))
+        resp = self.cursor.fetchall()
+        if resp == []: return None
+        return objects.RoleplayNote(*resp[0])
+
+    def editRoleplayNote(self, ndcId, userId, content):
+        roleplayNote = self.getRoleplayNote(ndcId, userId)
+        if roleplayNote is None:
+            self.cursor.execute("INSERT INTO RoleplayNotes VALUES (?, ?, ?)", (ndcId, userId, content))
+            return True
+        else:
+            self.cursor.execute("UPDATE RoleplayNotes SET content=? WHERE ndcId=? AND userId=?", (content, ndcId, userId))
+        return False
+
+    def getPAResults(self, ndcId, userId):
+        self.cursor.execute("SELECT * FROM PAResults WHERE ndcId=? AND userId=?", (ndcId, userId))
+        resp = self.cursor.fetchall()
+        if resp == []: return None
+        return objects.PAResults(*resp[0])
+
+    def registerPAResults(self, ndcId, userId):
+        result = db.getPAResults(ndcId, userId)
+        if result is None:
+            self.cursor.execute("INSERT INTO PAResults VALUES (?, ?, 1)", (ndcId, userId))
+            return 1
+        else:
+            self.cursor.execute("UPDATE PAResults SET value=? WHERE ndcId=? AND userId=?", (result.value + 1, ndcId, userId))
+            return result.value + 1
+
+    def getPAResultsTable(self, ndcId):
+        self.cursor.execute("SELECT * FROM PAResults GROUP BY value DESC LIMIT 10")
+        resp = self.cursor.fetchall()
+        return tuple(map(lambda x: objects.PAResults(*x), resp))
+
+    def registerPAHexatlon(self, userId, nickname, link):
+        self.cursor.execute("SELECT * FROM PABlogs WHERE userId=?", (userId,))
+        resp = self.cursor.fetchall()
+        if resp == []:
+            self.cursor.execute("INSERT INTO PABlogs VALUES (?, ?, ?)", (userId, nickname, link))
+            return
+        else:
+            self.cursor.execute("UPDATE PABlogs SET nickname=?, link=? WHERE userId=?", (nickname, link, userId))
+        return
+
+    def clearPABlogs(self):
+        self.cursor.execute("UPDATE PABlogs SET link='none'")
+        return
+
+    def getPABlogs(self):
+        self.cursor.execute("SELECT * FROM PABlogs")
+        resp = self.cursor.fetchall()
+        return tuple(map(lambda x: objects.PABlogs(*x), resp))
+
+    def getLastMessages(self, ndcId, threadId, userId):
+        self.cursor.execute("SELECT * FROM MessageHistory WHERE ndcId=? AND threadId=? and userId=? GROUP BY timestamp DESC LIMIT 10", (ndcId, threadId, userId))
+        resp = self.cursor.fetchall()
+        return tuple(map(lambda x: objects.MessageHistory(*x), resp))
+
+    def getChatMessage(self, ndcId, threadId, userId, messageId):
+        self.cursor.execute("SELECT * FROM MessageHistory WHERE ndcId=? AND threadId=? AND userId=? AND messageId=?", (ndcId, threadId, userId, messageId))
+        resp = self.cursor.fetchall()
+        if resp == []: return None
+        return objects.MessageHistory(*resp[0])
+
+    def getDeletedMessages(self, ndcId, threadId, userId):
+        self.cursor.execute("SELECT * FROM DeletedMessageHistory WHERE ndcId=? AND threadId=? and userId=? GROUP BY timestamp DESC LIMIT 10", (ndcId, threadId, userId))
+        resp = self.cursor.fetchall()
+        return tuple(map(lambda x: objects.MessageHistory(*x), resp))
+
+    def getDeletedChatMessages(self, ndcId, threadId):
+        self.cursor.execute("SELECT * FROM DeletedMessageHistory WHERE ndcId=? AND threadId=? GROUP BY timestamp DESC LIMIT 10", (ndcId, threadId))
+        resp = self.cursor.fetchall()
+        return tuple(map(lambda x: objects.MessageHistory(*x), resp))
+
+    def getMessagesSent(self, ndcId, userId):
+        self.cursor.execute("SELECT COUNT(*) FROM MessageHistory WHERE ndcId=? AND userId=?", (ndcId, userId))
+        resp = self.cursor.fetchall()
+        if resp == []: return 0
+        return resp[0][0]
+
+    def getMessagesSentCommunity(self, ndcId):
+        self.cursor.execute("SELECT COUNT(*) FROM MessageHistory WHERE ndcId=?", (ndcId, ))
+        resp = self.cursor.fetchall()
+        if resp == []: return 0
+        return resp[0][0]
+
+    def getMessagesSentChatroom(self, ndcId):
+        self.cursor.execute("SELECT threadId,COUNT(*) as ct FROM MessageHistory WHERE ndcId=? GROUP BY threadId ORDER BY ct DESC LIMIT 20", (ndcId, ))
+        resp = self.cursor.fetchall()
+        return resp
+
+    def getReportResume(self, ndcId):
+        dt = datetime.datetime.now()
+        dt1 = dt - datetime.timedelta(days=7)
+        dt2 = dt - datetime.timedelta(days=14)
+        date1 = f"{dt1.year}-{dt1.month}-{dt1.day} 00-00-00"
+        date2 = f"{dt2.year}-{dt2.month}-{dt2.day} 00-00-00"
+
+        self.cursor.execute("SELECT COUNT(*) FROM Reports WHERE comId=? AND registerDate>=?", (ndcId, date1))
+        resp = self.cursor.fetchall()
+        week = resp[0][0]
+        self.cursor.execute("SELECT COUNT(*) FROM Reports WHERE comId=? AND registerDate>=? AND registerDate<?", (ndcId, date2, date1))
+        resp = self.cursor.fetchall()
+        lastWeek = resp[0][0]
+        typed = {}
+        for t in objects.AntiSpam.msg_desc.keys():
+            self.cursor.execute(f"SELECT COUNT(c{str(t).zfill(3)}) FROM Reports WHERE comId=? AND registerDate>=? AND c{str(t).zfill(3)}=1", (ndcId, date1))
+            resp = self.cursor.fetchall()
+            typed[t] = resp[0][0]
+        self.cursor.execute("SELECT * FROM Reports WHERE comId=? AND registerDate>=?", (ndcId, date1))
+        raw     = self.cursor.fetchall()
+        return objects.ReportsResume(week, lastWeek, typed, raw)
+
+    def getFunctionRanking(self, ndcId):
+        self.cursor.execute("SELECT * FROM WeeklyFuncAnalytics WHERE ndcId=? ORDER BY value DESC LIMIT 15", (ndcId, ))
+        resp = self.cursor.fetchall()
+        return tuple(map(lambda x: objects.WeeklyFunctionCounter(*x), resp))
+
+    def newConfession(self, ndcId, userId, text):
+        self.cursor.execute("INSERT INTO Confessions VALUES (?, ?, NOW(), ?)", (ndcId, userId, text))
+        return
+
+    def retrieveConfessions(self, ndcId, globalFlag):
+        if globalFlag is True:  self.cursor.execute("SELECT * FROM Confessions");
+        else:                   self.cursor.execute("SELECT * FROM Confessions WHERE ndcId=?", (ndcId,))
+        resp = self.cursor.fetchall()
+        return tuple(map(lambda x: objects.Confession(*x), resp))
+
+    def getSubscriptionRepository(self, topic):
+        topic = topic.lower()
+        if topic not in objects.AVAILABLE_TOPICS: return None
+        self.cursor.execute("SELECT * FROM subscriptionRepository WHERE topic=?", (topic,))
+        resp = self.cursor.fetchall()
+        return tuple(map(lambda x: objects.SubscriptionRepository(*x), resp))
+
+    def addSubscriptionRepository(self, topic, title, url):
+        topic = topic.lower()
+        if topic not in objects.AVAILABLE_TOPICS: return False
+        self.cursor.execute("INSERT INTO subscriptionRepository VALUES (?, ?, ?, NOW())", (topic, title, url))
+        return True
+    
+    def getTopicSubscriptionList(self, topic):
+        topic = topic.lower()
+        if topic not in objects.AVAILABLE_TOPICS: return None
+        self.cursor.execute("SELECT * FROM subscription WHERE topic=?", (topic, ))
+        resp = self.cursor.fetchall()
+        return tuple(map(lambda x: x[0], resp))
+
+    def getExpRankPosition(self, userId):
+        self.cursor.execute("SELECT userId, SUM(exp) as exp FROM UserEXP GROUP BY userId ORDER BY exp DESC")
+        resp = self.cursor.fetchall()
+        rank = -1
+        for i,item in enumerate(resp):
+            if item[0] != userId: continue
+            rank = i + 1
+            return rank
+        
+        return None
 
 db = Database()

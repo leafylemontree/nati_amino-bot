@@ -13,6 +13,7 @@ async def audioSubProcess(ctx, url):
         print(text)
     return await ctx.send(text)
 
+@utils.userTracker("escuchar")
 async def audioRecognize(ctx):
     fail_message = "Debe usar este comando respondiendo a un audio"
 

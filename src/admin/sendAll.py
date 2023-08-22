@@ -21,6 +21,7 @@ async def send_all(ctx):
                 print("failed at:", comId)
 
 
+@utils.userTracker("enviartodos")
 async def sendEveryone(ctx):
 
     message = ctx.msg.content.split(" ")

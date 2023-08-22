@@ -5,6 +5,7 @@ from .funcs import *
 import os
 
 @utils.userId
+@utils.userTracker("article")
 async def wiki(ctx, uid, msg):
         w = 512
         h = 512

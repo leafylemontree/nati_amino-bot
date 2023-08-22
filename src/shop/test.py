@@ -1,7 +1,9 @@
 from src.challenges.rewards import donateAC
 import random
 from src.database import db
+from src          import utils
 
+@utils.userTracker("testdonation")
 async def testDonation(ctx):
     amount = 2 + random.randint(0, 4)
     try:

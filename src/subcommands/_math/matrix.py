@@ -1,4 +1,5 @@
 import ctypes
+from src import utils
 
 path = "src/subcommands/_math/c/"
 
@@ -12,7 +13,8 @@ matrAdd = ctypes.cdll.LoadLibrary(f"{path}matrAdd.so")
 matrAdd.main.argtypes  = (ctypes.c_char_p, )
 matrAdd.main.restype   = ctypes.c_char_p
 
-def matrix(msg):
+@utils.userTracker("matrix")
+async def matrix(ctx, msg):
         msg = msg[9:]
         c_in = msg.encode('ascii')
 

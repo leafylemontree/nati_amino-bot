@@ -5,6 +5,7 @@ from src import utils
 
 
 @utils.isCoHost
+@utils.userTracker("everyone")
 async def everyone(ctx):
         thread  = await ctx.get_chat_info()
         userCount = thread.membersCount
@@ -30,6 +31,7 @@ async def everyone(ctx):
                                     reply=None )
         return
 
+@utils.userTracker("staff")
 async def staff(ctx):
 
         leaders  = list(await ctx.client.get_all_users("leaders", 0, 100))

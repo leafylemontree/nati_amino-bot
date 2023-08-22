@@ -7,6 +7,7 @@ from src.pet import helpers
 import edamino
 import random
 from src.shop.images import multiitem
+from src          import utils
 
 pet_card        = cairo.ImageSurface.create_from_png("media/templates/pet/stats_card.png")
 give_item_card  = cairo.ImageSurface.create_from_png("media/templates/pet/give_item_card.png")
@@ -27,6 +28,7 @@ def maximizePet(pet):
     if pet.thirst       < 0             :   pet.thirst      = 0
     return
 
+@utils.userTracker("mascota")
 async def info(ctx):
 
     pet = db.getNatiPetData(ctx.msg.ndcId)
@@ -144,11 +146,14 @@ async def info(ctx):
     await send_image(ctx, image=img)
     return
 
+
+@utils.userTracker("nueva-mascota")
 async def initPet(ctx):
     pet = db.initNatiPet(ctx.msg.ndcId)
     return await ctx.send("Mascota creada")
 
 
+@utils.userTracker("dar-item")
 async def giveItem(ctx):
     msg = ctx.msg.content.split(" ")
     if len(msg) < 2:    return await ctx.send("Debe ingresar el item que quiere darle a Nati. Consulte el inventario con --inventario e ingrese el número de la posición que sale a la izquierda.")
@@ -408,6 +413,7 @@ async def open_lootBox_large(ctx, inventory, test=False):
     await updateInventoryLoot(ctx, inventory, items, LOOTBOX_ID, test=test)
     return
 
+@utils.userTracker("usar-item")
 async def useItem(ctx):
     nums = parseNumbers(ctx.msg.content)
     if len(nums) == 0:    return await ctx.send("Debe ingresar el item que quiere utilizar. Consulte el inventario con --inventario e ingrese el número de la posición que sale a la izquierda.")
@@ -431,6 +437,7 @@ async def useItem(ctx):
 
 
 
+@utils.userTracker("probar-cajas")
 async def testBox(ctx):
     nums    = parseNumbers(ctx.msg.content)
     num     = 1

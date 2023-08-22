@@ -10,6 +10,9 @@ import cairocffi        as      cairo
 import pangocffi        as      pango
 import pangocairocffi   as      pc
 from   .funcs           import  putText
+from src import utils
+
+@utils.userTracker("news")
 async def getNews(ctx):
     
     link        = ""

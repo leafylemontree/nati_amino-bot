@@ -1,12 +1,13 @@
 import time
 
-async def send_image(ctx, image=None, media=None, itype='jpg'):
+async def send_image(ctx, image=None, media=None, itype='jpg', threadId=None):
     """
     ctx is Context
     image is a bytes object
     """
 
     if media is None:   media = await ctx.client.upload_media(image, f"image/{itype}")
+    if threadId is None: threadId = ctx.msg.threadId
     data = {
             "content": None,
             "clientRefId": int(time.time() / 10 % 1000000000),
@@ -17,7 +18,7 @@ async def send_image(ctx, image=None, media=None, itype='jpg'):
             "uploadId": 0,
             "mediaValue": media
             }
-    return await ctx.client.request("POST", f"chat/thread/{ctx.msg.threadId}/message", json=data)
+    return await ctx.client.request("POST", f"chat/thread/{threadId}/message", json=data)
 
 async def send_gif(ctx, image=None, media=None):
     """

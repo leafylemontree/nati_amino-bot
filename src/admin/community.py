@@ -25,6 +25,7 @@ async def leave_community(ctx, ndcId: int, invitationId: str = None):
 
 
 @utils.isStaff
+@utils.userTracker("gotocommunity")
 async def newCommunity(ctx):
     text = ctx.msg.content.split(" ")
     if len(text) == 1:      return await ctx.send("Debe poner el link de una comunidad")
@@ -55,6 +56,7 @@ async def newCommunity(ctx):
 
 
 @utils.isStaff
+@utils.userTracker("quitcommunity")
 async def removeCommunity(ctx):
     text = ctx.msg.content.split(" ")
     if len(text) == 1:      return await ctx.send("Debe poner el link de una comunidad")

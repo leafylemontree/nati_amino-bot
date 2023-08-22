@@ -27,15 +27,20 @@ async def getPfp(user):
         return
 
 
-async def getImageBytes(ctx, url):
+async def getImageBytes(ctx, url, noconvert=False):
+    if isinstance(url, str) is False: return
 
     response    = await ctx.client.session.request(method='GET', url=url)
     image       = io.BytesIO(await response.read())
     image.seek(0)
     result = io.BytesIO()
+    if noconvert: return image
 
     temp        = PIL.Image.open(image)
     temp.save(result, format='PNG')
     result.seek(0)
+    return        result
+    
+async def getImageIO(ctx, url):
     return        result
     

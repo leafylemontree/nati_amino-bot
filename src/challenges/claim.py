@@ -1,7 +1,9 @@
 from src.database import db
 from src.challenges.rewards import donate_blog, donate_wiki
 from src.shop.interface import add_item
+from src          import utils
 
+@utils.userTracker("reclamar-recompensas")
 async def claimRewards(ctx):
     rewards = db.getUserRewards(ctx.msg.author.uid, ctx.msg.ndcId)
     if len(rewards) == 0: return await ctx.send("No tiene recompensas pendientes por reclamar.")

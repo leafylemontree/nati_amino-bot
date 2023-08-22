@@ -26,7 +26,7 @@ rewardTable = {
             },
                 {
                     'POINTS'    : 150,
-                    'ITEM'      : 27        # 27 = Featured card
+                    'ITEM'      : [27, 1]        # 27 = Featured card
             },
                 {
                     'AC'        : 60,
@@ -34,18 +34,18 @@ rewardTable = {
             },
                 {
                     'AC'        : 80,
-                    'ITEM'      : 28        # 28 = Featured chat card
+                    'ITEM'      : [28, 1]        # 28 = Featured chat card
             },
                 {
                     'AC'        : 100,
-                    'ITEM'      : 29        # 29 = Notification card
+                    'ITEM'      : [29, 1]        # 29 = Notification card
             },
                 {
                     'AC'        : 120,
                     'POINTS'    : 300
             },
                 {
-                    'ITEM'      : 30,       # 30 = Custom title card
+                    'ITEM'      : [30, 1],      # 30 = Custom title card
                     'POINTS'    : 400
             },
         ],
@@ -96,7 +96,7 @@ rewardTable = {
             },
                 {
                     "AC"        : 5,
-                    "ITEM"      : 27
+                    "ITEM"      : [27, 1]
             },
 
 
@@ -141,6 +141,50 @@ rewardTable = {
                 {
                     "AC"        : 130
             },
+        ],
+    199654959: [
+                {
+                    "AC"        : 10
+            },
+                {
+                    "AC"        : 20
+            },
+                {
+                    "MULTIPLE"  : {
+                            "AC"    : 10,
+                            "ITEM"  : [30, 2]
+                        }
+            },
+                {
+                    "MULTIPLE"  : {
+                            "AC"    : 30,
+                            "ITEM"  : [30, 1]
+                        }
+            },
+                {
+                    "AC"        : 40
+            },
+                {
+                    "MULTIPLE"  : {
+                            "AC"    : 50,
+                            "ITEM"  : [30, 1]
+                        }
+            },
+                {
+                    "AC"        : 60
+            },
+                {
+                    "AC"        : 70
+            },
+                {
+                    "MULTIPLE"  : {
+                            "AC"    : 100,
+                            "ITEM"  : [30, 1]
+                        }
+            },
+                {
+                    "AC"        : 200
+            }
         ]
 }
 
@@ -242,11 +286,11 @@ async def getConfirmationLA(ctx, ins):
     elif ctx.msg.content.upper().find("-PUNTOS") == 0: r = await donatePoints(ctx, ins.data['userId'], ins.data['amount'])
     return r
 
-
 def labelReward(reward):
     if      reward == 'AC'      : return "Recibir premio en AC"
     elif    reward == 'POINTS'  : return "Recibir premio en punto de actividad"
     elif    reward == 'ITEM'    : return "Recibir premio como un item"
+    elif    reward == 'MULTIPLE': return "Recompensa múltiple"
 
 def multipleRewardMessage(ndcId, level):
     rewards = list(rewardTable[ndcId][level].keys())
@@ -262,11 +306,21 @@ El premio para este nivel se puede escojer entre dos opciones. Ingrese -si o -no
 """
     return msg
 
+async def executeGiveMultiple(ctx, userId, rewards):
+    items = tuple(rewards.items())
+    for reward in items:
+        rewardType, amount = reward
+        if   rewardType == 'AC'        : await donateAC(ctx, userId, amount)
+        elif rewardType == 'POINTS'    : await donatePoints(ctx, userId, amount)
+        elif rewardType == 'ITEM'      : await add_item(ctx, objectId=amount[0], amount=amount[1], mode="ADD", userId=userId)
+    return
+
 async def executeGive(ctx, userId, r, rewards):
     reward, amount = tuple(rewards)[r]
     if   reward == 'AC'        : await donateAC(ctx, userId, amount)
     elif reward == 'POINTS'    : await donatePoints(ctx, userId, amount)
-    elif reward == 'ITEM'      : await add_item(ctx, objectId=amount, amount=1, mode="ADD", userId=userId)
+    elif reward == 'ITEM'      : await add_item(ctx, objectId=amount[0], amount=amount[1], mode="ADD", userId=userId)
+    elif reward == "MULTIPLE"  : await executeGiveMultiple(ctx, userId, amount)
     return
 
 

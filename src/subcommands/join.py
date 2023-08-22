@@ -1,4 +1,5 @@
 import time
+from src import utils
 
 async def join_chat(ctx, threadId: str):
         data = {"timestamp": int(time.time() * 1000)}
@@ -8,6 +9,7 @@ async def join_chat(ctx, threadId: str):
                 json=data
                 )
 
+@utils.userTracker("join")
 async def joinChat(ctx):
         link = ctx.msg.content.split(" ")
         if len(link) == 1: return "Debe poner el link del chat al cual quiere que el bot se una"
@@ -23,3 +25,33 @@ async def joinChat(ctx):
             return "Se ha producido un error :c"
         
         return "Listo, ya me he unido c:"
+
+@utils.userTracker("unirvc")
+async def joinVC(ctx):
+    data = {
+        "o": {
+            "ndcId": ctx.msg.ndcId,
+            "threadId": ctx.msg.threadId,
+            "joinRole": 1,
+            "id": "2154531"
+        },
+        "t": 112
+    }
+    await ctx.ws.send_json(data)
+    await ctx.send("Unido al chat de voz.")
+    return
+
+@utils.userTracker("unirsala")
+async def joinSR(ctx):
+    data = {
+        "o": {
+            "ndcId": ctx.msg.ndcId,
+            "threadId": ctx.msg.threadId,
+            "joinRole": 2,
+            "id": "72446"
+        },
+        "t": 112
+    }
+    await ctx.ws.send_json(data)
+    await ctx.send("Unido a la sala de proyección.")
+    return

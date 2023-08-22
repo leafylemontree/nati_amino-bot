@@ -3,7 +3,9 @@ from aiofile import AIOFile
 from .funcs import *
 import time
 from src import objects
+from src import utils
 
+@utils.userTracker("botinfo")
 async def stats(ctx):
         time_passed = time.time() - objects.botStats.time
         

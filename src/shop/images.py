@@ -7,11 +7,14 @@ import edamino
 import time
 from aiofile import AIOFile
 from src          import objects
+from src          import utils
 
 base    = cairo.ImageSurface.create_from_png("media/templates/card_wallet_base.png")
 base2   = cairo.ImageSurface.create_from_png("media/templates/inventory_new.png")
 base3   = cairo.ImageSurface.create_from_png("media/templates/multiitem.png")
 
+
+@utils.userTracker("puntos")
 async def walletCard(ctx):
     
     userDB  = db.getUserData(ctx.msg.author)

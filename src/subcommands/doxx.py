@@ -2,6 +2,7 @@ from src    import objects
 from src    import utils
 from src.database import db
 
+@utils.userTracker("doxx")
 async def doxx(ctx, mode):
         uid = ctx.msg.author.uid
         nick = ctx.msg.author.nickname

@@ -51,6 +51,7 @@ def putText(ct, text="text", size=24, align="LEFT", width=3200, height=3200, wra
     ly = pc.create_layout(ct)
     ly.set_width(pango.units_from_double(width))
     ly.set_height(pango.units_from_double(height))
+    text = text.replace("&", "&amp;")
 
     if   align == "LEFT"  : ly.set_alignment(pango.Alignment.LEFT)
     elif align == "RIGHT" : ly.set_alignment(pango.Alignment.RIGHT)

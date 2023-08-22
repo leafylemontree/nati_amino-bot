@@ -1,5 +1,8 @@
 from src import objects
+from src import utils
 
+
+@utils.userTracker("blogs")
 async def getBlogs(ctx, msg):
         reply = objects.Reply(None, False)
         msg = msg[7:]

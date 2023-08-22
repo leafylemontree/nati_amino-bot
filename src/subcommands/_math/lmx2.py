@@ -2,6 +2,7 @@ import ctypes
 from PIL import Image
 import io
 from src.images import paletteCard
+from src import utils
 
 libmx2 = ctypes.cdll.LoadLibrary("./src/subcommands/_math/eigen/main.so")
 
@@ -34,6 +35,7 @@ def splitImage(image):
     s = libmx2.image_tree(w, h, r, g, b)
     return s
 
+@utils.userTracker("valores-propios")
 async def imageEigenvalues(ctx):
     im = None
     if ctx.msg.extensions.replyMessage is None: return await ctx.send("Debe usar este comando respondiendo a una imagen")
@@ -73,6 +75,7 @@ weight: {self.w}
 """
 
 
+@utils.userTracker("paleta")
 async def imagePalette(ctx):
     im = None
     if ctx.msg.extensions.replyMessage is None: return await ctx.send("Debe usar este comando respondiendo a una imagen")

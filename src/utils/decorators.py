@@ -4,6 +4,7 @@ from src import objects
 import logging
 import traceback
 #from src.utils.text import helpFunction
+from dataclasses import dataclass
 
 leafId    =  "17261eb7-7fcd-4af2-9539-dc69c5bf2c76"
 noMessage = "Usted no está autorizado para ejercer este comando"
@@ -68,6 +69,7 @@ def userId(func):
             link = await ctx.client.get_info_link(f"http://aminoapps.com/p/{userLink}")
             if link.linkInfo.objectType != 0: pass
             uid = link.linkInfo.objectId
+        print(uid)
         await func(*args, uid, msg, **kwargs)
         return
     return check
@@ -221,8 +223,20 @@ def disabled(func):
 #
 ###########################
 
-
+@dataclass
 class AW:
+    userId:        str
+    ndcId:         int
+    threadId:      str
+    message:       str
+    func:          str
+    content:       str
+    data:          str
+    fcargs:        str
+    kill:          bool
+    accessed:      bool
+    deleteNext:    bool
+
     def __init__(self, userId, ndcId, threadId, message, func, content, fcargs=None, instantKill=False):
         self.userId     = userId
         self.ndcId      = ndcId
@@ -243,7 +257,7 @@ class AW:
         self.message    = None
         self.deleteNext = True
 
-
+@dataclass
 class Waiting:
     aw = []
     cn = []
@@ -334,6 +348,17 @@ def waitForMessage(message="-si", timeout=None, callback=clbdefault, fcargs=None
         return wrapper
     return main
 
+async def createMessageAwaiter(ctx, ndcId, userId, threadId, data, callback):
+    index, ins = waiting.look(userId, ndcId, threadId, "*")
+    if ins     : return None
+    waiting.add(userId, ndcId, threadId, "*", callback, "-", None, False)
+    waiting.editData(userId, ndcId, threadId, data=data)
+    return True
+
+def closeAwaiter(ndcId, userId, threadId):
+    index = waiting.retrieve(userId, ndcId, threadId)
+    if index != -1: waiting.delete(index)
+    return
 
 async def waitForCallback(ctx):
 
@@ -349,9 +374,9 @@ async def waitForCallback(ctx):
     threadId    = ctx.msg.threadId
     ndcId       = ctx.client.ndc_id
     userId      = ctx.msg.author.uid
-    msg         = ctx.msg.content.upper()
+    msg         = ctx.msg.content.upper() if ctx.msg.content is not None else ""
 
-    index, ins = waiting.look(userId, ndcId, threadId, msg.upper())
+    index, ins = waiting.look(userId, ndcId, threadId, msg)
     if not ins: return
     
     if ins.kill and ins.accessed:
@@ -421,6 +446,7 @@ class SubTaskScheduler:
     async def set(self, ctx):
         self.context = ctx
         self.loop    = asyncio.get_event_loop()
+        print("Loop: ", self.loop)
 
     def reloadContext(self, loop, ctx):
         self.context = ctx
@@ -445,9 +471,9 @@ class SubTaskScheduler:
                         logging.info(f'$.{objects.ba.instance} - Running subTak {i}. subTaskTimer={self.timeCounter}')
                         self.loop.create_task(subTask.callback(self.context))
                         
-                    except Exception as e:   
+                    except Exception as e:
+                        traceback.print_exc()
                         logging.error(f'$.{objects.ba.instance} Corroutine {i} errored!: {e}')
-                        pass
 
                 await asyncio.sleep(1)
                 self.timeCounter += 1

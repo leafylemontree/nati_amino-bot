@@ -132,6 +132,7 @@ UPLOADED_IMAGES = {
 
 
 @utils.cutes
+@utils.userTracker("cutes")
 async def cutes(ctx, uid, com):
         reply = objects.Reply(None, True)
         user = await ctx.client.get_user_info(uid)
@@ -188,6 +189,7 @@ async def cutes(ctx, uid, com):
         return
 
 @utils.userId
+@utils.userTracker("matar/golpear")
 async def interaction(ctx, itype, uid, com):
         reply = objects.Reply(None, True)
         user = await ctx.client.get_user_info(uid)
@@ -225,6 +227,7 @@ async def feelings(ctx):
     return
 
 @utils.isStaff
+@utils.userTracker("cutesall")
 async def cutes_sendall(ctx):
     from src.imageSend import send_gif
 

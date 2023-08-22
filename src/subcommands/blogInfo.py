@@ -1,3 +1,6 @@
+from src import utils
+
+@utils.userTracker("bloginfo")
 async def blogInfo(ctx):
     links       = ctx.msg.content.split("\n")[1:]
     linkInfo    = [await ctx.client.get_info_link(link) for link in links]

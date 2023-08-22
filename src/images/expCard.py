@@ -8,8 +8,8 @@ import math
 
 base    = cairo.ImageSurface.create_from_png("media/templates/exp_card.png")
 
-a = 40
-b = 1.0875
+a = 75
+b = 1.2
 
 def getLevel(exp):
     return math.floor( math.log(1  - exp * (1 - b) / a) / math.log(b) )
@@ -25,12 +25,14 @@ def getExpLevel(level):
 def barFill(minExp, exp, maxExp):
     return (exp - minExp) / (maxExp - minExp)
 
+@utils.userTracker("exp")
 async def expCardCreate(ctx, message=True):
     imgIO   = io.BytesIO()
     image   = cairo.ImageSurface(cairo.FORMAT_ARGB32, 1024, 448, )
     ct      = cairo.Context(image)
+    isGlobal= True if ctx.msg.content.upper().find("-GLOBAL") != -1 else False
 
-    exp     = db.getUserExp(ctx.msg.ndcId, ctx.msg.author.uid)
+    exp     = db.getUserExp(ctx.msg.ndcId, ctx.msg.author.uid, isGlobal=isGlobal)
     level   = getLevel(exp)
     limits  = getExpLevel(level)
 

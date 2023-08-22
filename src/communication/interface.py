@@ -5,13 +5,17 @@ from src                import objects
 import ujson as json
 import time
 import asyncio
+from src import utils
 
+instances = 5
+
+@utils.userTracker("socketcom")
 async def get_communities(ctx):
 
     await ctx.send('Obteniendo información de comunidades. Espere un momento')
 
     content = {'objectId': 0, 'value': 0}
-    nodeId = socketPool.register(data=None, length=4, timeout=10)
+    nodeId = socketPool.register(data=None, length=instances, timeout=10)
     await sc.send(
             dtype=1,
             request=content,
@@ -29,12 +33,13 @@ async def get_communities(ctx):
     await ctx.send(msg)
     return
 
+@utils.userTracker("socketwallet")
 async def get_wallets(ctx):
 
     await ctx.send('Obteniendo información de monederos. Espere un momento')
 
     content = {'objectId': 1, 'value': 0}
-    nodeId = socketPool.register(data=None, length=4, timeout=10)
+    nodeId = socketPool.register(data=None, length=instances, timeout=10)
     await sc.send(
             dtype=1,
             request=content,
@@ -52,12 +57,13 @@ async def get_wallets(ctx):
     await ctx.send(msg)
     return
 
+@utils.userTracker("socketactivity")
 async def get_activity(ctx):
 
     await ctx.send('Obteniendo información de actividad de Nati. Espere un momento')
 
     content = {'objectId': 2, 'value': 0}
-    nodeId = socketPool.register(data=None, length=4, timeout=10)
+    nodeId = socketPool.register(data=None, length=instances, timeout=10)
     await sc.send(
             dtype=1,
             request=content,
@@ -76,6 +82,7 @@ async def get_activity(ctx):
     return
 
 
+@utils.userTracker("isinstance")
 async def is_instance_in(ctx):
     text = ctx.msg.content.split(" ")
     if len(text) == 1:      return await ctx.send("Debe poner el link de una comunidad")
@@ -93,7 +100,7 @@ async def is_instance_in(ctx):
     await ctx.send('Obteniendo información de comunidades. Espere un momento')
 
     content = {'objectId': 0, 'value': 0}
-    nodeId = socketPool.register(data=None, length=4, timeout=10)
+    nodeId = socketPool.register(data=None, length=instances, timeout=10)
     await sc.send(
             dtype=1,
             request=content,

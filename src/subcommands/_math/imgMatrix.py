@@ -4,9 +4,11 @@ from src import utils
 from PIL import Image as PImage
 import struct
 import os
+from src import utils
 
 path = 'src/subcommands/_math/c/'
 
+@utils.userTracker("imgmatrix")
 async def imgMatrix(ctx):
     imgDs = ctypes.cdll.LoadLibrary(f'{path}imgMatrix.so')
     im    = None

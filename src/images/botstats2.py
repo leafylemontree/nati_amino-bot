@@ -6,6 +6,7 @@ from aiofile import AIOFile
 from src.database import db
 import ctypes
 import math
+from src import utils
 
 def getNext(data):
     path = 'src/subcommands/_math/c/'
@@ -23,6 +24,7 @@ def getNext(data):
     return abs(pr/math.factorial(10))
 
 
+@utils.userTracker("reportes")
 async def botstats2(ctx):
     msg = ctx.msg.content.upper().split(" ")
     if   len(msg) == 1: msg.append("-G")

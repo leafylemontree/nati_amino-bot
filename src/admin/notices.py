@@ -22,6 +22,7 @@ async def notice(ctx, userId, title='Example', content='Testing', penaltyType=0,
     return
 
 @utils.isStaff
+@utils.userTracker("notice")
 async def giveNotice(ctx):
     msg = ctx.msg.content.split(" ")
 

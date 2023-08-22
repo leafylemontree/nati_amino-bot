@@ -1,7 +1,9 @@
 import cairo
 import qrcode
 from aiofile import AIOFile
+from src import utils
 
+@utils.userTracker("card1")
 async def card(ctx):
     print("cards")
     text = ctx.msg.content

@@ -1,5 +1,6 @@
 import ctypes
 import math
+from src import utils
 
 path = 'src/subcommands/_math/c/'
 rt   = ctypes.cdll.LoadLibrary(f'{path}rate.so')
@@ -13,6 +14,7 @@ async def like_wiki(ctx, postId):
                                   json=data)
 
 
+@utils.userTracker("rate")
 async def rateBlog(ctx):
     link = ctx.msg.content.split(" ")
     if len(link) == 1: return "Debe poner el link de un blog"

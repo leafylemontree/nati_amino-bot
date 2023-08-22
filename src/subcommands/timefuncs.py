@@ -10,12 +10,14 @@ async def stopTime(ctx, aw):
 
 
 @utils.waitForMessage("-detener", callback=stopTime)
+@utils.userTracker("cronometro")
 async def stopwatch(ctx):
     date = datetime.datetime.now()
     await ctx.send(f"Temporizador puesto por {ctx.msg.author.nickname}:\n{date}")
     return date
 
 
+@utils.userTracker("temporizador")
 async def timer(ctx):
     com = ctx.msg.content.upper().split()
 

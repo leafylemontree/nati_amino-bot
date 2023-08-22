@@ -2,6 +2,7 @@ from asyncio import sleep
 from src import utils
 
 @utils.isStaff
+@utils.userTracker("deletemsg")
 async def del_(ctx):
     msg = ctx.msg.content.upper().split(" ")
     l = msg[1] if len(msg)>1 else 10

@@ -5,6 +5,7 @@ from .funcs import *
 import datetime
 
 @utils.userId
+@utils.userTracker("tweet")
 async def tweet(ctx, uid, msg):
         user = await ctx.client.get_user_info(uid)
         await utils.getPfp(user)

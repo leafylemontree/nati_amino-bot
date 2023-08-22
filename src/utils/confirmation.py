@@ -1,6 +1,7 @@
 import uuid
 import time
 import asyncio
+from src.utils.userTracker import userTracker
 
 class ConfirmerElement:
     def __init__(self, threadId, userId, ndcId, staff=False, timeout=30):
@@ -55,6 +56,7 @@ async def confirmation(ctx, threadId, userId, ndcId, staff=False, timeout=30):
         await asyncio.sleep(3)
     return False
 
+@userTracker("confirm")
 async def registerConfirmation(ctx, value):
     threadId = ctx.msg.threadId
     userId   = ctx.msg.author.uid

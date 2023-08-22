@@ -11,9 +11,10 @@ async def get_user_checkins(ctx, userId):
     return resp['consecutiveCheckInDays']
 
 @utils.userId
+@utils.userTracker("info")
 async def userInfo(ctx, uid, content):
         user = await ctx.client.get_user_info(uid)
-        # print(user)
+        print(user)
         role = "Curador" if user.role == 101 else "Líder" if user.role == 102 else "Ninguno"
 
         checkInDays = await get_user_checkins(ctx, user.uid)

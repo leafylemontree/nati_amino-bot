@@ -4,6 +4,7 @@ from src.database import db
 from time import time
 
 @utils.ban
+@utils.userTracker("ban", flags=0b00100000, invert=True)
 async def ban_user(ctx, userId, reason):
         user = await ctx.client.get_user_info(user_id=userId)
         
@@ -37,6 +38,7 @@ Para desbanear, solo responda este mensaje y ponga --unban
         return
 
 @utils.ban
+@utils.userTracker("unban", flags=0b00100000, invert=True)
 async def unban_user(ctx, userId, reason):
         user = await ctx.client.get_user_info(user_id=userId)
         try:
@@ -64,6 +66,8 @@ ID: {userId}
                                     reply=None )
 
         return
+
+@utils.userTracker("warn", flags=0b00100000, invert=True)
 async def warn(ctx, user_id, reason):
     data = {
         "uid": user_id,
@@ -82,6 +86,7 @@ async def warn(ctx, user_id, reason):
     response = await ctx.client.request("POST", "notice", json=data)
     return
 
+@utils.userTracker("strike", flags=0b00100000, invert=True)
 async def strike(ctx, user_id, reason):
     data = {
         "uid": user_id,

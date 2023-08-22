@@ -145,15 +145,15 @@ async def show_online(ctx, ndcId):
 async def beActive(ctx):
     coms = await get_my_communities(ctx, start=0, size=100)
     comList = list(map(lambda com: com.ndcId, coms))
-    loop = asyncio.get_event_loop()
     ctx.ws = await ctx.client.ws_connect()
+    loop = asyncio.get_event_loop()
     logging.info(f"{objects.ba.instance} Restarting websocket")
-
 
     for i,com in enumerate(comList):
         await show_online(ctx, com)
 
     await asyncio.sleep(180)
+    ctx.ws = await ctx.client.ws_connect()
     for i,com in enumerate(comList):
         log = db.getLogConfig(com)
         status = 0
@@ -163,16 +163,16 @@ async def beActive(ctx):
             status = 3
             await activity_status(ctx, status=1)
             await asyncio.sleep(10)
-            if log.active :
-                blogs = await get_featured_blogs(ctx, start=0, size=100)
-                blog  = blogs[int(random.random() * len(blogs))]
-                status = 1
-                data = ws_activity_data(com, blog.refObjectId, blog.refObjectType)
-                await ctx.ws.send_json(data) 
-                status = 2
-                await send_active_obj(ctx)
-                status = 4
-                await send_action(ctx, blog.refObjectId)
+            #if log.active :
+                #blogs = await get_featured_blogs(ctx, start=0, size=100)
+                #blog  = blogs[int(random.random() * len(blogs))]
+                #status = 1
+                #data = ws_activity_data(com, blog.refObjectId, blog.refObjectType)
+                #await ctx.ws.send_json(data) 
+                #status = 2
+                #await send_active_obj(ctx)
+                #status = 4
+                #await send_action(ctx, blog.refObjectId)
             status = 5
             loop.create_task(show_online(ctx, com))
             await show_online(ctx, com)
@@ -208,7 +208,8 @@ async def giveWelcome(ctx):
                 await asyncio.sleep(5)
 
                 db.redis.hset('usersWelcome', f'?{com}&{user.uid}', int(time.time() * 1000))
-                bio_warn  = await findContent(user.content, comId=com)
+                bio_warn = []
+                if log.biography: bio_warn  = await findContent(user.content, comId=com)
                 nick_warn = await findNickname(user.nickname)
                 img_warn  = await imageDetect(user.icon)
                 if log.threadId and (bio_warn or nick_warn or img_warn):

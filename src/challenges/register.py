@@ -34,6 +34,7 @@ class ChallengeAPI:
     beInChat        = 27
     nicknameStart   = 28
     likeFeatured    = 29
+    customMessage   = 30
 
     def getLabel(c):
             label = ''
@@ -67,6 +68,7 @@ class ChallengeAPI:
             elif c.type == ChallengeAPI.beInChat        : label = f"Está en {c.args} chat donde esté Nati también."
             elif c.type == ChallengeAPI.beInChat        : label = f"Ten un nick que comience por \"{c.args}\"."
             elif c.type == ChallengeAPI.likeFeatured    : label = f"Dale like a {c.args} publicaciones que estén en destacados."
+            elif c.type == ChallengeAPI.customMessage   : label = f"{c.args}."
             return label
 
 class ChallengeRequirement:
@@ -446,5 +448,46 @@ challenges = {
                 [   ChallengeRequirement(ChallengeAPI.postFeatured,    1, False, start=date) ],
                 [   ChallengeRequirement(ChallengeAPI.like,    1, False, start=date) ],
                 [   ChallengeRequirement(ChallengeAPI.likeAndComment,    1, False, start=date) ],
+        ]),
+    199654959: CommunityChallenges(199654959, [
+            [
+                    ChallengeRequirement(ChallengeAPI.profileChange, 1, False, start=date)
+            ],
+            [
+                    ChallengeRequirement(ChallengeAPI.customMessage, "Únete a 1 Team", False, start=date)
+            ],
+            [
+                    ChallengeRequirement(ChallengeAPI.level, 5, False, start=date)
+            ],
+            [
+                    ChallengeRequirement(ChallengeAPI.level, 7, False, start=date),
+                    ChallengeRequirement(ChallengeAPI.customMessage, "Recomienda una serie o película", False, start=date)
+            ],
+            [
+                    ChallengeRequirement(ChallengeAPI.quizUpload, 1, False, start=date),
+                    ChallengeRequirement(ChallengeAPI.level, 8, False, start=date)
+            ],
+            [
+                    ChallengeRequirement(ChallengeAPI.dailyMinutes, 200, False, start=date),
+                    ChallengeRequirement(ChallengeAPI.blogUpload, 1, False, start=date)
+            ],
+            [
+                    ChallengeRequirement(ChallengeAPI.checkIn, 10, False, start=date),
+                    ChallengeRequirement(ChallengeAPI.weeklyMinutes, 400, False, start=date)
+            ],
+            [
+                    ChallengeRequirement(ChallengeAPI.level, 12, False, start=date),
+                    ChallengeRequirement(ChallengeAPI.postFeatured, 1, False, start=date),
+                    ChallengeRequirement(ChallengeAPI.checkIn, 15, False, start=date),
+            ],
+            [
+                    ChallengeRequirement(ChallengeAPI.dailyMinutes, 300, False, start=date),
+                    ChallengeRequirement(ChallengeAPI.customMessage, "Preséntate como coanfritrión, curador, líder o socio de un Team", False, start=date)
+            ],
+            [
+                    ChallengeRequirement(ChallengeAPI.weeklyMinutes, 550, False, start=date),
+                    ChallengeRequirement(ChallengeAPI.customMessage, "Invita a 2 amigos", False, start=date),
+                    ChallengeRequirement(ChallengeAPI.customMessage, "Ten una pareja de rol estable", False, start=date),
+            ]
         ])
 }

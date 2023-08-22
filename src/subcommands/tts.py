@@ -2,7 +2,10 @@ import aiohttp
 import asyncio
 import base64
 import aiofile
+from src import utils
 
+
+@utils.userTracker("tts")
 async def tts(ctx):
     text = ctx.msg.content.split(" ")[1:]
     text = " ".join(text)

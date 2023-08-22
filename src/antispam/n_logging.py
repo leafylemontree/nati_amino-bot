@@ -7,6 +7,7 @@ import datetime
 from src.database import db
 
 @utils.isStaff
+@utils.userTracker("setlog")
 async def set_logging(ctx):
     db.setLogConfig(ctx.msg.ndcId, 'threadId', ctx.msg.threadId)
     return "El chat para el log del bot ha sido cambiado con éxito"

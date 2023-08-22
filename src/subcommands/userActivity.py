@@ -8,10 +8,12 @@ class FakeUser:
     def __init__(self, userId):
         self.uid = userId
 
-def kiwilatigo(ctx):
+@utils.userTracker("kiwilatigo")
+async def kiwilatigo(ctx):
         db.modifyRecord(32, ctx.msg.author)
         return objects.Reply(f"[ci]¡Oh no! Han hecho enfadar a {ctx.msg.author.nickname}\n\n[ci]/c skpa.", False)
 
+@utils.userTracker("alias")
 async def alias(ctx, msg):
         if ctx.msg.extensions.mentionedArray:
             msg = msg.split("\u200e")[0]
@@ -35,6 +37,7 @@ async def alias(ctx, msg):
             return f"El nuevo alias de {ctx.msg.author.nickname} es {msg}."
         return None
 
+@utils.userTracker("ghost")
 async def ghost(ctx, msg):
         msg = msg[8:]
         await ctx.client.send_message(  message=msg,
@@ -47,12 +50,13 @@ async def ghost(ctx, msg):
                                     reply=None )
         return False
     
+@utils.userTracker("sigueme")
 async def follow(ctx):
         await ctx.follow()
         msg = "Ya está, ya te he seguido, uwu."
         return objects.Reply(msg, True)
 
-def replyMsg(msg):
+async def replyMsg(ctx, msg):
         return objects.Reply(msg, True)
 
 async def kick(ctx, msg):
@@ -64,6 +68,7 @@ async def kick(ctx, msg):
 
         return objects.Reply(msg, False)
 
+@utils.userTracker("papulince")
 async def papulince(ctx):
 
         grasa = [
@@ -101,6 +106,7 @@ async def papulince(ctx):
             if msg.find(word) != -1 : return await ctx.send("[CB]¡Papulince detectado! :v")
         return await ctx.send("No hay grasa en este mensaje")
 
+@utils.userTracker("custommsg")
 async def customMsg(ctx):
 
         msg = ctx.msg.content
@@ -119,6 +125,7 @@ async def customMsg(ctx):
 
 
 @utils.userId
+@utils.userTracker("chocolate")
 async def giveChocolate(ctx, userId, message):
 
     if userId == ctx.client.uid:    return await ctx.send("Lamentablemente, no se le pueden dar chocolates a Nati, unu")
@@ -135,6 +142,7 @@ async def giveChocolate(ctx, userId, message):
     else    : await ctx.send(f"{user.nickname} ha rechazado el chocolate, unu")
 
 @utils.userId
+@utils.userTracker("matrimonio")
 async def askMarry(ctx, userId, message):
 
     if userId == ctx.client.uid:     return await ctx.send("Por fin alguien se quiere casar conmigo, uwu.")
@@ -161,6 +169,8 @@ async def askMarry(ctx, userId, message):
     db.modifyRecord(50, ctx.msg.author, value=user.uid)
     await ctx.send(f"{ctx.msg.author.nickname}, {user.nickname}, los declaro marido y mujer.\n[c]Puede besar a la novia")
     return
+
+@utils.userTracker("format")
 async def fmt(ctx):
     msg = ctx.msg.content.split('\n')
 
@@ -172,6 +182,7 @@ async def fmt(ctx):
     await ctx.send(message)
 
 
+@utils.userTracker("mediaValue")
 async def mediaValue(ctx):
     if not ctx.msg.extensions.replyMessage:             return await ctx.send("Debe ejecutar este comando respondiendo a otro")
     if not ctx.msg.extensions.replyMessage.mediaValue:  return await ctx.send("El mensaje no posee mediaValue")
@@ -183,6 +194,7 @@ async def mediaValue(ctx):
     await ctx.client.send_message(message=f"Normal: {mediaValue}\n\nArreglado: {mediaValueFix}", chat_id=ctx.msg.threadId, linkSnippetRaw=mediaValueFix)
 
 
+@utils.userTracker("fromsticker")
 async def fromSticker(ctx):
     if not ctx.msg.extensions.replyMessage:             return await ctx.send("Debe ejecutar este comando respondiendo a otro")
     if not ctx.msg.extensions.replyMessage.mediaValue:  return await ctx.send("El mensaje no posee mediaValue")
@@ -193,6 +205,7 @@ async def fromSticker(ctx):
     else                                    : await send_image(ctx, media=ctx.msg.extensions.replyMessage.mediaValue)
     return
 
+@utils.userTracker("usuariosactivos")
 async def activeUsers(ctx):
     users = await ctx.client.get_online_users(start=0, size=100)
 
@@ -255,6 +268,7 @@ async def AP_callback(ctx, ins):
 
 
 @utils.waitForMessage(message='*', callback=AP_callback)
+@utils.userTracker("soytunekitaonishan")
 async def ayudaPsicologica(ctx):
     user = db.getUserData(user=ctx.msg.author)
     await ctx.send(f"""[ci]Buenas, {ctx.msg.author.nickname}, más conocido/a como {user.alias}
@@ -265,6 +279,7 @@ async def ayudaPsicologica(ctx):
 [ci]-SALIR: Termina la sesión.""")
 
 
+@utils.userTracker("link-info")
 async def sendLinkInfo(ctx):
     words = ctx.msg.content.split(" ")
     if len(words) < 2: return await ctx.send("Debe colocar un link tras el comando.")
@@ -286,6 +301,7 @@ async def sendLinkInfo(ctx):
     await ctx.send(str(o)[:2000])
 
 
+@utils.userTracker("stickers")
 async def getStickerPacksInfo(ctx):
     from src.challenges.test import get_community_stickers
     stickerCollections = await get_community_stickers(ctx)

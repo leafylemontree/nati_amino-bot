@@ -1,4 +1,5 @@
 import ctypes
+from src import utils
 
 path = 'src/subcommands/_math/c/'
 
@@ -16,7 +17,8 @@ tape_f  = ctypes.cdll.LoadLibrary(f"{path}tape.so")
 tape_f.main.argtypes  = (ctypes.c_char_p, )
 tape_f.main.restype   = ctypes.c_char_p
 
-def mathfc(msg):
+@utils.userTracker("math")
+async def mathfc(ctx, msg):
         if    msg.find("{") != -1:
             return str(tape(msg.upper()))
 

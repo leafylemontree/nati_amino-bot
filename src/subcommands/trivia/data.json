@@ -1,995 +1,1548 @@
 {
-    "questions" : {
-	"history" : [
-		{
-		    "question" : "¿En qué año descubrió América Cristobal Colon?",
-		    "correct"  : "1492",
-		    "wrong"    : [
-			    "1776",
-			    "1820",
-			    "1140"
-			]
-		    },
-		{
-		    "question" : "¿Cuál de los siguientes eventos inició la primera guerra mundial?",
-		    "correct"  : "Asesinato del archiduque Austro-hungaro",
-		    "wrong"    : [
-			    "Creación Pacto de Varsovia",
-			    "Firma del armisticio de Compiegne",
-			    "Gran depresión de 1929"
-			]
-		    },
-		{
-		    "question" : "¿En qué año fue disuelta la Unión Soviética?",
-		    "correct"  : "1991",
-		    "wrong"    : [
-			    "1986",
-			    "1945",
-			    "1957"
-			]
-		    },
-		{
-		    "question" : "Nombre el país que no pertenecía a la triple entente",
-		    "correct"  : "Alemania",
-		    "wrong"    : [
-			    "Gran Bretaña",
-			    "Francia",
-			    "Rusia"
-			]
-		    },
-		{
-		    "question" : "¿Cuántas tesis publicó Martin Lutero sobre la iglesia?",
-		    "correct"  : "95 tesis",
-		    "wrong"    : [
-			    "80 tesis",
-			    "112 tesis",
-			    "46 tesis"
-			]
-		    },
-		{
-		    "question" : "¿Qué ocurrió en Pompeya el 79 DC?",
-		    "correct"  : "Erupción del Vesubio",
-		    "wrong"    : [
-			    "Fin de la glaciación",
-			    "Gran terremoto",
-			    "Epidemia que casi acaba con la humanidad"
-			]
-		    },
-		{
-		    "question" : "¿En qué año acabó la guerra del pacífico?",
-		    "correct"  : "1883",
-		    "wrong"    : [
-			    "1881",
-			    "1878",
-			    "1884"
-			]
-		    },
-		{
-		    "question" : "¿Cuántos años vivió la Reina Isabel II de Reino Unido?",
-		    "correct"  : "96 años",
-		    "wrong"    : [
-			    "101 años",
-			    "89 años",
-			    "Aún no ha muerto"
-			]
-		    },
-		{
-		    "question"	: "¿Cuántos años duró la guerra de los 100 años?",
-		    "correct"	: "116 años",
-		    "wrong"	: [
-		    	    "100 años",
-		    	    "104 años",
-		    	    "89 años"
-		    	]
-		    },
-		{
-		    "question"	: "¿Quién fue el primer presidente de los Estados Unidos?",
-		    "correct"	: "George Washington",
-		    "wrong"	: [
-		    	    "George Bush",
-		    	    "Abraham Lincoln",
-		    	    "Theodore Roosevelt"
-		    	]
-		    },
-		{
-		    "question"	: "¿Cuál de los siguientes posee la mayor altura?",
-		    "correct"	: "Monte Everest",
-		    "wrong"	: [
-		    	    "Cordillera de los Andes",
-		    	    "K2",
-		    	    "Kongur Tagh"
-		    	]
-		    },
-		{
-		    "question"	: "Teniente coronel soviético que detuvo una guerra nuclear",
-		    "correct"	: "Stanislav Petrov",
-		    "wrong"	: [
-		    	    "Nikita Jrushchov",
-		    	    "Vasili Arjípov",
-		    	    "Anatoli Diátlov"
-		    	]
-		    },
-		{
-		    "question"	: "Nombre del fundador de una empresa de automóviles de lujo, que solía hacer tractores",
-		    "correct"	: "Ferrucio Lamborghini",
-		    "wrong"	: [
-		    	    "Enzo Ferrari",
-		    	    "Karl Benz",
-		    	    "Nicola Romeo"
-		    	]
-		    },
-		{
-		    "question"	: "Pandemia que azotó a europa en el siglo XIV",
-		    "correct"	: "Peste negra",
-		    "wrong"	: [
-		    	    "Peste blanca",
-		    	    "Gripe Española",
-		    	    "Síndrome agudo respiratorio severo"
-		    	]
-		    },
-		{
-		    "question"	: "OTAN significa...",
-		    "correct"	: "Organización del Tratado del Atlántico Norte",
-		    "wrong"	: [
-		    	    "Oficina de Tratados de Amnistía Norteamericano",
-		    	    "Organización de Traslado de Alimentos Noruego",
-		    	    "Organización Transnacional Armamentística Norteamericana"
-		    	]
-		    },
-		{
-		    "question"	: "Presidente de Chile muerto por parte del ejército en 1973",
-		    "correct"	: "Salvador Allende",
-		    "wrong"	: [
-		    	    "Augusto Pinochet",
-		    	    "Patricio Aulwin",
-		    	    "Eduardo Frei Montalva"
-		    	]
-		    }
-		
-		],
-	"math" : [
-		{
-		    "question" : "Quinto decimal truncado del número PI",
-		    "correct"  : "9",
-		    "wrong"    : [
-			    "8",
-			    "5",
-			    "2"
-			]
-		    },
-		{
-		    "question" : "Un googol es...",
-		    "correct"  : "Un uno seguido de 100 ceros",
-		    "wrong"    : [
-			    "Un 0. seguido de 100 ceros y un 1",
-			    "10 elevado a 10 a la 100 ",
-			    "Un número irracional"
-			]
-		    },
-		{
-		    "question" : "Sucesión que se calcula sumando los dos últimos números",
-		    "correct"  : "Serie de Fibonacci",
-		    "wrong"    : [
-			    "Suma de Rieman",
-			    "Polinomio de Taylor",
-			    "Serie telescópica"
-			]
-		    },
-		{
-		    "question" : "Proceso inverso a la integración",
-		    "correct"  : "Derivación",
-		    "wrong"    : [
-			    "Sumatoria",
-			    "Radicación",
-			    "Potenciación"
-			]
-		    },
-		{
-		    "question" : "Volumen de una esfera",
-		    "correct"  : "4/3 * pi * r^3",
-		    "wrong"    : [
-			    "4/3 * pi * r^2",
-			    "2/3 * pi * r^3",
-			    "2 * pi * r^2"
-			]
-		    },
-		{
-		    "question" : "Derivada de: 4x^3 + ln(x^2)",
-		    "correct"  : "12x^2 + 2/x",
-		    "wrong"    : [
-			    "4x^2 + 2x/ln(x)",
-			    "12x^2 - 2/x",
-			    "x^4 + 2x * ln(x) + 2x"
-			]
-		    },
-		{
-		    "question" : "Redondeo aproximando al número más alto",
-		    "correct"  : "Redondeo por exceso",
-		    "wrong"    : [
-			    "Redondeo por defecto",
-			    "Truncamiento",
-			    "Ninguna de las anteriores"
-			]
-		    },
-		{
-		    "question" : "Un cubo posee",
-		    "correct"  : "12 aristas",
-		    "wrong"    : [
-			    "4 caras",
-			    "12 vértices",
-			    "6 vértices"
-			]
-		    },
-		{
-		    "question"	: "Número que al dividirlo por si mismo, su resultado es indeterminado",
-		    "correct"	: "0",
-		    "wrong"	: [
-		    	    "-1",
-		    	    "0.00000 ... 01",
-		    	    "No existe un número así"
-		    	]
-		    },
-		{
-		    "question"	: "La sumatoria de todos los números del 1 a n puede ser expresada como",
-		    "correct"	: "(n * (n+1)) / 2",
-		    "wrong"	: [
-		    	    "(n * (n+1) * (2n+1)) / 6",
-		    	    "(n * (n+1))^2 /4",
-		    	    "(n - (n+1) - (n^2))/3"
-		    	]
-		    },
-		{
-		    "question"	: "Una derivada por definición se calcula como",
-		    "correct"	: "lim h -> 0, (f(x + h) - f(x)) / h",
-		    "wrong"	: [
-		    	    "lim h-> inf, (f(x + h) - f(x)) / h",
-		    	    "lim x-> 0, (f(x + h) - f(x)) / h",
-		    	    "lim x-> inf, (f(x + h) - f(x)) / h"
-		    	]
-		    },
-		{
-		    "question"	: "Operación que multiplica todos los números desde 1 hasta n",
-		    "correct"	: "Factorial",
-		    "wrong"	: [
-		    	    "Sumatoria",
-		    	    "Potenciación",
-		    	    "Derivación"
-		    	]
-		    },
-		{
-		    "question"	: "Una matriz no es invertible si",
-		    "correct"	: "Su determinante es 0",
-		    "wrong"	: [
-		    	    "La cantidad de filas y columnas son iguales",
-		    	    "Es la matriz identidad",
-		    	    "Posee al menos una base con multiplicidad mayor a 1"
-		    	]
-		    },
-		{
-		    "question"	: "Seleccione la que no es propiedad de los logaritmos",
-		    "correct"	: "log(a) + log(b) = log(a + b)",
-		    "wrong"	: [
-		    	    "log(a) + log(b) = log(a * b)",
-		    	    "a * log(b) = log(b^a)",
-		    	    "log_b_(a) = log(a) / log(b)"
-		    	]
-		    },
-		{
-		    "question"	: "2 * sin(x) * cos(x) =",
-		    "correct"	: "sin(2x)",
-		    "wrong"	: [
-		    	    "sin^2(x)",
-		    	    "1",
-		    	    "cos(2x)"
-		    	]
-		    },
-		{
-		    "question"	: "1 = ",
-		    "correct"	: "sin^2(x) + cos^2(x)",
-		    "wrong"	: [
-		    	    "sin^2(x) - cos^2(x)",
-		    	    "2 * sin(x) * cos(x)",
-		    	    "sin(a) * sin(b) - cos(a) * cos(b)"
-		    	]
-		    },
-		{
-		    "question"	: "La suma de los ángulos interiores de un triángulo es",
-		    "correct"	: "180 grados",
-		    "wrong"	: [
-		    	    "90 grados",
-		    	    "360 grados",
-		    	    "Varía dependiendo del triángulo"
-		    	]
-		    },
-		{
-		    "question"	: "Línea que pasa por el centro de una circunferencia, dividiendo en dos mitades",
-		    "correct"	: "Diámetro",
-		    "wrong"	: [
-		    	    "Secante",
-		    	    "Tangente",
-		    	    "Segmento"
-		    	]
-		    },
-		{
-		    "question"	: "¿Cuál de los siguientes cuerpos no puede ser hecho como sólido de revolución",
-		    "correct"	: "Cubo",
-		    "wrong"	: [
-		    	    "Toroide",
-		    	    "Esfera",
-		    	    "Cono"
-		    	]
-		    },
-		{
-		    "question"	: "Seleccione el número y conjunto que no corresponda",
-		    "correct"	: "4 + 2i, irracionales ",
-		    "wrong"	: [
-		    	    "2.17, reales",
-		    	    "506, naturales",
-		    	    "14/3, racionales"
-		    	]
-		    },
-		{
-		    "question"	: "Selecciones la forma y fórmula que corresponda a una sección cónica",
-		    "correct"	: "Elipse, (x-h)^2 / a + (y-k)^2 / b = 1 ",
-		    "wrong"	: [
-		    	    "Círculo, x^2 = 4 * p * y",
-		    	    "Hiperbola, (x-h)^2 + (y-h)^2 = r^2",
-		    	    "Parabola, (x-h)^2 - (y-k)^2 = 1"
-		    	]
-		    },
-		{
-		    "question"	: "6 / 2 * (1 + 2)",
-		    "correct"	: "9",
-		    "wrong"	: [
-		    	    "1",
-		    	    "5",
-		    	    "1.5"
-		    	]
-		    },
-		{
-		    "question"	: "Integral de x^4 * dx",
-		    "correct"	: "x^5 / 5 + C",
-		    "wrong"	: [
-		    	    "x^5 / 5",
-		    	    "4x^3 + C",
-		    	    "x^5 + C"
-		    	]
-		    },
-		{
-		    "question"	: "Derivada de f(x) * g(x))",
-		    "correct"	: "f'(x) * g(x) + f(x) * g'(x)",
-		    "wrong"	: [
-		    	    "f'(x) * g'(x)",
-		    	    "f'(g(x)) * g'(x)",
-		    	    "(f'(x) * g(x) - f(x) * g'(x)) / g^2(x)"
-		    	]
-		    },
-		{
-		    "question"	: "Integral de u(x) * v'(x) = ",
-		    "correct"	: "u(x) * v(x) - Integral(v(x) * u'(x)) + C",
-		    "wrong"	: [
-		    	    "U(x) * v(x) + C",
-		    	    "u(x) * v(x) - v(x) * u'(x) + C",
-		    	    "Integral(v(x) * u'(x)) + u(x) * v'(x) + C"
-		    	]
-		    },
-		{
-		    "question"	: "f(x) = sin(x)/x. ¿Está definido f(0)? Seleccione la más adecuada",
-		    "correct"	: "No está definido, pero su límite es 1",
-		    "wrong"	: [
-		    	    "No está definido, tampoco su límite",
-		    	    "Es igual a 1",
-		    	    "Es igual a 0"
-		    	]
-		    }
-	
-	],
-	"science" : [
-		{
-		    "question" : "¿Cuántos huesos tiene el cuerpo humano adulto?",
-		    "correct"  : "206",
-		    "wrong"    : [
-			    "196",
-			    "348",
-			    "249"
-			]
-		    },
-		{
-		    "question" : "Científico muerto por causa del núcleo del demonio, recibiendo una dosis de más de 10 Gy",
-		    "correct"  : "Louis Slotin",
-		    "wrong"    : [
-			    "Robert J. Hemmerly",
-			    "Alvin C. Graves",
-			    "Haroutune Krikor Daghlian"
-			]
-		    },
-		{
-		    "question" : "¿A cuántos kilómetros está el sol de Marte?",
-		    "correct"  : "206,7 millones",
-		    "wrong"    : [
-			    "257,8 millones",
-			    "564,6 millones",
-			    "548,9 millones"
-			]
-		    },
-		{
-		    "question" : "Fuerza que se opone al movimiento",
-		    "correct"  : "Fuerza de roce",
-		    "wrong"    : [
-			    "Fuerza normal",
-			    "Fuerza de gravedad",
-			    "Fuerza centrípeta"
-			]
-		    },
-		{
-		    "question" : "Elemento radioactivo asociado al incidente de Goiania",
-		    "correct"  : "Cesio 137",
-		    "wrong"    : [
-			    "Radón 222",
-			    "Polonio 210",
-			    "Cobalto 60"
-			]
-		    },
-		{
-		    "question" : "Calor específico del agua líquida",
-		    "correct"  : "4.18 joules",
-		    "wrong"    : [
-			    "2.05 joules",
-			    "1 joule",
-			    "14.2 joules"
-			]
-		    },
-		{
-		    "question" : "Elemento más pesado descubierto hasta 2022",
-		    "correct"  : "Oganesón",
-		    "wrong"    : [
-			    "Nihorio",
-			    "Copernicio",
-			    "Darmtadtio"
-			]
-		    },
-		{
-		    "question" : "Elemento de la tabla periódica más denso",
-		    "correct"  : "Osmio",
-		    "wrong"    : [
-			    "Tungsteno",
-			    "Plomo",
-			    "Uranio"
-			]
-		    },
-		{
-		    "question" : "Aparato utilzado para medir el decaimiento de partículas",
-		    "correct"  : "Contador Geiger",
-		    "wrong"    : [
-			    "Densímetro",
-			    "Cámara de vapor",
-			    "Radiómetro"
-			]
-		    },
-		{
-		    "question" : "El límite de la radiación ionizante se encuentra en el espectro de:",
-		    "correct"  : "Luz Ultravioleta",
-		    "wrong"    : [
-			    "Rayos X",
-			    "Microondas",
-			    "Infrarrojos"
-			]
-		    },
-		{
-		    "question" : "La escala de decibeles es",
-		    "correct"  : "Logarítmica",
-		    "wrong"    : [
-			    "Lineal",
-			    "Exponencial",
-			    "Inversa"
-			]
-		    }
-	],
-	"culture" : [
-		{
-		    "question" : "¿Cuántas integrantes tiene TWICE?",
-		    "correct"  : "9",
-		    "wrong"    : [
-			    "8",
-			    "10",
-			    "6"
-			]
-		    },
-		{
-		    "question" : "¿Qué poder tiene Deku (Boku no hero) de nacimiento?",
-		    "correct"  : "Ninguno",
-		    "wrong"    : [
-			    "One for all",
-			    "All for one",
-			    "Deterioro"
-			]
-		    },
-		{
-		    "question" : "Si en una carrera voy tercero y adelanto al segundo, ¿en qué posición quedo?",
-		    "correct"  : "Segundo",
-		    "wrong"    : [
-			    "Primero",
-			    "Tercero",
-			    "Cuarto"
-			]
-		    },
-		{
-		    "question" : "¿Qué alimento es usado en Minecraft para reproducir los cerdos?",
-		    "correct"  : "Zanahorias",
-		    "wrong"    : [
-			    "Semillas",
-			    "Trigo",
-			    "Pescado"
-			]
-		    },
-		{
-		    "question" : "Programa de televisión live action con mayor cantidad de episodios",
-		    "correct"  : "General Hospital",
-		    "wrong"    : [
-			    "Dr Who",
-			    "Days of our Lives",
-			    "Plaza Sésamo"
-			]
-		    },
-		{
-		    "question" : "la pizza más grande del mundo tenía un área de",
-		    "correct"  : "1300 km^2",
-		    "wrong"    : [
-			    "1200 km^2",
-			    "1500 km^2",
-			    "900 km^2"
-			]
-		    },
-		{
-		    "question" : "¿Cómo se llama el shinigami de Light?",
-		    "correct"  : "Ryuk",
-		    "wrong"    : [
-			    "Rem",
-			    "Sidoh",
-			    "Jealous"
-			]
-		    },
-		{
-		    "question" : "¿Qué iba a comprar Homero antes de comprar el saxofón de Lisa?",
-		    "correct"  : "Un aire acondicionado",
-		    "wrong"    : [
-			    "Un televisor",
-			    "Cerveza",
-			    "Un automóvil"
-			]
-		    },
-		{
-		    "question" : "¿Cuál de estas series no era transmitida en Cartoon Network?",
-		    "correct"  : "Gravity Falls",
-		    "wrong"    : [
-			    "Un show más",
-			    "Hora de Aventura",
-			    "Clarence"
-			]
-		    },
-		{
-		    "question" : "¿Quién dijo la siguiente frase? \"Confucio, fue uno de los que inventó la confusión.\"",
-		    "correct"  : "Giosue Cozzarelli",
-		    "wrong"    : [
-			    "Liseth Díaz",
-			    "Alicia Durán",
-			    "Stephanie Thompson"
-			]
-		    },
-		{
-		    "question" : "¿Cuál combinación de teclas abre el administrador de tareas en Windows?",
-		    "correct"  : "Ctrl + Alt + Supr",
-		    "wrong"    : [
-			    "Alt + F4",
-			    "Ctrl + W",
-			    "Ctrl + Shift + P"
-			]
-		    },
-		{
-		    "question" : "Programa de televisión, animado con mayor cantidad de episodios",
-		    "correct"  : "Sazae-san",
-		    "wrong"    : [
-			    "Doraemon",
-			    "One Piece",
-			    "Pokémon"
-			]
-		    }
-		],
-	"movies" : [
-		  {
-		   "question"	: "¿Con qué se pincha el dedo la Princesa Aurora en La Bella Durmienta?",
-		   "correct"	: "El uso de una rueca",
-		   "wrong"	: [
-			    "La espina de una rosa",
-			    "Una aguja de costura",
-			    "La púa de un cactus envenenado"
-			]
-		  },
-		  {
-		   "question"	: "De las siguientes películas ¿cuál NO es de Disney?",
-		   "correct"	: "Shrek",
-		   "wrong"	: [
-			    "¡Rompe Ralph!",
-			    "Taron y el caldero mágico",
-			    "El rey León"
-			]
-		  },
-		  {
-		   "question"	: "¿Quién es el inseparable amigo de Gastón en La Bella y la Bestia?",
-		   "correct"	: "Lefou",
-		   "wrong"	: [
-			    "Lumiere",
-			    "Clayton",
-			    "Maurice"
-			]
-		  },
-		  {
-		   "question"	: "¿Cuál es el nombre del perro de Sid en “Toy Story”?",
-		   "correct"	: "Scud",
-		   "wrong"	: [
-			    "Spike",
-			    "Spud",
-			    "Slinky"
-			]
-		  },
-		  {
-		   "question"	: "En “Buscando A Nemo”, ¿cómo se llama el pelícano amigo de los peces de la pecera?",
-		   "correct"	: "Nigel",
-		   "wrong"	: [
-			    "Luis",
-			    "Dory",
-			    "Marlin"
-			]
-		  },
-		  {
-		   "question"	: "¿Cuál es la dirección que Dory no quiere olvidar en “Buscando A Nemo”?",
-		   "correct"	: "P. Sherman, calle Wallaby 42, Sidney.",
-		   "wrong"	: [
-			    "P. Sherman, calle Wallaby 62, Sidney.",
-			    "P. Sherman, calle Wallaby 52, Sidney.",
-			    "P. Sherman, calle Wallaby 54, Sidney."
-			]
-		  },
-		  {
-		   "question"	: "En “Los Increíbles”, ¿qué hace Edna Moda?",
-		   "correct"	: "Diseña los trajes de los superhéroes",
-		   "wrong"	: [
-			    "Ve y predice el futuro tocando sus lentes",
-			    "Habla muchos idiomas que combina con sus poderes.",
-			    "Salva a los niños siendo niñera "
-			]
-		  },
-		  {
-		   "question"	: "Completa la frase: “Pon tu fe en lo que tú más creas. Un ser, dos mundos son, te guiará tu corazón y…",
-		   "correct"	: "decidirá por ti”",
-		   "wrong"	: [
-			    "sabrás lo que decir”",
-			    "un hijo de hombre tu serás”",
-			    "a tu lado yo estaré”"
-			]
-		  },
-		  {
-		   "question"	: "¿Por qué Mulán se alista en el Ejército Imperial?",
-		   "correct"	: "Para evitar que vaya su padre enfermo",
-		   "wrong"	: [
-			    "Para devolverle honor a su familia ",
-			    "Para luchar contra los hunos",
-			    "Para conquistar a Li Shang"
-			]
-		  },
-		  {
-		   "question"	: "Completa la frase: “Se oye una canción, que hace suspirar…”",
-		   "correct"	: "Y habla el corazón de una sensación",
-		   "wrong"	: [
-			    "Bella y bestia son",
-			    "Tiemblan de emoción",
-			    "Cierto como el sol, que nos da calor"
-			]
-		  },
-		  {
-		   "question"	: "¿Quién es el enemigo de Hércules?",
-		   "correct"	: "Hades",
-		   "wrong"	: [
-			    "Ares",
-			    "Prometeo",
-			    "Ícaro"
-			]
-		  },
-		  {
-		   "question"	: "¿Cómo se llama el hada en Peter Pan?",
-		   "correct"	: "Campanita",
-		   "wrong"	: [
-			    "Morgana",
-			    "Esmeralda",
-			    "Wendy"
-			]
-		  },
-		  {
-		   "question"	: "¿Cómo se llama el perro de Miguel?",
-		   "correct"	: "Dante",
-		   "wrong"	: [
-			    "Sante",
-			    "Ernesto de la Cruz",
-			    "Alebrije"
-			]
-		  },
-		  {
-		   "question"	: "¿Cuál es el apellido real de la familia de ‘Los Increíbles’?",
-		   "correct"	: "Parr",
-		   "wrong"	: [
-			    "Pons",
-			    "Pets",
-			    "Patt"
-			]
-		  },
-		  {
-		   "question"	: "¿Cómo se llama la hija de Simba en el rey leon?",
-		   "correct"	: "Kiara",
-		   "wrong"	: [
-			    "Nali",
-			    "Nalu",
-			    "Pumba"
-			]
-		  }
-
-	],
-	"books" : [
-		  {
-		   "question"	: "¿Quién escribió ‘La Ilíada’?",
-		   "correct"	: "Homero",
-		   "wrong"	: [
-			    "Marco Tulio Cicerón",
-			    "Séneca",
-			    "Heródoto"
-			]
-		  },
-		{
-		    "question" : "¿Cuál de estas obras no es de Shakespeare?",
-		    "correct"  : "Enrique III",
-		    "wrong"    : [
-			    "Macbeth",
-			    "El rey Lear",
-			    "Otelo"
-			]
-		    },
-		  {
-		   "question"	: "Autor de ‘El arte de la guerra’",
-		   "correct"	: "Sun Tzu",
-		   "wrong"	: [
-			    "Shī Jīng",
-			    "Dào Dé Jing",
-			    "Confucio"
-			]
-		  },
-		  {
-		   "question"	: "¿Por qué El Principito decide abandonar su planeta?",
-		   "correct"	: "Porque sentía que una rosa se aprovechaba de él",
-		   "wrong"	: [
-			    "Porque quería conocer la tierra",
-			    "Porque el Rey le ordena irse",
-			    "Porque estaba enfermo"
-			]
-		  },
-		  {
-		   "question"	: "¿Quién es el autor de la ‘Divina comedia’?",
-		   "correct"	: "Dante Alighieri",
-		   "wrong"	: [
-			    "Petrarca",
-			    "Giovanni Bocaccio",
-			    "Maquiavelo"
-			]
-		  },
-		  {
-		   "question"	: "¿Quién le dijo al Principito que “ lo esencial es invisible a los ojos”",
-		   "correct"	: "El zorro",
-		   "wrong"	: [
-			    "El rey",
-			    "El aviador",
-			    "La rosa"
-			]
-		  },
-		  {
-		   "question"	: "¿Con qué confundió Don Quijote a los molinos?",
-		   "correct"	: "Gigantes",
-		   "wrong"	: [
-			    "Volcanes",
-			    "Gorilas",
-			    "Cactus"
-			]
-		  },
-		  {
-		   "question"	: "Heathcliff es el héroe sombrío de:",
-		   "correct"	: "Cumbres Borrascosas de Emily Brontë",
-		   "wrong"	: [
-			    "Rebecca de Daphne du Maurier",
-			    "Jane Eyre de Charlotte Brontë",
-			    "Moby Dick de Herman Melville"
-			]
-		  },
-		  {
-		   "question"	: "Cosette es la niña huérfana de:",
-		   "correct"	: "Los miserables de Victor Hugo",
-		   "wrong"	: [
-			    "Germinal de Émile Zola",
-			    "Sin familia de Héctor Malot",
-			    "Orgullo y prejuicio de Jane Austen"
-			]
-		  },
-		  {
-		   "question"	: "¿En qué cuento está inspirado “Una corte de rosas y espinas”?",
-		   "correct"	: "La Bella y la Bestia",
-		   "wrong"	: [
-			    "La Bella Durmiente",
-			    "Blancanieves",
-			    "La reina de las nieves"
-			]
-		  },
-		  {
-		   "question"	: "¿Qué tipo de ‘grisha’ es Nina de “Seis de Cuervos”?",
-		   "correct"	: "Mortificadora",
-		   "wrong"	: [
-			    "Sanadora",
-			    "Agitamareas",
-			    "Vendaval"
-			]
-		  },
-		  {
-		   "question"	: "“Los malvados se alzarán” es la segunda parte de:",
-		   "correct"	: "¡Dorothy debe morir!",
-		   "wrong"	: [
-			    "El sermón de fuego",
-			    "La caída de los reinos",
-			    "Los demás seguimos aquí"
-			]
-		  },
-		  {
-		   "question"	: "¿Cuál es el nombre de la protagonista de “It Ends With Us” de Colleen Hoover?",
-		   "correct"	: "Lily Bloom",
-		   "wrong"	: [
-			    "Allysa Kincaid",
-			    "Atlas Corrigan",
-			    "Ryle Kincaid"
-			]
-		  },
-		  {
-		   "question"	: "¿Quién escribió la saga se Cazadores de Sombras?",
-		   "correct"	: "Cassandra Clare",
-		   "wrong"	: [
-			    "Laura Gallego",
-			    "Stephenie Meyer",
-			    "G. Howard"
-			]
-		  }
-	],
-	"music"	: [
-		  {
-		   "question"	: "Banda de rock británica, que compuso el tema 'Somebody to Love'",
-		   "correct"	: "Queen",
-		   "wrong"	: [
-			    "Kiss",
-			    "Pink Floyd",
-			    "The Beatles"
-			]
-		  },
-		  {
-		   "question"	: "Bajista y cantante de la banda The Beatles",
-		   "correct"	: "Paul McCartney",
-		   "wrong"	: [
-			    "Geroge Harrison",
-			    "John Lennon",
-			    "Ringo Starr"
-			]
-		  },
-		  {
-		   "question"	: "última sinfonía compuesta por Mozart",
-		   "correct"	: "Requiem - lacrimosa",
-		   "wrong"	: [
-			    "Rondo alla Turca",
-			    "La flauta mágica",
-			    "Serenata n°13"
-			]
-		  },
-		  {
-		   "question"	: "Compositor de 'Tocata y fuga en Re menor'",
-		   "correct"	: "Johann Sebastian Bach",
-		   "wrong"	: [
-			    "Georg Friederich Hendel",
-			    "Frederic Chopin",
-			    "Antonio Vivaldi"
-			]
-		  },
-		  {
-		   "question"	: "Último disco de Pink Floyd lanzado con Roger Waters",
-		   "correct"	: "The final cut",
-		   "wrong"	: [
-			    "The wall",
-			    "A momentary lapse of reason",
-			    "The division bell"
-			]
-		  },
-		  {
-		   "question"	: "Seleccione el integrante que no pertenece a BTS",
-		   "correct"	: "Xiumin",
-		   "wrong"	: [
-			    "Jungkook",
-			    "Suga",
-			    "RM"
-			]
-		  },
-		  {
-		   "question"	: "Obra compuesta por Andrew Lloyd Webber, adaptada de un libro homónimo de 1910, en la cual ocurren sin fin de muertes",
-		   "correct"	: "El fantasma de la ópera",
-		   "wrong"	: [
-			    "Jesucristo Superestrella",
-			    "Cats",
-			    "Starlight Express"
-			]
-		  },
-		  {
-		   "question"	: "La música de 31 minutos es mayoritariamente compuesta por",
-		   "correct"	: "Chancho en piedra",
-		   "wrong"	: [
-			    "Los tres",
-			    "Profeta y frenéticos",
-			    "Los bunkers"
-			]
-		  },
-		  {
-		   "question"	: "Compositor cubano, autor de obras como 'Quien fuera' o 'ángel para un final'",
-		   "correct"	: "Silvio Rodriguez",
-		   "wrong"	: [
-			    "Bad Bunny",
-			    "Carlos Puebla",
-			    "Cesar Portillo de la Luz"
-			]
-		  },
-		  {
-		   "question"	: "Cantante inglés que formó parte de Genesis, y además ha cantado para películas de Disney",
-		   "correct"	: "Phil Colins",
-		   "wrong"	: [
-			    "Peter Gabriel",
-			    "Billy Joel",
-			    "Paul Kandel"
-			]
-		  },
-		{
-		    "question" : "Canción que rompió el visualizador de reproducciones de Youtube",
-		    "correct"  : "PSY - Gangnam Style",
-		    "wrong"    : [
-			    "Luis Fonsi & Daddy Yankee - Despacito",
-			    "Baby Shark",
-			    "Adele - Hello"
-			]
-		    },
-		{
-		    "question" : "Una de la siguientes bandas no es latinoamericana",
-		    "correct"  : "Héroes del Silencio",
-		    "wrong"    : [
-			    "Caifanes",
-			    "Soda Stereo",
-			    "Los prisioneros"
-			]
-		    },
-		  {
-		   "question"	: "Canción de Luis Miguel, en la cual alcanza su nota más alta",
-		   "correct"	: "Palabra de honor",
-		   "wrong"	: [
-			    "La chica del bikini azul",
-			    "Siempre me quedo, siempre me voy",
-			    "Fiebre de amor"
-			]
-		  },
-		  {
-		   "question"	: "Federico Moura fue parte de",
-		   "correct"	: "Virus",
-		   "wrong"	: [
-			    "Soda Stereo",
-			    "Papo's blues",
-			    "Pescado rabioso"
-			]
-		  }
-		
-	
-	]
+    "questions": {
+        "history": [
+            {
+                "question": "¿En qué año descubrió América Cristobal Colon?",
+                "correct": "1492",
+                "wrong": [
+                    "1776",
+                    "1820",
+                    "1140"
+                ]
+            },
+            {
+                "question": "¿Cuál de los siguientes eventos inició la primera guerra mundial?",
+                "correct": "Asesinato del archiduque Austro-hungaro",
+                "wrong": [
+                    "Creación Pacto de Varsovia",
+                    "Firma del armisticio de Compiegne",
+                    "Gran depresión de 1929"
+                ]
+            },
+            {
+                "question": "¿En qué año fue disuelta la Unión Soviética?",
+                "correct": "1991",
+                "wrong": [
+                    "1986",
+                    "1945",
+                    "1957"
+                ]
+            },
+            {
+                "question": "Nombre el país que no pertenecía a la triple entente",
+                "correct": "Alemania",
+                "wrong": [
+                    "Gran Bretaña",
+                    "Francia",
+                    "Rusia"
+                ]
+            },
+            {
+                "question": "¿Cuántas tesis publicó Martin Lutero sobre la iglesia?",
+                "correct": "95 tesis",
+                "wrong": [
+                    "80 tesis",
+                    "112 tesis",
+                    "46 tesis"
+                ]
+            },
+            {
+                "question": "¿Qué ocurrió en Pompeya el 79 DC?",
+                "correct": "Erupción del Vesubio",
+                "wrong": [
+                    "Fin de la glaciación",
+                    "Gran terremoto",
+                    "Epidemia que casi acaba con la humanidad"
+                ]
+            },
+            {
+                "question": "¿En qué año acabó la guerra del pacífico?",
+                "correct": "1883",
+                "wrong": [
+                    "1881",
+                    "1878",
+                    "1884"
+                ]
+            },
+            {
+                "question": "¿Cuántos años vivió la Reina Isabel II de Reino Unido?",
+                "correct": "96 años",
+                "wrong": [
+                    "101 años",
+                    "89 años",
+                    "Aún no ha muerto"
+                ]
+            },
+            {
+                "question": "¿Cuántos años duró la guerra de los 100 años?",
+                "correct": "116 años",
+                "wrong": [
+                    "100 años",
+                    "104 años",
+                    "89 años"
+                ]
+            },
+            {
+                "question": "¿Quién fue el primer presidente de los Estados Unidos?",
+                "correct": "George Washington",
+                "wrong": [
+                    "George Bush",
+                    "Abraham Lincoln",
+                    "Theodore Roosevelt"
+                ]
+            },
+            {
+                "question": "¿Cuál de los siguientes posee la mayor altura?",
+                "correct": "Monte Everest",
+                "wrong": [
+                    "Cordillera de los Andes",
+                    "K2",
+                    "Kongur Tagh"
+                ]
+            },
+            {
+                "question": "Teniente coronel soviético que detuvo una guerra nuclear",
+                "correct": "Stanislav Petrov",
+                "wrong": [
+                    "Nikita Jrushchov",
+                    "Vasili Arjípov",
+                    "Anatoli Diátlov"
+                ]
+            },
+            {
+                "question": "Nombre del fundador de una empresa de automóviles de lujo, que solía hacer tractores",
+                "correct": "Ferrucio Lamborghini",
+                "wrong": [
+                    "Enzo Ferrari",
+                    "Karl Benz",
+                    "Nicola Romeo"
+                ]
+            },
+            {
+                "question": "Pandemia que azotó a europa en el siglo XIV",
+                "correct": "Peste negra",
+                "wrong": [
+                    "Peste blanca",
+                    "Gripe Española",
+                    "Síndrome agudo respiratorio severo"
+                ]
+            },
+            {
+                "question": "OTAN significa...",
+                "correct": "Organización del Tratado del Atlántico Norte",
+                "wrong": [
+                    "Oficina de Tratados de Amnistía Norteamericano",
+                    "Organización de Traslado de Alimentos Noruego",
+                    "Organización Transnacional Armamentística Norteamericana"
+                ]
+            },
+            {
+                "question": "Presidente de Chile muerto por parte del ejército en 1973",
+                "correct": "Salvador Allende",
+                "wrong": [
+                    "Augusto Pinochet",
+                    "Patricio Aulwin",
+                    "Eduardo Frei Montalva"
+                ]
+            },
+            {
+                "question": "¿Cuándo terminó la segunda guerra mundial?",
+                "correct": "2 de septiembre, 1945",
+                "wrong": [
+                    "6 de agosto, 1945",
+                    "9 de agosto, 1945",
+                    "Ninguna de las anteriores"
+                ]
+            },
+            {
+                "question": "¿Quién de estos presidentes no ha sido asesinado?",
+                "correct": "Theodore Roosevelt",
+                "wrong": [
+                    "Salvador Allende",
+                    "Abraham Lincoln",
+                    "Leon Trotsky"
+                ]
+            },
+            {
+                "question": "Serie de protestas a favor de la democracia y los derechos humanos de la población árabe.",
+                "correct": "Primavera árabe",
+                "wrong": [
+                    "Resurgir árabe",
+                    "Yihadismo",
+                    "الله أكبر"
+                ]
+            },
+            {
+                "question": "¿Cuál de estos países posee la menor densidad poblacional?",
+                "correct": "Groenlandia",
+                "wrong": [
+                    "Islandia",
+                    "Marreucos",
+                    "Taiwan"
+                ]
+            },
+            {
+                "question": "Nombre del barco que en 1939 llevó europeos a las costas de Chile.",
+                "correct": "Winnipeg",
+                "wrong": [
+                    "Mayflower",
+                    "Santa Maria",
+                    "HMS Beagle"
+                ]
+            },
+            {
+                "question": "¿Cuál de estos paises no forma parte de la Unión Europea?",
+                "correct": "Reino Unido",
+                "wrong": [
+                    "España",
+                    "Bélgica",
+                    "Paises Bajos"
+                ]
+            },
+            {
+                "question": "¿Dónde queda Murcia?",
+                "correct": "Sureste de España",
+                "wrong": [
+                    "No existe",
+                    "Narnia",
+                    "No sabe/No contesta"
+                ]
+            },
+            {
+                "question": "¿Es Taiwan un país?",
+                "correct": "Sí",
+                "wrong": [
+                    "No, es parte de China",
+                    "No, pero no es parte de China",
+                    "-"
+                ]
+            },
+            {
+                "question": "¿Qué hito da paso de la prehistoria a la historia?",
+                "correct": "Invención de la escritura",
+                "wrong": [
+                    "Trabajo del bronce",
+                    "La invasión de un pueblo",
+                    "Asesinato de alguien importante"
+                ]
+            },
+            {
+                "question": "¿En qué época, aproximadamente, el hombre dominó la agricultura?",
+                "correct": "10.000 AC",
+                "wrong": [
+                    "3.500 AC",
+                    "25.000 AC",
+                    "7.200 AC"
+                ]
+            },
+            {
+                "question": "¿Cuántos países forman la Unión Europea en 2023?",
+                "correct": "27 países",
+                "wrong": [
+                    "28 países",
+                    "24 países",
+                    "32 países"
+                ]
+            },
+            {
+                "question": "¿Cuál de estos países no ha tenido dictadura militar?",
+                "correct": "Italia",
+                "wrong": [
+                    "Argentina",
+                    "Chile",
+                    "España"
+                ]
+            },
+            {
+                "question": "¿Cuántas repúblicas formaron la República Federativa de Yugoslavia?",
+                "correct": "6",
+                "wrong": [
+                    "3",
+                    "7",
+                    "8"
+                ]
+            }
+        ],
+        "math": [
+            {
+                "question": "Quinto decimal truncado del número PI",
+                "correct": "9",
+                "wrong": [
+                    "8",
+                    "5",
+                    "2"
+                ]
+            },
+            {
+                "question": "Un googol es...",
+                "correct": "Un uno seguido de 100 ceros",
+                "wrong": [
+                    "Un 0. seguido de 100 ceros y un 1",
+                    "10 elevado a 10 a la 100 ",
+                    "Un número irracional"
+                ]
+            },
+            {
+                "question": "Sucesión que se calcula sumando los dos últimos números",
+                "correct": "Serie de Fibonacci",
+                "wrong": [
+                    "Suma de Rieman",
+                    "Polinomio de Taylor",
+                    "Serie telescópica"
+                ]
+            },
+            {
+                "question": "Proceso inverso a la integración",
+                "correct": "Derivación",
+                "wrong": [
+                    "Sumatoria",
+                    "Radicación",
+                    "Potenciación"
+                ]
+            },
+            {
+                "question": "Volumen de una esfera",
+                "correct": "4/3 * pi * r^3",
+                "wrong": [
+                    "4/3 * pi * r^2",
+                    "2/3 * pi * r^3",
+                    "2 * pi * r^2"
+                ]
+            },
+            {
+                "question": "Derivada de: 4x^3 + ln(x^2)",
+                "correct": "12x^2 + 2/x",
+                "wrong": [
+                    "4x^2 + 2x/ln(x)",
+                    "12x^2 - 2/x",
+                    "x^4 + 2x * ln(x) + 2x"
+                ]
+            },
+            {
+                "question": "Redondeo aproximando al número más alto",
+                "correct": "Redondeo por exceso",
+                "wrong": [
+                    "Redondeo por defecto",
+                    "Truncamiento",
+                    "Ninguna de las anteriores"
+                ]
+            },
+            {
+                "question": "Un cubo posee",
+                "correct": "12 aristas",
+                "wrong": [
+                    "4 caras",
+                    "12 vértices",
+                    "6 vértices"
+                ]
+            },
+            {
+                "question": "Número que al dividirlo por si mismo, su resultado es indeterminado",
+                "correct": "0",
+                "wrong": [
+                    "-1",
+                    "0.00000 ... 01",
+                    "No existe un número así"
+                ]
+            },
+            {
+                "question": "La sumatoria de todos los números del 1 a n puede ser expresada como",
+                "correct": "(n * (n+1)) / 2",
+                "wrong": [
+                    "(n * (n+1) * (2n+1)) / 6",
+                    "(n * (n+1))^2 /4",
+                    "(n - (n+1) - (n^2))/3"
+                ]
+            },
+            {
+                "question": "Una derivada por definición se calcula como",
+                "correct": "lim h -> 0, (f(x + h) - f(x)) / h",
+                "wrong": [
+                    "lim h-> inf, (f(x + h) - f(x)) / h",
+                    "lim x-> 0, (f(x + h) - f(x)) / h",
+                    "lim x-> inf, (f(x + h) - f(x)) / h"
+                ]
+            },
+            {
+                "question": "Operación que multiplica todos los números desde 1 hasta n",
+                "correct": "Factorial",
+                "wrong": [
+                    "Sumatoria",
+                    "Potenciación",
+                    "Derivación"
+                ]
+            },
+            {
+                "question": "Una matriz no es invertible si",
+                "correct": "Su determinante es 0",
+                "wrong": [
+                    "La cantidad de filas y columnas son iguales",
+                    "Es la matriz identidad",
+                    "Posee al menos una base con multiplicidad mayor a 1"
+                ]
+            },
+            {
+                "question": "Seleccione la que no es propiedad de los logaritmos",
+                "correct": "log(a) + log(b) = log(a + b)",
+                "wrong": [
+                    "log(a) + log(b) = log(a * b)",
+                    "a * log(b) = log(b^a)",
+                    "log_b_(a) = log(a) / log(b)"
+                ]
+            },
+            {
+                "question": "2 * sin(x) * cos(x) =",
+                "correct": "sin(2x)",
+                "wrong": [
+                    "sin^2(x)",
+                    "1",
+                    "cos(2x)"
+                ]
+            },
+            {
+                "question": "1 = ",
+                "correct": "sin^2(x) + cos^2(x)",
+                "wrong": [
+                    "sin^2(x) - cos^2(x)",
+                    "2 * sin(x) * cos(x)",
+                    "sin(a) * sin(b) - cos(a) * cos(b)"
+                ]
+            },
+            {
+                "question": "La suma de los ángulos interiores de un triángulo es",
+                "correct": "180 grados",
+                "wrong": [
+                    "90 grados",
+                    "360 grados",
+                    "Varía dependiendo del triángulo"
+                ]
+            },
+            {
+                "question": "Línea que pasa por el centro de una circunferencia, dividiendo en dos mitades",
+                "correct": "Diámetro",
+                "wrong": [
+                    "Secante",
+                    "Tangente",
+                    "Segmento"
+                ]
+            },
+            {
+                "question": "¿Cuál de los siguientes cuerpos no puede ser hecho como sólido de revolución",
+                "correct": "Cubo",
+                "wrong": [
+                    "Toroide",
+                    "Esfera",
+                    "Cono"
+                ]
+            },
+            {
+                "question": "Seleccione el número y conjunto que no corresponda",
+                "correct": "4 + 2i, irracionales ",
+                "wrong": [
+                    "2.17, reales",
+                    "506, naturales",
+                    "14/3, racionales"
+                ]
+            },
+            {
+                "question": "Selecciones la forma y fórmula que corresponda a una sección cónica",
+                "correct": "Elipse, (x-h)^2 / a + (y-k)^2 / b = 1 ",
+                "wrong": [
+                    "Círculo, x^2 = 4 * p * y",
+                    "Hiperbola, (x-h)^2 + (y-h)^2 = r^2",
+                    "Parabola, (x-h)^2 - (y-k)^2 = 1"
+                ]
+            },
+            {
+                "question": "6 / 2 * (1 + 2)",
+                "correct": "9",
+                "wrong": [
+                    "1",
+                    "5",
+                    "1.5"
+                ]
+            },
+            {
+                "question": "Integral de x^4 * dx",
+                "correct": "x^5 / 5 + C",
+                "wrong": [
+                    "x^5 / 5",
+                    "4x^3 + C",
+                    "x^5 + C"
+                ]
+            },
+            {
+                "question": "Derivada de f(x) * g(x))",
+                "correct": "f'(x) * g(x) + f(x) * g'(x)",
+                "wrong": [
+                    "f'(x) * g'(x)",
+                    "f'(g(x)) * g'(x)",
+                    "(f'(x) * g(x) - f(x) * g'(x)) / g^2(x)"
+                ]
+            },
+            {
+                "question": "Integral de u(x) * v'(x) = ",
+                "correct": "u(x) * v(x) - Integral(v(x) * u'(x)) + C",
+                "wrong": [
+                    "U(x) * v(x) + C",
+                    "u(x) * v(x) - v(x) * u'(x) + C",
+                    "Integral(v(x) * u'(x)) + u(x) * v'(x) + C"
+                ]
+            },
+            {
+                "question": "f(x) = sin(x)/x. ¿Está definido f(0)? Seleccione la más adecuada",
+                "correct": "No está definido, pero su límite es 1",
+                "wrong": [
+                    "No está definido, tampoco su límite",
+                    "Es igual a 1",
+                    "Es igual a 0"
+                ]
+            },
+            {
+                "question": "¿Cuál de estas no es una integral impropia?",
+                "correct": "Sólido de revolución",
+                "wrong": [
+                    "Función Beta",
+                    "Función Gamma",
+                    "Transformada de Lpalace"
+                ]
+            },
+            {
+                "question": "Coordenadas donde hay una magnitud r, una radial θ y altura z",
+                "correct": "Coordenadas cilíndricas",
+                "wrong": [
+                    "Coordenadas esféricas",
+                    "Coordenadas rectangulares",
+                    "Coordenadas polares"
+                ]
+            },
+            {
+                "question": "e ^ (a + bi) = ",
+                "correct": "e^a * (cos(b) + isin(b))",
+                "wrong": [
+                    "e^a * (cos(b) + sin(b))",
+                    "e^a * (cos(b) - isin(b))",
+                    "a * (cos(b) + isin(b))"
+                ]
+            },
+            {
+                "question": "Límite de i tiende a cero, de la sumatoria i entre a y b de f(i)",
+                "correct": "Integral definida",
+                "wrong": [
+                    "Derivada",
+                    "Producto cruz",
+                    "Ponderación"
+                ]
+            },
+            {
+                "question": "[a, b] ... [c, d] = [a * c, b * d]",
+                "correct": "Producto punto",
+                "wrong": [
+                    "Producto cruz",
+                    "Normalización",
+                    "Ortogonalización"
+                ]
+            },
+            {
+                "question": "[a, b, c] ... [d, e, f] = [(b*f - e*c)i, (a*f - d*c)j, (a*e - d*b)k]",
+                "correct": "Producto cruz",
+                "wrong": [
+                    "Producto punto",
+                    "Normalización",
+                    "Ortogonalización"
+                ]
+            },
+            {
+                "question": "Dominio de 1/(x - n), con n ∈ R",
+                "correct": "Todos los reales, salvo \"n\"",
+                "wrong": [
+                    "Todos los reales, exceptuando unicamente el 0",
+                    "Todos los reales",
+                    "Solo n"
+                ]
+            },
+            {
+                "question": "(e^(x) - e^(-x)) / 2  = ",
+                "correct": "sinh(x)",
+                "wrong": [
+                    "cosh(x)",
+                    "-1",
+                    "sin(x)"
+                ]
+            },
+            {
+                "question": "i^4",
+                "correct": "1",
+                "wrong": [
+                    "-i",
+                    "-1",
+                    "i"
+                ]
+            },
+            {
+                "question": "69 - 42 =",
+                "correct": "27",
+                "wrong": [
+                    "26",
+                    "69",
+                    "91"
+                ]
+            },
+            {
+                "question": "111111111 * 111111111",
+                "correct": "12345678987654321",
+                "wrong": [
+                    "111111111111111111",
+                    "10000000000000001",
+                    "12345678887654321"
+                ]
+            },
+            {
+                "question": "L(2sin(4)) = ",
+                "correct": "4/(s + 2)",
+                "wrong": [
+                    "4/(s -2)",
+                    "2/(s + 2)",
+                    "2s/(s + 2)"
+                ]
+            },
+            {
+                "question": "L-1 (8/(s-7)^4) = ",
+                "correct": "4(e^7t * (t^3))/3",
+                "wrong": [
+                    "(e^-7t * (t^3))/3",
+                    "2(e^-7t * (t^4))",
+                    "4(t^3))/3"
+                ]
+            },
+            {
+                "question": "x^2 - y^2 = 1",
+                "correct": "Hipérbola",
+                "wrong": [
+                    "Círculo",
+                    "Parábola",
+                    "Curva"
+                ]
+            },
+            {
+                "question": "ln(e^4x) = ",
+                "correct": "4x",
+                "wrong": [
+                    "4x * ln(1)",
+                    "4 * ln(ex)",
+                    "4/x * ln(e^x)"
+                ]
+            },
+            {
+                "question": "x^x = 100. X debe estar entre...",
+                "correct": "3 y 4",
+                "wrong": [
+                    "1 y 2",
+                    "4 y 5",
+                    "2 y 3"
+                ]
+            },
+            {
+                "question": "x + 2 = x",
+                "correct": "No hay solución",
+                "wrong": [
+                    "x = 0",
+                    "x = -2",
+                    "x = x"
+                ]
+            },
+            {
+                "question": "Función que extiende el factorial a números reales",
+                "correct": "Función Gamma",
+                "wrong": [
+                    "Función Beta",
+                    "Función trigonométrica",
+                    "Producto escalar"
+                ]
+            },
+            {
+                "question": "Integral de e^(nx)",
+                "correct": "(e^(nx))/n + C",
+                "wrong": [
+                    "ne^(nx)",
+                    "e^(nx)",
+                    "ne^(x(n-1)) + C"
+                ]
+            },
+            {
+                "question": "arcsin(1) = ",
+                "correct": "π/2",
+                "wrong": [
+                    "π",
+                    "3/2 * π",
+                    "0"
+                ]
+            },
+            {
+                "question": "Es una forma de resolver una integral de la forma dt/t^n",
+                "correct": "Sustitución simple",
+                "wrong": [
+                    "Sustitución trigonométrica",
+                    "Integración por partes",
+                    "Fracciones parciales"
+                ]
+            },
+            {
+                "question": "No es un método de resolver ecuaciones diferenciales",
+                "correct": "Todos lo son",
+                "wrong": [
+                    "Transformada de Laplace",
+                    "Variación de parámetros",
+                    "Aniquiladores"
+                ]
+            },
+            {
+                "question": "Volumen de un cono",
+                "correct": "(πr^2)/3 * h",
+                "wrong": [
+                    "πr^2 * h",
+                    "2πr * h",
+                    "4/3 * πr^3"
+                ]
+            }
+        ],
+        "science": [
+            {
+                "question": "¿Cuántos huesos tiene el cuerpo humano adulto?",
+                "correct": "206",
+                "wrong": [
+                    "196",
+                    "348",
+                    "249"
+                ]
+            },
+            {
+                "question": "Científico muerto por causa del núcleo del demonio, recibiendo una dosis de más de 10 Gy",
+                "correct": "Louis Slotin",
+                "wrong": [
+                    "Robert J. Hemmerly",
+                    "Alvin C. Graves",
+                    "Haroutune Krikor Daghlian"
+                ]
+            },
+            {
+                "question": "¿A cuántos kilómetros está el sol de Marte?",
+                "correct": "206,7 millones",
+                "wrong": [
+                    "257,8 millones",
+                    "564,6 millones",
+                    "548,9 millones"
+                ]
+            },
+            {
+                "question": "Fuerza que se opone al movimiento",
+                "correct": "Fuerza de roce",
+                "wrong": [
+                    "Fuerza normal",
+                    "Fuerza de gravedad",
+                    "Fuerza centrípeta"
+                ]
+            },
+            {
+                "question": "Elemento radioactivo asociado al incidente de Goiania",
+                "correct": "Cesio 137",
+                "wrong": [
+                    "Radón 222",
+                    "Polonio 210",
+                    "Cobalto 60"
+                ]
+            },
+            {
+                "question": "Calor específico del agua líquida",
+                "correct": "4.18 joules",
+                "wrong": [
+                    "2.05 joules",
+                    "1 joule",
+                    "14.2 joules"
+                ]
+            },
+            {
+                "question": "Elemento más pesado descubierto hasta 2022",
+                "correct": "Oganesón",
+                "wrong": [
+                    "Nihorio",
+                    "Copernicio",
+                    "Darmtadtio"
+                ]
+            },
+            {
+                "question": "Elemento de la tabla periódica más denso",
+                "correct": "Osmio",
+                "wrong": [
+                    "Tungsteno",
+                    "Plomo",
+                    "Uranio"
+                ]
+            },
+            {
+                "question": "Aparato utilzado para medir el decaimiento de partículas",
+                "correct": "Contador Geiger",
+                "wrong": [
+                    "Densímetro",
+                    "Cámara de vapor",
+                    "Radiómetro"
+                ]
+            },
+            {
+                "question": "El límite de la radiación ionizante se encuentra en el espectro de:",
+                "correct": "Luz Ultravioleta",
+                "wrong": [
+                    "Rayos X",
+                    "Microondas",
+                    "Infrarrojos"
+                ]
+            },
+            {
+                "question": "La escala de decibeles es",
+                "correct": "Logarítmica",
+                "wrong": [
+                    "Lineal",
+                    "Exponencial",
+                    "Inversa"
+                ]
+            },
+            {
+                "question": "¿Quiénes realizaron el experimento de la doble rendija en 1927, utilizando electrones en vez de luz?",
+                "correct": "Davisson y Germer",
+                "wrong": [
+                    "Mach y Zehnder",
+                    "Young y Volta",
+                    "Feymann y Einstein"
+                ]
+            },
+            {
+                "question": "Elemento descubierto en 1898 por Maria Skłodowska y Pierre Curie",
+                "correct": "Polonio",
+                "wrong": [
+                    "Radio",
+                    "Torio",
+                    "Bismuto"
+                ]
+            },
+            {
+                "question": "Conjunto de elementos descubiertos por William Ramsay que lo hizo ganar un nobel en 1904",
+                "correct": "Gases nobles",
+                "wrong": [
+                    "Lantanos",
+                    "Alcalino-térreos",
+                    "Metales de transición"
+                ]
+            },
+            {
+                "question": "Se entiende como el límite entre la atmósfera y el espacio exterior en la capa:",
+                "correct": "Exósfera",
+                "wrong": [
+                    "Ionósfera",
+                    "Tropósfera",
+                    "Mesósfera"
+                ]
+            },
+            {
+                "question": "Capa de la litósfera en la cual la roca se encuentra en estado líquido",
+                "correct": "Núcleo externo",
+                "wrong": [
+                    "Núcleo interno",
+                    "Manto",
+                    "Corteza"
+                ]
+            },
+            {
+                "question": "¿Qué color tiene una onda de luz más larga?",
+                "correct": "Rojo",
+                "wrong": [
+                    "Azul",
+                    "Verde",
+                    "Amarillo"
+                ]
+            },
+            {
+                "question": "¿Cuánto tiempo tardaríamos en darnos cuenta que el sol ha desaparecido, si fuera quitado en este momento?",
+                "correct": "8 minutos",
+                "wrong": [
+                    "18 minutos",
+                    "Instantáneamente",
+                    "2 horas"
+                ]
+            },
+            {
+                "question": "Fraile que investigó el fenómeno de la herencia genética en los guisantes",
+                "correct": "Gregor Mendel",
+                "wrong": [
+                    "Charles Darwin",
+                    "Dimitri Mendeléyev",
+                    "Louis Pasteur"
+                ]
+            },
+            {
+                "question": "Enfermera italiana considerada precursora de la enfermería contemporánea, y creadora del primer modelo conceptual de enfermería",
+                "correct": "Florence Nightingale",
+                "wrong": [
+                    "Mary Seacole",
+                    "Irene Joliot-Curie",
+                    "Marie-Sophie Germain"
+                ]
+            },
+            {
+                "question": "Nombre del continente primigenio donde estaba toda la tierra unida",
+                "correct": "Pangea",
+                "wrong": [
+                    "Murcia",
+                    "América",
+                    "África"
+                ]
+            },
+            {
+                "question": "No existe",
+                "correct": "Sonido en el espacio",
+                "wrong": [
+                    "Murcia",
+                    "Paraguay",
+                    "El calentamiento global"
+                ]
+            },
+            {
+                "question": "No es un método de balancear ecuaciones",
+                "correct": "Todos lo son",
+                "wrong": [
+                    "Por tanteo",
+                    "Redox",
+                    "Algebraico"
+                ]
+            },
+            {
+                "question": "Una fuerza es conservativa si",
+                "correct": "No depende de su trayectoria el cambio",
+                "wrong": [
+                    "Se mantiene constante",
+                    "Es cero",
+                    "No existen fuerzas conservativas"
+                ]
+            },
+            {
+                "question": "La dirección de la fuerza magnética es",
+                "correct": "Perpendicular al campo magnético y la velocidad",
+                "wrong": [
+                    "Paralelo a la velocidad, perpendicular al campo",
+                    "Perpendicular a la velocidad y el campo",
+                    "Siempre va hacia abajo"
+                ]
+            },
+            {
+                "question": "Se calcula como la inversa de la conductividad, multiplicado la longitud dividido el área",
+                "correct": "Resistencia",
+                "wrong": [
+                    "Resistividad",
+                    "Densidad de corriente",
+                    "Diferencia de potencial"
+                ]
+            },
+            {
+                "question": "En el lanzamiento de un proyectil, la altura (y) y desplazamiento (x) se calculan:",
+                "correct": "x = vx * t; y = y0 + vy * t - (gt^2)/2",
+                "wrong": [
+                    "x = x0 + vx * t + (gt^2)/2; y = vy * t",
+                    "x = vx * t; y = vy * y",
+                    "x = x0 + vx * t + (gt^2)/2; y = y0 + vy * t - (gt^2)/2"
+                ]
+            },
+            {
+                "question": "No corresponde a una fórmula de fuerza",
+                "correct": "F = (m * g)/u",
+                "wrong": [
+                    "F = q*E",
+                    "F = q*v x B. (x: producto cruz)",
+                    "F = k * x"
+                ]
+            }
+        ],
+        "culture": [
+            {
+                "question": "¿Cuántas integrantes tiene TWICE?",
+                "correct": "9",
+                "wrong": [
+                    "8",
+                    "10",
+                    "6"
+                ]
+            },
+            {
+                "question": "¿Qué poder tiene Deku (Boku no hero) de nacimiento?",
+                "correct": "Ninguno",
+                "wrong": [
+                    "One for all",
+                    "All for one",
+                    "Deterioro"
+                ]
+            },
+            {
+                "question": "Si en una carrera voy tercero y adelanto al segundo, ¿en qué posición quedo?",
+                "correct": "Segundo",
+                "wrong": [
+                    "Primero",
+                    "Tercero",
+                    "Cuarto"
+                ]
+            },
+            {
+                "question": "¿Qué alimento es usado en Minecraft para reproducir los cerdos?",
+                "correct": "Zanahorias",
+                "wrong": [
+                    "Semillas",
+                    "Trigo",
+                    "Pescado"
+                ]
+            },
+            {
+                "question": "Programa de televisión live action con mayor cantidad de episodios",
+                "correct": "General Hospital",
+                "wrong": [
+                    "Dr Who",
+                    "Days of our Lives",
+                    "Plaza Sésamo"
+                ]
+            },
+            {
+                "question": "la pizza más grande del mundo tenía un área de",
+                "correct": "1300 km^2",
+                "wrong": [
+                    "1200 km^2",
+                    "1500 km^2",
+                    "900 km^2"
+                ]
+            },
+            {
+                "question": "¿Cómo se llama el shinigami de Light?",
+                "correct": "Ryuk",
+                "wrong": [
+                    "Rem",
+                    "Sidoh",
+                    "Jealous"
+                ]
+            },
+            {
+                "question": "¿Qué iba a comprar Homero antes de comprar el saxofón de Lisa?",
+                "correct": "Un aire acondicionado",
+                "wrong": [
+                    "Un televisor",
+                    "Cerveza",
+                    "Un automóvil"
+                ]
+            },
+            {
+                "question": "¿Cuál de estas series no era transmitida en Cartoon Network?",
+                "correct": "Gravity Falls",
+                "wrong": [
+                    "Un show más",
+                    "Hora de Aventura",
+                    "Clarence"
+                ]
+            },
+            {
+                "question": "¿Quién dijo la siguiente frase? \"Confucio, fue uno de los que inventó la confusión.\"",
+                "correct": "Giosue Cozzarelli",
+                "wrong": [
+                    "Liseth Díaz",
+                    "Alicia Durán",
+                    "Stephanie Thompson"
+                ]
+            },
+            {
+                "question": "¿Cuál combinación de teclas abre el administrador de tareas en Windows?",
+                "correct": "Ctrl + Alt + Supr",
+                "wrong": [
+                    "Alt + F4",
+                    "Ctrl + W",
+                    "Ctrl + Shift + P"
+                ]
+            },
+            {
+                "question": "Programa de televisión, animado con mayor cantidad de episodios",
+                "correct": "Sazae-san",
+                "wrong": [
+                    "Doraemon",
+                    "One Piece",
+                    "Pokémon"
+                ]
+            },
+            {
+                "question": "Ganador de Eurovisión en 2011",
+                "correct": "Azerbaiyán",
+                "wrong": [
+                    "España",
+                    "Alemania",
+                    "Finlandia"
+                ]
+            },
+            {
+                "question": "¿Cuántos años pasaron para que Ash ganara la liga? (No cuentan las naranja)",
+                "correct": "25 años",
+                "wrong": [
+                    "15 años",
+                    "Nunca la ha ganado",
+                    "2 años"
+                ]
+            },
+            {
+                "question": "¿Qué frase repite la mamá de 11 en Stranger Things?",
+                "correct": "Girasol, tres a la derecha, cuatro a la izquierda, arco iris, 450",
+                "wrong": [
+                    "Estrella, 2 a la izquierda, 5 a la derecha, margarita, 320",
+                    "Amapola, 4 a la izquierda, 3 a la derecha, nube, 400",
+                    "Rayo de sol, 4 a la derecha, adentro, avión, 500"
+                ]
+            },
+            {
+                "question": "Ganador de Eurovisión en 2021",
+                "correct": "Italia, tercera vez",
+                "wrong": [
+                    "España, primera vez",
+                    "Ucrania, segunda vez",
+                    "Suecia, quinta vez"
+                ]
+            },
+            {
+                "question": "Festival importante en Chile, celebrado en febrero que consta de siete noches",
+                "correct": "Festival de la canción de Viña del Mar",
+                "wrong": [
+                    "Festival del huaso de Olmué",
+                    "Festival de Rio Negro",
+                    "Festival de La Moneda"
+                ]
+            }
+        ],
+        "movies": [
+            {
+                "question": "¿Con qué se pincha el dedo la Princesa Aurora en La Bella Durmienta?",
+                "correct": "El uso de una rueca",
+                "wrong": [
+                    "La espina de una rosa",
+                    "Una aguja de costura",
+                    "La púa de un cactus envenenado"
+                ]
+            },
+            {
+                "question": "De las siguientes películas ¿cuál NO es de Disney?",
+                "correct": "Shrek",
+                "wrong": [
+                    "¡Rompe Ralph!",
+                    "Taron y el caldero mágico",
+                    "El rey León"
+                ]
+            },
+            {
+                "question": "¿Quién es el inseparable amigo de Gastón en La Bella y la Bestia?",
+                "correct": "Lefou",
+                "wrong": [
+                    "Lumiere",
+                    "Clayton",
+                    "Maurice"
+                ]
+            },
+            {
+                "question": "¿Cuál es el nombre del perro de Sid en “Toy Story”?",
+                "correct": "Scud",
+                "wrong": [
+                    "Spike",
+                    "Spud",
+                    "Slinky"
+                ]
+            },
+            {
+                "question": "En “Buscando A Nemo”, ¿cómo se llama el pelícano amigo de los peces de la pecera?",
+                "correct": "Nigel",
+                "wrong": [
+                    "Luis",
+                    "Dory",
+                    "Marlin"
+                ]
+            },
+            {
+                "question": "¿Cuál es la dirección que Dory no quiere olvidar en “Buscando A Nemo”?",
+                "correct": "P. Sherman, calle Wallaby 42, Sidney.",
+                "wrong": [
+                    "P. Sherman, calle Wallaby 62, Sidney.",
+                    "P. Sherman, calle Wallaby 52, Sidney.",
+                    "P. Sherman, calle Wallaby 54, Sidney."
+                ]
+            },
+            {
+                "question": "En “Los Increíbles”, ¿qué hace Edna Moda?",
+                "correct": "Diseña los trajes de los superhéroes",
+                "wrong": [
+                    "Ve y predice el futuro tocando sus lentes",
+                    "Habla muchos idiomas que combina con sus poderes.",
+                    "Salva a los niños siendo niñera "
+                ]
+            },
+            {
+                "question": "Completa la frase: “Pon tu fe en lo que tú más creas. Un ser, dos mundos son, te guiará tu corazón y…",
+                "correct": "decidirá por ti”",
+                "wrong": [
+                    "sabrás lo que decir”",
+                    "un hijo de hombre tu serás”",
+                    "a tu lado yo estaré”"
+                ]
+            },
+            {
+                "question": "¿Por qué Mulán se alista en el Ejército Imperial?",
+                "correct": "Para evitar que vaya su padre enfermo",
+                "wrong": [
+                    "Para devolverle honor a su familia ",
+                    "Para luchar contra los hunos",
+                    "Para conquistar a Li Shang"
+                ]
+            },
+            {
+                "question": "Completa la frase: “Se oye una canción, que hace suspirar…”",
+                "correct": "Y habla el corazón de una sensación",
+                "wrong": [
+                    "Bella y bestia son",
+                    "Tiemblan de emoción",
+                    "Cierto como el sol, que nos da calor"
+                ]
+            },
+            {
+                "question": "¿Quién es el enemigo de Hércules?",
+                "correct": "Hades",
+                "wrong": [
+                    "Ares",
+                    "Prometeo",
+                    "Ícaro"
+                ]
+            },
+            {
+                "question": "¿Cómo se llama el hada en Peter Pan?",
+                "correct": "Campanita",
+                "wrong": [
+                    "Morgana",
+                    "Esmeralda",
+                    "Wendy"
+                ]
+            },
+            {
+                "question": "¿Cómo se llama el perro de Miguel?",
+                "correct": "Dante",
+                "wrong": [
+                    "Sante",
+                    "Ernesto de la Cruz",
+                    "Alebrije"
+                ]
+            },
+            {
+                "question": "¿Cuál es el apellido real de la familia de ‘Los Increíbles’?",
+                "correct": "Parr",
+                "wrong": [
+                    "Pons",
+                    "Pets",
+                    "Patt"
+                ]
+            },
+            {
+                "question": "¿Cómo se llama la hija de Simba en el rey leon?",
+                "correct": "Kiara",
+                "wrong": [
+                    "Nali",
+                    "Nalu",
+                    "Pumba"
+                ]
+            },
+            {
+                "question": "¿Qué saga de películas es considerada por tener la mejor segunda entrega?",
+                "correct": "El padrino",
+                "wrong": [
+                    "Shrek",
+                    "Como entrenar a tu dragón",
+                    "Mi pobre angelito"
+                ]
+            },
+            {
+                "question": "Película que catalogó al cine como el séptimo arte",
+                "correct": "El ciudadano Kane",
+                "wrong": [
+                    "Tiempos modernos",
+                    "King Kong",
+                    "Psicosis"
+                ]
+            },
+            {
+                "question": "Primera película animada por completo por computadora",
+                "correct": "Toy Story",
+                "wrong": [
+                    "Hormiguitas",
+                    "Bichos",
+                    "El príncipe de Egipto"
+                ]
+            },
+            {
+                "question": "Casa productora que hizo las películas \"El príncipe de Egipto\" y \"Josué, el rey de los sueños\"",
+                "correct": "Dreamworks SKG",
+                "wrong": [
+                    "Pixar",
+                    "Laika",
+                    "Sony Pictures"
+                ]
+            }
+        ],
+        "books": [
+            {
+                "question": "¿Quién escribió ‘La Ilíada’?",
+                "correct": "Homero",
+                "wrong": [
+                    "Marco Tulio Cicerón",
+                    "Séneca",
+                    "Heródoto"
+                ]
+            },
+            {
+                "question": "¿Cuál de estas obras no es de Shakespeare?",
+                "correct": "Enrique III",
+                "wrong": [
+                    "Macbeth",
+                    "El rey Lear",
+                    "Otelo"
+                ]
+            },
+            {
+                "question": "Autor de ‘El arte de la guerra’",
+                "correct": "Sun Tzu",
+                "wrong": [
+                    "Shī Jīng",
+                    "Dào Dé Jing",
+                    "Confucio"
+                ]
+            },
+            {
+                "question": "¿Por qué El Principito decide abandonar su planeta?",
+                "correct": "Porque sentía que una rosa se aprovechaba de él",
+                "wrong": [
+                    "Porque quería conocer la tierra",
+                    "Porque el Rey le ordena irse",
+                    "Porque estaba enfermo"
+                ]
+            },
+            {
+                "question": "¿Quién es el autor de la ‘Divina comedia’?",
+                "correct": "Dante Alighieri",
+                "wrong": [
+                    "Petrarca",
+                    "Giovanni Bocaccio",
+                    "Maquiavelo"
+                ]
+            },
+            {
+                "question": "¿Quién le dijo al Principito que “ lo esencial es invisible a los ojos”",
+                "correct": "El zorro",
+                "wrong": [
+                    "El rey",
+                    "El aviador",
+                    "La rosa"
+                ]
+            },
+            {
+                "question": "¿Con qué confundió Don Quijote a los molinos?",
+                "correct": "Gigantes",
+                "wrong": [
+                    "Volcanes",
+                    "Gorilas",
+                    "Cactus"
+                ]
+            },
+            {
+                "question": "Heathcliff es el héroe sombrío de:",
+                "correct": "Cumbres Borrascosas de Emily Brontë",
+                "wrong": [
+                    "Rebecca de Daphne du Maurier",
+                    "Jane Eyre de Charlotte Brontë",
+                    "Moby Dick de Herman Melville"
+                ]
+            },
+            {
+                "question": "Cosette es la niña huérfana de:",
+                "correct": "Los miserables de Victor Hugo",
+                "wrong": [
+                    "Germinal de Émile Zola",
+                    "Sin familia de Héctor Malot",
+                    "Orgullo y prejuicio de Jane Austen"
+                ]
+            },
+            {
+                "question": "¿En qué cuento está inspirado “Una corte de rosas y espinas”?",
+                "correct": "La Bella y la Bestia",
+                "wrong": [
+                    "La Bella Durmiente",
+                    "Blancanieves",
+                    "La reina de las nieves"
+                ]
+            },
+            {
+                "question": "¿Qué tipo de ‘grisha’ es Nina de “Seis de Cuervos”?",
+                "correct": "Mortificadora",
+                "wrong": [
+                    "Sanadora",
+                    "Agitamareas",
+                    "Vendaval"
+                ]
+            },
+            {
+                "question": "“Los malvados se alzarán” es la segunda parte de:",
+                "correct": "¡Dorothy debe morir!",
+                "wrong": [
+                    "El sermón de fuego",
+                    "La caída de los reinos",
+                    "Los demás seguimos aquí"
+                ]
+            },
+            {
+                "question": "¿Cuál es el nombre de la protagonista de “It Ends With Us” de Colleen Hoover?",
+                "correct": "Lily Bloom",
+                "wrong": [
+                    "Allysa Kincaid",
+                    "Atlas Corrigan",
+                    "Ryle Kincaid"
+                ]
+            },
+            {
+                "question": "¿Quién escribió la saga se Cazadores de Sombras?",
+                "correct": "Cassandra Clare",
+                "wrong": [
+                    "Laura Gallego",
+                    "Stephenie Meyer",
+                    "G. Howard"
+                ]
+            }
+        ],
+        "music": [
+            {
+                "question": "Banda de rock británica, que compuso el tema 'Somebody to Love'",
+                "correct": "Queen",
+                "wrong": [
+                    "Kiss",
+                    "Pink Floyd",
+                    "The Beatles"
+                ]
+            },
+            {
+                "question": "Bajista y cantante de la banda The Beatles",
+                "correct": "Paul McCartney",
+                "wrong": [
+                    "Geroge Harrison",
+                    "John Lennon",
+                    "Ringo Starr"
+                ]
+            },
+            {
+                "question": "última sinfonía compuesta por Mozart",
+                "correct": "Requiem - lacrimosa",
+                "wrong": [
+                    "Rondo alla Turca",
+                    "La flauta mágica",
+                    "Serenata n°13"
+                ]
+            },
+            {
+                "question": "Compositor de 'Tocata y fuga en Re menor'",
+                "correct": "Johann Sebastian Bach",
+                "wrong": [
+                    "Georg Friederich Hendel",
+                    "Frederic Chopin",
+                    "Antonio Vivaldi"
+                ]
+            },
+            {
+                "question": "Último disco de Pink Floyd lanzado con Roger Waters",
+                "correct": "The final cut",
+                "wrong": [
+                    "The wall",
+                    "A momentary lapse of reason",
+                    "The division bell"
+                ]
+            },
+            {
+                "question": "Seleccione el integrante que no pertenece a BTS",
+                "correct": "Xiumin",
+                "wrong": [
+                    "Jungkook",
+                    "Suga",
+                    "RM"
+                ]
+            },
+            {
+                "question": "Obra compuesta por Andrew Lloyd Webber, adaptada de un libro homónimo de 1910, en la cual ocurren sin fin de muertes",
+                "correct": "El fantasma de la ópera",
+                "wrong": [
+                    "Jesucristo Superestrella",
+                    "Cats",
+                    "Starlight Express"
+                ]
+            },
+            {
+                "question": "La música de 31 minutos es mayoritariamente compuesta por",
+                "correct": "Chancho en piedra",
+                "wrong": [
+                    "Los tres",
+                    "Profeta y frenéticos",
+                    "Los bunkers"
+                ]
+            },
+            {
+                "question": "Compositor cubano, autor de obras como 'Quien fuera' o 'ángel para un final'",
+                "correct": "Silvio Rodriguez",
+                "wrong": [
+                    "Bad Bunny",
+                    "Carlos Puebla",
+                    "Cesar Portillo de la Luz"
+                ]
+            },
+            {
+                "question": "Cantante inglés que formó parte de Genesis, y además ha cantado para películas de Disney",
+                "correct": "Phil Colins",
+                "wrong": [
+                    "Peter Gabriel",
+                    "Billy Joel",
+                    "Paul Kandel"
+                ]
+            },
+            {
+                "question": "Canción que rompió el visualizador de reproducciones de Youtube",
+                "correct": "PSY - Gangnam Style",
+                "wrong": [
+                    "Luis Fonsi & Daddy Yankee - Despacito",
+                    "Baby Shark",
+                    "Adele - Hello"
+                ]
+            },
+            {
+                "question": "Una de la siguientes bandas no es latinoamericana",
+                "correct": "Héroes del Silencio",
+                "wrong": [
+                    "Caifanes",
+                    "Soda Stereo",
+                    "Los prisioneros"
+                ]
+            },
+            {
+                "question": "Canción de Luis Miguel, en la cual alcanza su nota más alta",
+                "correct": "Palabra de honor",
+                "wrong": [
+                    "La chica del bikini azul",
+                    "Siempre me quedo, siempre me voy",
+                    "Fiebre de amor"
+                ]
+            },
+            {
+                "question": "Federico Moura fue parte de",
+                "correct": "Virus",
+                "wrong": [
+                    "Soda Stereo",
+                    "Papo's blues",
+                    "Pescado rabioso"
+                ]
+            }
+        ]
     }
 }

@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
 import asyncio
 from aiofile import async_open, AIOFile
+from src import utils
 
 loop = False
 
+@utils.userTracker("download")
 async def videoDownload(ctx):
     global loop
 

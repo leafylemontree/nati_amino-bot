@@ -6,10 +6,12 @@ import math
 
 async def triggerLevelUp(ctx, level):
     from src.challenges.rewards import donateAC
-    print(ctx.msg.ndcId, ctx.msg.author.uid, level, ctx.msg.author.nickname)
     await expCardCreate(ctx)
-    await donateAC(ctx, ctx.msg.author.uid, (level * 5), silent=True)
-    
+    if level < 21:
+        await donateAC(ctx, ctx.msg.author.uid, (level * 5), silent=True)
+    elif level > 20 and (level % 5) == 0:
+        await donateAC(ctx, ctx.msg.author.uid, 100, silent=True)
+    return
 
 async def petMessageRegister(ndcId):
     if not db.redis.hexists(db.r_messageCom, f"?{ndcId}"):
@@ -54,6 +56,19 @@ async def userExpSave(ctx, ndcId, userId, counter):
         await triggerLevelUp(ctx, newLevel)
     return
 
+
+async def messageCopy(ctx):
+    ndcId       = ctx.msg.ndcId
+    threadId    = ctx.msg.threadId
+    userId      = ctx.msg.author.uid
+    messageId   = ctx.msg.messageId
+
+    message     = db.getChatMessage(ndcId, threadId, userId, messageId)
+    if message is None: return
+    db.cursor.execute("INSERT INTO DeletedMessageHistory VALUES (?, ?, ?, ?, ?, NOW(), ?)", (ndcId, threadId, userId, messageId, message.instance, message.content))
+    db.cursor.execute("DELETE FROM MessageHistory WHERE ndcId=? AND threadId=? AND userId=? AND messageId=?", (ndcId, threadId, userId, messageId))
+    return
+
 async def messageRegister(ctx):
     if ctx.msg.author is None: return
     
@@ -62,5 +77,7 @@ async def messageRegister(ctx):
 
     c = await userMessageCounter(ctx.msg.ndcId, ctx.msg.author.uid)
     await userExpSave(ctx, ctx.msg.ndcId, ctx.msg.author.uid, c)
-    db.cursor.execute(f'INSERT INTO MessageHistory VALUES (?, NOW(), {ba.instance + 1}, ?);', (ctx.msg.author.uid, ctx.msg.content))
+    if ctx.msg.type == 100: return await messageCopy(ctx)
+
+    db.cursor.execute(f'INSERT INTO MessageHistory VALUES (?, ?, ?, ?, {ba.instance + 1}, NOW(), ?);', (ctx.msg.ndcId, ctx.msg.threadId, ctx.msg.author.uid, ctx.msg.messageId, ctx.msg.content))
     return

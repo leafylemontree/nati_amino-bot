@@ -2,8 +2,8 @@ from random import random
 from src import objects
 from src import utils
 
-
-def dices(msg):
+@utils.userTracker("dados")
+async def dices(ctx, msg):
         if len(msg.split(" ")) == 1:
             return objects.Reply("Debe ingresar un número después del comando, por ejemplo\n\n--dados 6", False)
         else :

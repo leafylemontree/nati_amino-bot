@@ -8,6 +8,7 @@ async def delete_comment(ctx, commentId, userId):
      return
 
 @utils.isStaff
+@utils.userTracker("eliminarcomentarios")
 async def deleteComments(ctx):
 
     await ctx.send("Eliminando comentarios...")

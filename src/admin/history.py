@@ -1,5 +1,6 @@
 from src import objects
 import asyncio
+from src import utils
 
 STRIKE          = 205
 TITLE_CHANGE    = 207
@@ -60,6 +61,8 @@ async def get_user_moderation(ctx, userId, modType='WARN'):
     return counter
 
 
+
+@utils.userTracker("historial")
 async def get_history(ctx):
     #adminLogList = await moderation_history(ctx, userId=ctx.msg.author.uid, size=100)
     try:    adminLogList = await moderation_history(ctx, userId="7d470c61-c596-4b1c-a0b6-ffd7c9e581c6", size=100)
